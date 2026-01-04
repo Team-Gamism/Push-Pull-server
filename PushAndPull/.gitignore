@@ -1,0 +1,125 @@
+﻿# .NET build output
+bin/
+obj/
+
+# NuGet
+project.assets.json
+project.nuget.cache
+*.nuget.*
+
+# 디폴트 무시된 파일
+/shelf/
+/workspace.xml
+
+# Rider에서 무시된 파일
+/projectSettingsUpdater.xml
+/.idea.PushAndPull.iml
+/modules.xml
+/contentModel.xml
+
+# 쿼리 파일을 포함한 무시된 디폴트 폴더
+/queries/
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# 에디터 기반 HTTP 클라이언트 요청
+/httpRequests/
+
+# Rider 사용자별 설정
+/dictionaries/
+*.sw?
+.idea_modules/
+
+# 작업 및 통계
+/tasks.xml
+/usage.statistics.xml
+/statistics.xml
+
+# 빌드 및 컴파일 캐시
+/caches/
+/compiler.xml
+/encodings.xml
+/misc.xml
+/vcs.xml
+
+# 사용자 라이브러리
+/libraries/
+
+# 실행 구성 (선택사항)
+# 팀원과 공유하고 싶다면 주석처리
+/runConfigurations/
+
+# 로컬 히스토리
+/localHistory/
+
+# 인덱싱
+/indexLayout.xml
+
+# 동적 생성 파일
+/dynamic.xml
+
+# 플러그인
+/externalDependencies.xml
+/jarRepositories.xml
+
+# 디버깅
+/debugger.xml
+
+# 코드 스타일 (팀원과 공유하고 싶다면 주석처리)
+# /codeStyles/
+
+# 검사 프로필 (팀원과 공유하고 싶다면 주석처리)
+# /inspectionProfiles/
+
+# 사용자별 UI 설정
+/uiDesigner.xml
+/dbnavigator.xml
+
+# Git 도구창
+/git_toolbox_prj.xml
+
+# 파일 색상
+/fileColors.xml
+
+# 스크래치 파일
+/scratches/
+
+# 로컬 DB 스키마
+/dbSchemas/
+
+# SQL 다이얼렉트
+/sqldialects.xml
+
+# 프로젝트 레벨 사전
+/dictionaries/
+
+# TODO 설정
+/aws.xml
+
+# 파일 템플릿
+/fileTemplates/
+
+# 프로젝트 뷰
+/projectView.xml
+
+# 스코프
+/scopes/
+
+# Rider 특정 설정
+/.idea.*.dir/
+*.iws
+/sonarlint/
+
+# Avalonia 관련 (사용 시)
+/avalonia.xml
+
+# 사용자 사전
+/shelf.xml
+
+# NuGet 캐시 (Rider)
+/.idea.*/
+
+# 파일 인코딩
+/fileEncodings.xml
