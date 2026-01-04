@@ -3,19 +3,18 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>git rm -r --cached .
-        git add .
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Api\" />
-      <Folder Include="Application\" />
-      <Folder Include="Domain\" />
-      <Folder Include="Infrastructure\" />
+        <Folder Include="Api\" />
+        <Folder Include="Application\" />
+        <Folder Include="Domain\" />
+        <Folder Include="Infrastructure\" />
     </ItemGroup>
 
 </Project>
