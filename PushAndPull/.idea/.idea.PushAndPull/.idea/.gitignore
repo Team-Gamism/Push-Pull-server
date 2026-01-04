@@ -1,0 +1,50 @@
+﻿# 디폴트 무시된 파일
+/shelf/
+/workspace.xml
+# Rider에서 무시된 파일
+/projectSettingsUpdater.xml
+/.idea.PushAndPull.iml
+/modules.xml
+/contentModel.xml
+# 쿼리 파일을 포함한 무시된 디폴트 폴더
+/queries/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# 에디터 기반 HTTP 클라이언트 요청
+/httpRequests/
+# Rider 사용자별 설정
+/dictionaries/
+*.sw?
+.idea_modules/
+
+# 작업 관련
+/tasks.xml
+/usage.statistics.xml
+/statistics.xml
+
+# 빌드 캐시
+/caches/
+/compiler.xml
+/encodings.xml
+/misc.xml
+/vcs.xml
+
+# 사용자 라이브러리
+/libraries/
+
+# 실행 구성 (팀원과 공유하지 않을 경우)
+/runConfigurations/
+
+# 로컬 히스토리
+/localHistory/
+
+# 인덱싱 캐시
+/indexLayout.xml
+
+# 동적으로 생성된 파일
+/dynamic.xml
+
+# 플러그인 관련
+/externalDependencies.xml
+/jarRepositories.xml
