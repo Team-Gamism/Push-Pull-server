@@ -17,7 +17,6 @@
     <ItemGroup>
         <Folder Include="Api\Controller\" />
         <Folder Include="Api\Dto\" />
-        <Folder Include="Application\Usecase\" />
         <Folder Include="Domain\Entity\" />
         <Folder Include="Infrastructure\Persistence\" />
     </ItemGroup>
