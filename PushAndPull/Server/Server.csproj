@@ -12,7 +12,8 @@
 
     <ItemGroup>
         <Folder Include="Api\Controller\" />
-        <Folder Include="Application\" />
+        <Folder Include="Api\Dto\" />
+        <Folder Include="Application\Usecase\" />
         <Folder Include="Domain\" />
         <Folder Include="Infrastructure\" />
     </ItemGroup>
