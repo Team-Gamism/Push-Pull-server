@@ -1,16 +1,16 @@
 using Server.Application.Port.Input;
+using Server.Application.Port.Output;
 using Server.Application.Service;
-using Server.Infrastructure.Auth;
 
 namespace Server.Application.UseCase.Auth;
 
 public class LoginUseCase : ILoginUseCase
 {
-    private readonly SteamAuthTicketValidator _validator;
+    private readonly IAuthTicketValidator _validator;
     private readonly SessionService _sessionService;
 
     public LoginUseCase(
-        SteamAuthTicketValidator validator,
+        IAuthTicketValidator validator,
         SessionService sessionService
         )
     {
