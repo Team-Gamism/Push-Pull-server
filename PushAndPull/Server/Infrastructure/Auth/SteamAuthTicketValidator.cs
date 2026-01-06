@@ -31,7 +31,7 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
         {
             var url = 
                 $"https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/?" + 
-                $"?key={Uri.EscapeDataString(_apiKey)}" + 
+                $"key={Uri.EscapeDataString(_apiKey)}" + 
                 $"&appid={_appId}" + 
                 $"&ticket={Uri.EscapeDataString(ticket)}";
         
