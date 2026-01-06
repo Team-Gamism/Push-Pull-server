@@ -2,7 +2,7 @@ using Server.Application.Port.Input;
 using Server.Application.Service;
 using Server.Infrastructure.Auth;
 
-namespace Server.Application.Usecase.Auth;
+namespace Server.Application.UseCase.Auth;
 
 public class LoginUseCase : ILoginUseCase
 {
