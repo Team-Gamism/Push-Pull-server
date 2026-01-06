@@ -29,10 +29,11 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
 
         try
         {
-            var url = $"https://api.example.com" +
-                      $"?key={Uri.EscapeDataString(_apiKey)}" +
-                      $"&appid={_appId}" +
-                      $"&ticket={Uri.EscapeDataString(ticket)}";
+            var url = 
+                $"https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/?" + 
+                $"?key={Uri.EscapeDataString(_apiKey)}" + 
+                $"&appid={_appId}" + 
+                $"&ticket={Uri.EscapeDataString(ticket)}";
         
             var response = await _httpClient.GetAsync(url);
             if (!response.IsSuccessStatusCode)
