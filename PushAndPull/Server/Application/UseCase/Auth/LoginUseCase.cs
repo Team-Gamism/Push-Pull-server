@@ -7,11 +7,11 @@ namespace Server.Application.UseCase.Auth;
 public class LoginUseCase : ILoginUseCase
 {
     private readonly IAuthTicketValidator _validator;
-    private readonly SessionService _sessionService;
+    private readonly ISessionService _sessionService;
 
     public LoginUseCase(
         IAuthTicketValidator validator,
-        SessionService sessionService
+        ISessionService sessionService
         )
     {
         _validator = validator;

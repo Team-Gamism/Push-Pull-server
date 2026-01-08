@@ -1,10 +1,10 @@
 using Server.Application.Port.Output;
-using Server.Domain.ValueObject;
+using Server.Domain.Entity;
 using Server.Infrastructure.Cache;
 
 namespace Server.Application.Service;
 
-public class SessionService
+public class SessionService : ISessionService
 {
     private readonly ICacheStore _cacheStore;
     
@@ -15,16 +15,12 @@ public class SessionService
 
     public async Task<PlayerSession> CreateAsync(ulong steamId, TimeSpan ttl)
     {
-        var session = new PlayerSession(
-            Guid.NewGuid(),
-            steamId,
-            DateTime.UtcNow.Add(ttl)
-        );
-
+        var session = new PlayerSession(steamId, ttl);
+        
         await _cacheStore.SetAsync(
             CacheKey.Session.ById(session.SessionId),
             session,
-            ttl
+            session.Ttl
         );
         
         return session;
