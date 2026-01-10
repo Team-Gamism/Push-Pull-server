@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
+using Server.Api.Dto.Response;
 using Server.Application.Port.Input;
 
 namespace Server.Api.Controller
@@ -21,10 +22,13 @@ namespace Server.Api.Controller
             )
         {
             var result = await _loginUseCase.ExecuteAsync(new LoginCommand(
-                request.SteamTicket)
+                request.SteamTicket
+                )
             );
             
-            return Ok(result);
+            var response = new LoginResponse(result.SessionId);
+            
+            return Ok(response);
         }
     }
 }
