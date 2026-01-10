@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Api.Dto.Request;
 using Server.Api.Dto.Response;
 using Server.Application.Port.Input;
-using Server.Application.Port.Output;
 
 namespace Server.Api.Controller
 {
