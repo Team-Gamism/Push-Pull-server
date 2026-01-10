@@ -17,7 +17,7 @@ namespace Server.Api.Controller
         }
         
         [HttpPost]
-        public async Task<IActionResult> Login(
+        public async Task<ActionResult<LoginResponse>> Login(
             [FromBody] LoginRequest request
             )
         {
