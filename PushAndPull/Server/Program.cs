@@ -21,7 +21,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 
 builder.Services.AddScoped<ICacheStore, CacheStore>();
 builder.Services.AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>();
-builder.Services.AddScoped<SessionService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 
 var app = builder.Build();
