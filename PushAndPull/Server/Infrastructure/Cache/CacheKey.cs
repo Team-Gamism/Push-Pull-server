@@ -4,6 +4,6 @@ public static class CacheKey
 {
     public static class Session
     {
-        public static string ById(Guid sessionId) => $"session:{sessionId}";
+        public static string ById(string sessionId) => $"session:{sessionId}";
     }
 }

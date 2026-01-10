@@ -36,7 +36,7 @@ public class CacheStore : ICacheStore
         return JsonSerializer.Deserialize<T>(value!);
     }
 
-    public async Task RemoveAsync(string key)
+    public async Task DeleteAsync(string key)
     {
         await _db.KeyDeleteAsync(key);
     }

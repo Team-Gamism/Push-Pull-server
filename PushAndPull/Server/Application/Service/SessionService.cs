@@ -26,16 +26,21 @@ public class SessionService : ISessionService
         return session;
     }
     
-    public async Task<PlayerSession?> GetAsync(Guid sessionId)
+    public async Task<PlayerSession?> GetAsync(string sessionId)
     {
         return await _cacheStore.GetAsync<PlayerSession>(CacheKey.Session.ById(sessionId));
     }
-    
-    public async Task RemoveSessionAsync(Guid sessionId)
+
+    public async Task DeleteAsync(string sessionId)
+    {
+        await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
+    }
+
+    public async Task RemoveSessionAsync(string sessionId)
     {
         var session = await GetAsync(sessionId);
         if (session == null) return;
 
-        await _cacheStore.RemoveAsync(CacheKey.Session.ById(sessionId));
+        await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
     }
 }
