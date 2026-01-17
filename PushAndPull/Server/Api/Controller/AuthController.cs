@@ -21,7 +21,7 @@ namespace Server.Api.Controller
             _logoutUseCase = logoutUseCase;
         }
         
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login(
             [FromBody] LoginRequest request
             )
@@ -36,7 +36,7 @@ namespace Server.Api.Controller
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout(
             [FromHeader] string sessionId
             )
