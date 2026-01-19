@@ -1,6 +1,5 @@
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
-using Server.Application.Service;
 
 namespace Server.Application.UseCase.Auth;
 
@@ -26,6 +25,6 @@ public class LoginUseCase : ILoginUseCase
             authResult.SteamId, TimeSpan.FromDays(15)
             );
         
-        return new LoginResult(session.SessionId.ToString());
+        return new LoginResult(session.SessionId);
     }
 }
