@@ -7,8 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Azure.Identity" Version="1.17.1" />
+        <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.8.0" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.11" />
         <PackageReference Include="Npgsql" Version="10.0.1" />
         <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
@@ -16,7 +22,6 @@
 
     <ItemGroup>
         <Folder Include="Api\Controller\" />
-        <Folder Include="Infrastructure\Persistence\" />
     </ItemGroup>
 
 </Project>
