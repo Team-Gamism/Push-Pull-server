@@ -1,3 +1,5 @@
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
 using Server.Application.Service;
@@ -8,9 +10,22 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var keyVaultUri = new Uri(builder.Configuration["KeyVault:Uri"]!);
+var secretName = builder.Configuration["KeyVault:DbConnectionSecretName"]!;
+
+var credential = new DefaultAzureCredential();
+var secretClient = new SecretClient(keyVaultUri, credential);
+
+KeyVaultSecret secret = await secretClient.GetSecretAsync(secretName);
+string connectionString = secret.Value;
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddSingleton(connectionString);
+
+builder.Services.AddScoped<Npgsql.NpgsqlConnection>(_ =>
+    new Npgsql.NpgsqlConnection(connectionString));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 {
