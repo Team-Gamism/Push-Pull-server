@@ -2,8 +2,52 @@
 
 public class Room
 {
-    public string Code { get; set; }
-    public string Name { get; set; }
-    public string Password { get; set; }
+    public long Id { get; set; }
+    
+    public string RoomCode { get; set; } = null!;
+    public long SteamLobbyId { get; set; }
+    
+    public long HostSteamId { get; set; }
+    public int MaxPlayers { get; set; }
+    
     public bool IsPrivate { get; set; }
+    public string? PasswordHash { get; set; }
+    
+    public string Status { get; set; } = "ACTIVE";
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
+    
+    protected Room() { }
+    
+    public Room(
+        string roomCode,
+        long steamLobbyId,
+        long hostSteamId,
+        int maxPlayers,
+        bool isPrivate,
+        string? passwordHash
+    )
+    {
+        RoomCode = roomCode;
+        SteamLobbyId = steamLobbyId;
+        HostSteamId = hostSteamId;
+        MaxPlayers = maxPlayers;
+        IsPrivate = isPrivate;
+        PasswordHash = passwordHash;
+        Status = "ACTIVE";
+        CreatedAt = DateTimeOffset.UtcNow;
+    }
+    
+    public void MarkDeleting(TimeSpan ttl)
+    {
+        Status = "DELETING";
+        ExpiresAt = DateTimeOffset.UtcNow.Add(ttl);
+    }
+
+    public void Close()
+    {
+        Status = "CLOSED";
+        ExpiresAt = DateTimeOffset.UtcNow;
+    }
 }
