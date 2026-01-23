@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
+using Server.Application.Port.Output.Persistence;
 using Server.Application.Service;
 using Server.Application.UseCase.Auth;
 using Server.Infrastructure.Auth;
 using Server.Infrastructure.Cache;
 using Server.Infrastructure.Persistence.DbContext;
+using Server.Infrastructure.Persistence.Repository;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +45,8 @@ builder.Services.AddScoped<ICacheStore, CacheStore>();
 builder.Services.AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
 var app = builder.Build();
 
