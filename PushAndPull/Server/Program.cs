@@ -1,11 +1,15 @@
+using System.Data;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
 using Server.Application.Service;
 using Server.Application.UseCase.Auth;
 using Server.Infrastructure.Auth;
 using Server.Infrastructure.Cache;
+using Server.Infrastructure.Persistence.DbContext;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,10 +26,10 @@ string connectionString = secret.Value;
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.Services.AddSingleton(connectionString);
-
-builder.Services.AddScoped<Npgsql.NpgsqlConnection>(_ =>
-    new Npgsql.NpgsqlConnection(connectionString));
+builder.Services.AddDbContext<RoomContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+});
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 {
@@ -35,6 +39,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 });
 
 builder.Services.AddScoped<ICacheStore, CacheStore>();
+
 builder.Services.AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
@@ -47,9 +52,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
