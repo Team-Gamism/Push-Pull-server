@@ -1,8 +1,6 @@
-using System.Data;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
 using Server.Application.Port.Output.Persistence;
@@ -12,6 +10,7 @@ using Server.Infrastructure.Auth;
 using Server.Infrastructure.Cache;
 using Server.Infrastructure.Persistence.DbContext;
 using Server.Infrastructure.Persistence.Repository;
+using Server.Infrastructure.Service;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +46,9 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+
+builder.Services.AddSingleton<IRoomCodeGenerator, RoomCodeGenerator>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 var app = builder.Build();
 
