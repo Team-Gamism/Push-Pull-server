@@ -5,7 +5,7 @@ public class Room
     public long Id { get; set; }
     
     public string RoomCode { get; set; } = null!;
-    public long SteamLobbyId { get; set; }
+    public ulong SteamLobbyId { get; set; }
     
     public long HostSteamId { get; set; }
     public int MaxPlayers { get; set; }
@@ -22,7 +22,7 @@ public class Room
     
     public Room(
         string roomCode,
-        long steamLobbyId,
+        ulong steamLobbyId,
         long hostSteamId,
         int maxPlayers,
         bool isPrivate,
