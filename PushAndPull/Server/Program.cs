@@ -6,6 +6,7 @@ using Server.Application.Port.Output;
 using Server.Application.Port.Output.Persistence;
 using Server.Application.Service;
 using Server.Application.UseCase.Auth;
+using Server.Application.UseCase.Room;
 using Server.Infrastructure.Auth;
 using Server.Infrastructure.Cache;
 using Server.Infrastructure.Persistence.DbContext;
@@ -25,7 +26,6 @@ KeyVaultSecret secret = await secretClient.GetSecretAsync(secretName);
 string connectionString = secret.Value;
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<RoomContext>(options =>
 {
@@ -50,14 +50,11 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddSingleton<IRoomCodeGenerator, RoomCodeGenerator>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+builder.Services.AddScoped<ICreateRoomUseCase, CreateRoomUseCase>();
+builder.Services.AddScoped<IGetRoomUseCase, GetRoomUseCase>();
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.MapControllers();
 app.Run();
