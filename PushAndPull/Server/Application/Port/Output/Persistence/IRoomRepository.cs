@@ -6,6 +6,6 @@ public interface IRoomRepository
 {
     Task<Room?> GetAsync(string roomCode);
     Task CreateAsync(Room room);
-    Task<Room> UpdateAsync(Room room);
-    Task DeleteAsync(string roomCode);
+    Task UpdateAsync(Room room);
+    Task CloseAsync(string roomCode);
 }

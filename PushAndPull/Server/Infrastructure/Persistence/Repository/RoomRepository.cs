@@ -27,14 +27,13 @@ public class RoomRepository : IRoomRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Room> UpdateAsync(Room room)
+    public async Task UpdateAsync(Room room)
     {
         _context.Rooms.Update(room);
         await _context.SaveChangesAsync();
-        return room;
     }
 
-    public async Task DeleteAsync(string roomCode)
+    public async Task CloseAsync(string roomCode)
     {
         var room = await _context.Rooms
             .FirstOrDefaultAsync(x => x.RoomCode == roomCode);
@@ -42,9 +41,7 @@ public class RoomRepository : IRoomRepository
         if (room == null)
             return;
 
-        room.Status = "CLOSED";
-        room.ExpiresAt = DateTime.UtcNow;
-
+        room.Close();
         await _context.SaveChangesAsync();
     }
 }

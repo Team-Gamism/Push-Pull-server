@@ -23,6 +23,10 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
             entity.Property(x => x.Id)
                 .HasColumnName("id");
 
+            entity.Property(x => x.Name)
+                .HasColumnName("name")
+                .IsRequired();
+
             entity.Property(x => x.RoomCode)
                 .HasColumnName("room_code")
                 .HasMaxLength(20)
