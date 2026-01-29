@@ -3,6 +3,7 @@
 public class Room
 {
     public long Id { get; set; }
+    public string Name { get; set; }
     
     public string RoomCode { get; set; } = null!;
     public ulong SteamLobbyId { get; set; }
@@ -22,6 +23,7 @@ public class Room
     
     public Room(
         string roomCode,
+        string roomName,
         ulong steamLobbyId,
         long hostSteamId,
         int maxPlayers,
@@ -30,6 +32,7 @@ public class Room
     )
     {
         RoomCode = roomCode;
+        Name = roomName;
         SteamLobbyId = steamLobbyId;
         HostSteamId = hostSteamId;
         MaxPlayers = maxPlayers;
