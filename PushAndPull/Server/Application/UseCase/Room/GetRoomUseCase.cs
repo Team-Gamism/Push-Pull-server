@@ -22,8 +22,9 @@ public class GetRoomUseCase : IGetRoomUseCase
                    ?? throw new RoomNotFoundException(request.RoomCode);
 
         return new GetRoomResult(
-            room.Name,
+            room.RoomName,
             room.RoomCode,
+            room.CurrentPlayers,
             room.MaxPlayers,
             room.IsPrivate
         );

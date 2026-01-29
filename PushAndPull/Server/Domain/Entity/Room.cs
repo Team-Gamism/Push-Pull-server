@@ -3,12 +3,14 @@
 public class Room
 {
     public long Id { get; set; }
-    public string Name { get; set; }
+    public string RoomName { get; set; }
     
     public string RoomCode { get; set; } = null!;
     public ulong SteamLobbyId { get; set; }
     
     public long HostSteamId { get; set; }
+    
+    public int CurrentPlayers { get; set; }
     public int MaxPlayers { get; set; }
     
     public bool IsPrivate { get; set; }
@@ -32,7 +34,7 @@ public class Room
     )
     {
         RoomCode = roomCode;
-        Name = roomName;
+        RoomName = roomName;
         SteamLobbyId = steamLobbyId;
         HostSteamId = hostSteamId;
         MaxPlayers = maxPlayers;

@@ -12,6 +12,7 @@ public record GetRoomCommand(
 public record GetRoomResult(
     string RoomName,
     string RoomCode,
+    int CurrnetPlayers,
     int MaxPlayers,
     bool IsPrivate
     );

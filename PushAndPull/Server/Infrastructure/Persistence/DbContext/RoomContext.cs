@@ -23,8 +23,8 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
             entity.Property(x => x.Id)
                 .HasColumnName("id");
 
-            entity.Property(x => x.Name)
-                .HasColumnName("name")
+            entity.Property(x => x.RoomName)
+                .HasColumnName("room_name")
                 .IsRequired();
 
             entity.Property(x => x.RoomCode)
@@ -42,6 +42,10 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
 
             entity.Property(x => x.HostSteamId)
                 .HasColumnName("host_steam_id")
+                .IsRequired();
+            
+            entity.Property(x => x.CurrentPlayers)
+                .HasColumnName("current_players")
                 .IsRequired();
 
             entity.Property(x => x.MaxPlayers)
