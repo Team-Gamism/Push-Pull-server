@@ -64,9 +64,9 @@ namespace Server.Api.Controller
             );
             
             var response = new GetRoomResponse(
-                result.RoomName,
                 result.RoomCode,
-                result.MaxPlayers,
+                result.RoomName,
+                result.CurrnetPlayers,
                 result.IsPrivate
             );
             

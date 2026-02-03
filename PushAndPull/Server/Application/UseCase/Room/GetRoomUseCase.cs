@@ -25,7 +25,6 @@ public class GetRoomUseCase : IGetRoomUseCase
             room.RoomName,
             room.RoomCode,
             room.CurrentPlayers,
-            room.MaxPlayers,
             room.IsPrivate
         );
     }
