@@ -34,7 +34,6 @@ public class CreateRoomUseCase : ICreateRoomUseCase
             roomName: request.RoomName,
             steamLobbyId: request.LobbyId,
             hostSteamId: request.HostSteamId,
-            maxPlayers: request.MaxPlayers,
             isPrivate: request.IsPrivate,
             passwordHash: passwordHash
         );

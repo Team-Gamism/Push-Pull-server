@@ -10,7 +10,6 @@ public record CreateRoomCommand(
     string RoomName,
     bool IsPrivate,
     string? Password,
-    int MaxPlayers,
     long HostSteamId
     );
 

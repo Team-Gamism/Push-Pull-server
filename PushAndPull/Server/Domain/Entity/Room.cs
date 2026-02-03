@@ -11,7 +11,7 @@ public class Room
     public long HostSteamId { get; set; }
     
     public int CurrentPlayers { get; set; }
-    public int MaxPlayers { get; set; }
+    public int MaxPlayers { get; private set; }
     
     public bool IsPrivate { get; set; }
     public string? PasswordHash { get; set; }
@@ -28,7 +28,6 @@ public class Room
         string roomName,
         ulong steamLobbyId,
         long hostSteamId,
-        int maxPlayers,
         bool isPrivate,
         string? passwordHash
     )
@@ -37,11 +36,20 @@ public class Room
         RoomName = roomName;
         SteamLobbyId = steamLobbyId;
         HostSteamId = hostSteamId;
-        MaxPlayers = maxPlayers;
+        CurrentPlayers = 1;
+        MaxPlayers = 2;
         IsPrivate = isPrivate;
         PasswordHash = passwordHash;
         Status = "ACTIVE";
         CreatedAt = DateTimeOffset.UtcNow;
+    }
+    
+    public void Join()
+    {
+        if (CurrentPlayers >= MaxPlayers)
+            throw new InvalidOperationException("FULL_ROOM");
+
+        CurrentPlayers++;
     }
     
     public void MarkDeleting(TimeSpan ttl)
