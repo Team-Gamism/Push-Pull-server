@@ -52,6 +52,7 @@ builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<ICreateRoomUseCase, CreateRoomUseCase>();
 builder.Services.AddScoped<IGetRoomUseCase, GetRoomUseCase>();
+builder.Services.AddScoped<IGetAllRoomUseCase, GetAllRoomUseCase>();
 builder.Services.AddScoped<IJoinRoomUseCase, JoinRoomUseCase>();
 
 var app = builder.Build();

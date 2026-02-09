@@ -1,6 +1,7 @@
 ﻿using Server.Application.Port.Input;
 using Server.Application.Port.Output;
 using Server.Application.Port.Output.Persistence;
+using Server.Domain.Entity;
 using Server.Domain.Exception.Room;
 
 namespace Server.Application.UseCase.Room;
@@ -24,7 +25,7 @@ public class JoinRoomUseCase : IJoinRoomUseCase
         var room = await _roomRepository.GetAsync(request.RoomCode)
             ?? throw new RoomNotFoundException(request.RoomCode);
         
-        if (room.Status != "ACTIVE")
+        if (room.Status != RoomStatus.Active)
             throw new RoomNotActiveException(request.RoomCode);
 
         if (request.Password != null)

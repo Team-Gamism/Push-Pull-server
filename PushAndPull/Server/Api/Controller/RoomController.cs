@@ -13,16 +13,19 @@ namespace Server.Api.Controller
     {
         private readonly ICreateRoomUseCase _createRoomUseCase;
         private readonly IGetRoomUseCase _getRoomUseCase;
+        private readonly IGetAllRoomUseCase _getAllRoomUseCase;
         private readonly IJoinRoomUseCase _joinRoomUseCase;
 
         public RoomController(
             ICreateRoomUseCase createRoomUseCase,
             IGetRoomUseCase getRoomUseCase,
+            IGetAllRoomUseCase getAllRoomUseCase,
             IJoinRoomUseCase joinRoomUseCase
             )
         {
             _createRoomUseCase = createRoomUseCase;
             _getRoomUseCase = getRoomUseCase;
+            _getAllRoomUseCase = getAllRoomUseCase;
             _joinRoomUseCase = joinRoomUseCase;
         }
         
@@ -66,8 +69,25 @@ namespace Server.Api.Controller
             var response = new GetRoomResponse(
                 result.RoomCode,
                 result.RoomName,
-                result.CurrnetPlayers,
+                result.CurrentPlayers,
                 result.IsPrivate
+            );
+            
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        public async Task<ActionResult<GetAllRoomResponse>> GetAllRoom(CancellationToken ct)
+        {
+            var result = await _getAllRoomUseCase.ExecuteAsync(ct);
+
+            var response = new GetAllRoomResponse(
+                result.Rooms.Select(r => new GetRoomResponse(
+                    r.RoomCode,
+                    r.RoomName,
+                    r.CurrentPlayers,
+                    r.IsPrivate
+                )).ToList()   
             );
             
             return Ok(response);

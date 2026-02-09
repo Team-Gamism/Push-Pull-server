@@ -3,6 +3,6 @@
 public record GetRoomResponse(
     string RoomCode,
     string RoomName,
-    int CurrnetPlayers,
+    int CurrentPlayers,
     bool IsPrivate
     );

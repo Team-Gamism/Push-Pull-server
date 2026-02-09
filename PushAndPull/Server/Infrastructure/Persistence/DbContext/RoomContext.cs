@@ -64,7 +64,7 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
                 .HasColumnName("status")
                 .HasMaxLength(20)
                 .IsRequired()
-                .HasDefaultValue("ACTIVE");
+                .HasConversion<string>();
 
             entity.HasIndex(x => x.Status)
                 .HasDatabaseName("idx_room_status");

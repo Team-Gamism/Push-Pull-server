@@ -21,6 +21,15 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefaultAsync(x => x.RoomCode == roomCode);
     }
 
+    public async Task<IReadOnlyList<Room>> GetAllAsync(CancellationToken ct)
+    {
+        return await _context.Rooms
+            .AsNoTracking()
+            .Where(x => x.Status == RoomStatus.Active)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync(ct);
+    }
+
     public async Task CreateAsync(Room room)
     {
         _context.Rooms.Add(room);

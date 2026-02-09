@@ -1,4 +1,5 @@
-﻿using Server.Application.Port.Input;
+﻿using Server.Application.Dto;
+using Server.Application.Port.Input;
 using Server.Application.Port.Output.Persistence;
 using Server.Domain.Exception.Room;
 
@@ -20,7 +21,7 @@ public class GetRoomUseCase : IGetRoomUseCase
 
         var room = await _roomRepository.GetAsync(request.RoomCode)
                    ?? throw new RoomNotFoundException(request.RoomCode);
-
+        
         return new GetRoomResult(
             room.RoomName,
             room.RoomCode,

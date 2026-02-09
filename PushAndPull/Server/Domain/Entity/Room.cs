@@ -16,7 +16,7 @@ public class Room
     public bool IsPrivate { get; set; }
     public string? PasswordHash { get; set; }
     
-    public string Status { get; set; } = "ACTIVE";
+    public RoomStatus Status { get; set; }
     
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? ExpiresAt { get; set; }
@@ -40,7 +40,7 @@ public class Room
         MaxPlayers = 2;
         IsPrivate = isPrivate;
         PasswordHash = passwordHash;
-        Status = "ACTIVE";
+        Status = RoomStatus.Active;
         CreatedAt = DateTimeOffset.UtcNow;
     }
     
@@ -54,13 +54,21 @@ public class Room
     
     public void MarkDeleting(TimeSpan ttl)
     {
-        Status = "DELETING";
+        Status = RoomStatus.Deleting;
         ExpiresAt = DateTimeOffset.UtcNow.Add(ttl);
     }
 
     public void Close()
     {
-        Status = "CLOSED";
+        Status = RoomStatus.Closed;
         ExpiresAt = DateTimeOffset.UtcNow;
     }
+}
+
+
+public enum RoomStatus
+{
+    Active,
+    Deleting,
+    Closed
 }
