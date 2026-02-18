@@ -1,0 +1,27 @@
+name: Deploy pushandpull-server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "seanyee1227" --password-stdin
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          -t seanyee1227/pushandpull-server:latest \
+          -f PushAndPull/Server/Dockerfile \
+          PushAndPull/Server
+
+    - name: Push Docker image
+      run: docker push seanyee1227/pushandpull-server:latest
