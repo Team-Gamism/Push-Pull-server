@@ -1,5 +1,6 @@
 namespace Server.Api.Dto.Request;
 
 public record LoginRequest(
-    string SteamTicket
+    string SteamTicket,
+    string Nickname
     );

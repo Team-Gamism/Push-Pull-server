@@ -29,7 +29,8 @@ namespace Server.Api.Controller
             )
         {
             var result = await _loginUseCase.ExecuteAsync(new LoginCommand(
-                request.SteamTicket
+                request.SteamTicket,
+                request.Nickname
                 )
             );
             
