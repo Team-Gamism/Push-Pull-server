@@ -3,12 +3,12 @@ using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Persistence.DbContext;
 
-public class AppContext : Microsoft.EntityFrameworkCore.DbContext
+public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<User> Users => Set<User>();
     
-    public AppContext(DbContextOptions<AppContext> options)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
     }

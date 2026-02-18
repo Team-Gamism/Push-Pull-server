@@ -3,9 +3,9 @@
 public class User
 {
     public ulong SteamId { get; private set; }
-    public string Nickname { get; private set; }
+    public string Nickname { get; set; }
     public DateTime CreatedAt { get; private set; }
-    public DateTime LastLoginAt { get; private set; }
+    public DateTime LastLoginAt { get; set; }
 
     private User() { }
 

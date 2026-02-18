@@ -2,15 +2,14 @@
 using Server.Application.Port.Output.Persistence;
 using Server.Domain.Entity;
 using Server.Infrastructure.Persistence.DbContext;
-using AppContext = Server.Infrastructure.Persistence.DbContext.AppContext;
 
 namespace Server.Infrastructure.Persistence.Repository;
 
 public class RoomRepository : IRoomRepository
 {
-    private readonly AppContext _context;
+    private readonly AppDbContext _context;
     
-    public RoomRepository(AppContext context)
+    public RoomRepository(AppDbContext context)
     {
         _context = context;
     }
