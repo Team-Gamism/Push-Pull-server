@@ -43,7 +43,9 @@ builder.Services.AddScoped<ICacheStore, CacheStore>();
 
 builder.Services.AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>();
 builder.Services.AddScoped<ISessionService, SessionService>();
+
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+builder.Services.AddScoped<ILogoutUseCase, LogoutUseCase>();
 
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
