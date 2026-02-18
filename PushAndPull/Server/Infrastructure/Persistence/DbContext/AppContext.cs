@@ -3,17 +3,41 @@ using Server.Domain.Entity;
 
 namespace Server.Infrastructure.Persistence.DbContext;
 
-public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
+public class AppContext : Microsoft.EntityFrameworkCore.DbContext
 {
     public DbSet<Room> Rooms => Set<Room>();
+    public DbSet<User> Users => Set<User>();
     
-    public RoomContext(DbContextOptions<RoomContext> options)
+    public AppContext(DbContextOptions<AppContext> options)
         : base(options)
     {
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("user", "user");
+
+            entity.HasKey(x => x.SteamId);
+
+            entity.Property(x => x.SteamId)
+                .HasColumnName("steam_id");
+
+            entity.Property(x => x.Nickname)
+                .HasColumnName("nickname")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .HasColumnType("timestamptz");
+
+            entity.Property(x => x.LastLoginAt)
+                .HasColumnName("last_login_at")
+                .HasColumnType("timestamptz");
+        });
+        
         modelBuilder.Entity<Room>(entity =>
         {
             entity.ToTable("room", "room");
@@ -44,6 +68,9 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
                 .HasColumnName("host_steam_id")
                 .IsRequired();
             
+            entity.HasIndex(x => x.HostSteamId)
+                .HasDatabaseName("idx_room_host_steam_id");
+            
             entity.Property(x => x.CurrentPlayers)
                 .HasColumnName("current_players")
                 .IsRequired();
@@ -68,11 +95,13 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
 
             entity.HasIndex(x => x.Status)
                 .HasDatabaseName("idx_room_status");
+            
+            entity.HasIndex(x => new { x.Status, x.IsPrivate })
+                .HasDatabaseName("idx_room_status_private");
 
             entity.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("timestamptz")
-                .HasDefaultValueSql("now()");
+                .HasColumnType("timestamptz");
 
             entity.Property(x => x.ExpiresAt)
                 .HasColumnName("expires_at")
@@ -80,6 +109,12 @@ public class RoomContext : Microsoft.EntityFrameworkCore.DbContext
 
             entity.HasIndex(x => x.ExpiresAt)
                 .HasDatabaseName("idx_room_expires_at");
+            
+            entity.HasOne(r => r.Host)
+                .WithMany()
+                .HasForeignKey(r => r.HostSteamId)
+                .HasPrincipalKey(u => u.SteamId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

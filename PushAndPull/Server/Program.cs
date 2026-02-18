@@ -13,6 +13,7 @@ using Server.Infrastructure.Persistence.DbContext;
 using Server.Infrastructure.Persistence.Repository;
 using Server.Infrastructure.Service;
 using StackExchange.Redis;
+using AppContext = Server.Infrastructure.Persistence.DbContext.AppContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ string connectionString = secret.Value;
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<RoomContext>(options =>
+builder.Services.AddDbContext<AppContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });

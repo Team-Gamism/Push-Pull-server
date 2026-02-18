@@ -8,6 +8,7 @@ public class Room
     public string RoomCode { get; set; } = null!;
     public ulong SteamLobbyId { get; set; }
     
+    public User Host { get; private set; }
     public long HostSteamId { get; set; }
     
     public int CurrentPlayers { get; set; }
