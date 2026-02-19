@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Server.Api.Attribute;
 using Server.Api.Dto.Request;
 using Server.Api.Dto.Response;
+using Server.Api.Extension;
 using Server.Application.Port.Input;
 
 namespace Server.Api.Controller
@@ -27,7 +29,8 @@ namespace Server.Api.Controller
             )
         {
             var result = await _loginUseCase.ExecuteAsync(new LoginCommand(
-                request.SteamTicket
+                request.SteamTicket,
+                request.Nickname
                 )
             );
             
@@ -36,12 +39,16 @@ namespace Server.Api.Controller
             return Ok(response);
         }
 
+        [SessionAuthorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout(
-            [FromHeader] string sessionId
-            )
+        public async Task<IActionResult> Logout()
         {
-            await _logoutUseCase.ExecuteAsync(new LogoutCommand(sessionId));
+            var sessionId = User.GetSessionId();
+
+            await _logoutUseCase.ExecuteAsync(
+                new LogoutCommand(sessionId)
+            );
+
             return NoContent();
         }
     }
