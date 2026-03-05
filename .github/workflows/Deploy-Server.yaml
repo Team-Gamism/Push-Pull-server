@@ -1,14 +1,11 @@
 name: Deploy pushandpull-server
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -25,3 +22,29 @@ jobs:
 
     - name: Push Docker image
       run: docker push seanyee1227/pushandpull-server:latest
+
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        port: ${{ secrets.SSH_PORT }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker pull seanyee1227/pushandpull-server:latest
+          docker stop pushandpull-server || true
+          docker rm pushandpull-server || true
+          docker run -d \
+            --name pushandpull-server \
+            --restart unless-stopped \
+            -p 21754:80 \
+            -e ASPNETCORE_URLS=http://+:80 \
+            -e ASPNETCORE_ENVIRONMENT=Production \
+            -e AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }} \
+            -e AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }} \
+            -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }} \
+            seanyee1227/pushandpull-server:latest
+
+          sleep 5
+          docker ps | grep pushandpull-server
+          docker logs pushandpull-server --tail 20
