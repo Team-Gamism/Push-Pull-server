@@ -6,7 +6,6 @@ namespace Server.Application.Port.Output.Persistence
     {
         Task<User?> GetBySteamIdAsync(ulong steamId, CancellationToken ct = default);
         Task CreateAsync(User user, CancellationToken ct = default);
-        Task UpdateNicknameAsync(ulong steamId, string newNickname, CancellationToken ct = default);
-        Task UpdateLastLoginAsync(ulong steamId, DateTime lastLoginAt, CancellationToken ct = default);
+        Task UpdateAsync(ulong steamId, string nickname, DateTime lastLoginAt, CancellationToken ct = default);
     }
 }

@@ -27,23 +27,13 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateNicknameAsync(ulong steamId, string newNickname, CancellationToken ct = default)
+    public async Task UpdateAsync(ulong steamId, string nickname, DateTime lastLoginAt, CancellationToken ct = default)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.SteamId == steamId, ct);
-        if (user != null)
-        {
-            user.Nickname = newNickname;
-            await _context.SaveChangesAsync(ct);
-        }
-    }
-
-    public async Task UpdateLastLoginAsync(ulong steamId, DateTime lastLoginAt, CancellationToken ct = default)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.SteamId == steamId, ct);
-        if (user != null)
-        {
-            user.LastLoginAt = lastLoginAt;
-            await _context.SaveChangesAsync(ct);
-        }
+        await _context.Users
+            .Where(u => u.SteamId == steamId)
+            .ExecuteUpdateAsync(s => s
+                    .SetProperty(u => u.Nickname, nickname)
+                    .SetProperty(u => u.LastLoginAt, lastLoginAt),
+                ct);
     }
 }
