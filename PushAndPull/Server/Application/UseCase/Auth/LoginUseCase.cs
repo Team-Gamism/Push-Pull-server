@@ -34,12 +34,7 @@ public class LoginUseCase : ILoginUseCase
         }
         else
         {
-            if (user.Nickname != request.Nickname)
-            {
-                await _userRepository.UpdateNicknameAsync(user.SteamId, request.Nickname);
-            }
-
-            await _userRepository.UpdateLastLoginAsync(user.SteamId, DateTime.UtcNow);
+            await _userRepository.UpdateAsync(user.SteamId, request.Nickname, DateTime.UtcNow);
         }
 
         var session = await _sessionService.CreateAsync(
