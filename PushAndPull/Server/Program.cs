@@ -1,5 +1,4 @@
 using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.EntityFrameworkCore;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
@@ -17,13 +16,10 @@ using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultUri = new Uri(builder.Configuration["KeyVault:Uri"]!);
-var secretName = builder.Configuration["KeyVault:DbConnectionSecretName"]!;
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
-var credential = new DefaultAzureCredential();
-var secretClient = new SecretClient(keyVaultUri, credential);
-
-KeyVaultSecret secret = await secretClient.GetSecretAsync(secretName);
-string connectionString = secret.Value;
+var connectionString = builder.Configuration[builder.Configuration["KeyVault:DbConnectionSecretName"]!]
+                       ?? throw new InvalidOperationException("DB 연결 문자열을 Key Vault에서 가져올 수 없습니다.");
 
 builder.Services.AddControllers();
 
@@ -33,7 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-{
+{   
     var connStr = builder.Configuration["Redis:ConnectionString"]
                   ?? throw new InvalidOperationException();
     return ConnectionMultiplexer.Connect(connStr);
