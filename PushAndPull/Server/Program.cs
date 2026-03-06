@@ -56,6 +56,5 @@ builder.Services.AddScoped<IJoinRoomUseCase, JoinRoomUseCase>();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
