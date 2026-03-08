@@ -9,7 +9,7 @@ public class Room
     public ulong SteamLobbyId { get; set; }
     
     public User Host { get; private set; }
-    public long HostSteamId { get; set; }
+    public ulong HostSteamId { get; set; }
     
     public int CurrentPlayers { get; set; }
     public int MaxPlayers { get; private set; }
@@ -28,7 +28,7 @@ public class Room
         string roomCode,
         string roomName,
         ulong steamLobbyId,
-        long hostSteamId,
+        ulong hostSteamId,
         bool isPrivate,
         string? passwordHash
     )
