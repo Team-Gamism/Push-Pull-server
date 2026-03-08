@@ -1,6 +1,6 @@
+using Server.Application.Cache;
 using Server.Application.Port.Output;
 using Server.Domain.Entity;
-using Server.Infrastructure.Cache;
 
 namespace Server.Application.Service;
 
@@ -36,11 +36,4 @@ public class SessionService : ISessionService
         await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
     }
 
-    public async Task RemoveSessionAsync(string sessionId)
-    {
-        var session = await GetAsync(sessionId);
-        if (session == null) return;
-
-        await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
-    }
 }
