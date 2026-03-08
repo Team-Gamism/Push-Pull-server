@@ -1,4 +1,4 @@
-namespace Server.Infrastructure.Cache;
+namespace Server.Application.Cache;
 
 public static class CacheKey
 {
