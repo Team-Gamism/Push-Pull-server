@@ -19,8 +19,8 @@ public class GetAllRoomUseCase : IGetAllRoomUseCase
         
         var summaries = rooms
             .Select(room => new RoomSummary(
-                room.RoomCode,
                 room.RoomName,
+                room.RoomCode,
                 room.CurrentPlayers,
                 room.IsPrivate
             ))

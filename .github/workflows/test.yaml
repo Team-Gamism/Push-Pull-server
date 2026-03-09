@@ -1,0 +1,20 @@
+name: CI - Build & Test (PushAndPull)
+on:
+  pull_request:
+    branches: ["*"]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: dotnet restore PushAndPull/PushAndPull.sln
+      - name: Build solution
+        run: dotnet build PushAndPull/PushAndPull.sln --configuration Release
+      - name: Run all tests
+        run: dotnet test PushAndPull/PushAndPull.sln --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
