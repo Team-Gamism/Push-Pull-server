@@ -2,10 +2,8 @@ using Server.Domain.Entity;
 
 namespace Tests.Domain;
 
-// Describe: Room
 public class RoomTests
 {
-    // Context: When a player joins an active room
     public class WhenAPlayerJoinsAnActiveRoom
     {
         private readonly Room _room;
@@ -26,7 +24,6 @@ public class RoomTests
         }
     }
 
-    // Context: When a player tries to join a full room
     public class WhenAPlayerTriesToJoinAFullRoom
     {
         private readonly Room _room;
@@ -34,7 +31,7 @@ public class RoomTests
         public WhenAPlayerTriesToJoinAFullRoom()
         {
             _room = new Room("ROOM02", "Full Room", 222UL, 76561198000000001UL, false, null);
-            _room.Join(); // MaxPlayers = 2, now full
+            _room.Join();
         }
 
         [Fact]
@@ -46,7 +43,6 @@ public class RoomTests
         }
     }
 
-    // Context: When a room is marked as deleting
     public class WhenARoomIsMarkedAsDeleting
     {
         private readonly Room _room;
@@ -77,7 +73,6 @@ public class RoomTests
         }
     }
 
-    // Context: When a room is closed
     public class WhenARoomIsClosed
     {
         private readonly Room _room;
@@ -107,7 +102,6 @@ public class RoomTests
         }
     }
 
-    // Context: When a room is created
     public class WhenARoomIsCreated
     {
         [Fact]

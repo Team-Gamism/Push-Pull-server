@@ -5,10 +5,8 @@ using Server.Application.UseCase.Auth;
 
 namespace Tests.UseCase.Auth;
 
-// Describe: LogoutUseCase
 public class LogoutUseCaseTests
 {
-    // Context: When a user logs out with a valid session
     public class WhenAUserLogsOutWithAValidSession
     {
         private readonly Mock<ISessionService> _sessionServiceMock = new();

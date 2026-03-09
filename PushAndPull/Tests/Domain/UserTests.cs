@@ -2,10 +2,8 @@ using Server.Domain.Entity;
 
 namespace Tests.Domain;
 
-// Describe: User
 public class UserTests
 {
-    // Context: When updating a nickname with a valid value
     public class WhenUpdatingNicknameWithAValidValue
     {
         private readonly User _user;
@@ -24,7 +22,6 @@ public class UserTests
         }
     }
 
-    // Context: When updating a nickname with an empty string
     public class WhenUpdatingNicknameWithAnEmptyString
     {
         private readonly User _user;
@@ -43,7 +40,6 @@ public class UserTests
         }
     }
 
-    // Context: When updating the last login time
     public class WhenUpdatingLastLoginTime
     {
         private readonly User _user;
@@ -64,7 +60,6 @@ public class UserTests
         }
     }
 
-    // Context: When a user is created
     public class WhenAUserIsCreated
     {
         [Fact]

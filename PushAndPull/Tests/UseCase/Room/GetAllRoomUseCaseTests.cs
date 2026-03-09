@@ -5,10 +5,8 @@ using EntityRoom = Server.Domain.Entity.Room;
 
 namespace Tests.UseCase.Room;
 
-// Describe: GetAllRoomUseCase
 public class GetAllRoomUseCaseTests
 {
-    // Context: When multiple active rooms exist
     public class WhenMultipleActiveRoomsExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -51,7 +49,6 @@ public class GetAllRoomUseCaseTests
         }
     }
 
-    // Context: When no rooms exist
     public class WhenNoRoomsExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

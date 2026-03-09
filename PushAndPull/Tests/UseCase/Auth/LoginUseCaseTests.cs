@@ -7,10 +7,8 @@ using Server.Application.Port.Input;
 
 namespace Tests.UseCase.Auth;
 
-// Describe: LoginUseCase
 public class LoginUseCaseTests
 {
-    // Context: When a new user logs in for the first time
     public class WhenANewUserLogsInForTheFirstTime
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
@@ -68,7 +66,6 @@ public class LoginUseCaseTests
         }
     }
 
-    // Context: When an existing user logs in again
     public class WhenAnExistingUserLogsInAgain
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();

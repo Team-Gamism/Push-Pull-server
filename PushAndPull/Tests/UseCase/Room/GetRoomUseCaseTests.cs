@@ -7,10 +7,8 @@ using EntityRoom = Server.Domain.Entity.Room;
 
 namespace Tests.UseCase.Room;
 
-// Describe: GetRoomUseCase
 public class GetRoomUseCaseTests
 {
-    // Context: When an empty room code is provided
     public class WhenAnEmptyRoomCodeIsProvided
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -29,7 +27,6 @@ public class GetRoomUseCaseTests
         }
     }
 
-    // Context: When the room does not exist
     public class WhenTheRoomDoesNotExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -54,7 +51,6 @@ public class GetRoomUseCaseTests
         }
     }
 
-    // Context: When the room exists
     public class WhenTheRoomExists
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

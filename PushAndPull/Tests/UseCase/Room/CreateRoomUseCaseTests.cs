@@ -7,10 +7,8 @@ using EntityRoom = Server.Domain.Entity.Room;
 
 namespace Tests.UseCase.Room;
 
-// Describe: CreateRoomUseCase
 public class CreateRoomUseCaseTests
 {
-    // Context: When creating a public room without a password
     public class WhenCreatingAPublicRoomWithoutAPassword
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -69,7 +67,6 @@ public class CreateRoomUseCaseTests
         }
     }
 
-    // Context: When creating a private room with a password
     public class WhenCreatingAPrivateRoomWithAPassword
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

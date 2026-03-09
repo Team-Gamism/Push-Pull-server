@@ -8,10 +8,8 @@ using EntityRoom = Server.Domain.Entity.Room;
 
 namespace Tests.UseCase.Room;
 
-// Describe: JoinRoomUseCase
 public class JoinRoomUseCaseTests
 {
-    // Context: When the room does not exist
     public class WhenTheRoomDoesNotExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -37,7 +35,6 @@ public class JoinRoomUseCaseTests
         }
     }
 
-    // Context: When the room is not active
     public class WhenTheRoomIsNotActive
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -66,7 +63,6 @@ public class JoinRoomUseCaseTests
         }
     }
 
-    // Context: When the wrong password is provided for a private room
     public class WhenTheWrongPasswordIsProvidedForAPrivateRoom
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -102,7 +98,6 @@ public class JoinRoomUseCaseTests
         }
     }
 
-    // Context: When all conditions are valid for joining a room
     public class WhenAllConditionsAreValidForJoiningARoom
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
