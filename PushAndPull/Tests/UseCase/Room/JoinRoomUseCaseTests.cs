@@ -1,0 +1,145 @@
+using Moq;
+using Server.Application.Port.Input;
+using Server.Application.Port.Output;
+using Server.Application.Port.Output.Persistence;
+using Server.Application.UseCase.Room;
+using Server.Domain.Exception.Room;
+using EntityRoom = Server.Domain.Entity.Room;
+
+namespace Tests.UseCase.Room;
+
+// Describe: JoinRoomUseCase
+public class JoinRoomUseCaseTests
+{
+    // Context: When the room does not exist
+    public class WhenTheRoomDoesNotExist
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomUseCase _sut;
+
+        private const string RoomCode = "NOTEXIST";
+
+        public WhenTheRoomDoesNotExist()
+        {
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode))
+                .ReturnsAsync((EntityRoom?)null);
+
+            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsRoomNotFoundException()
+        {
+            await Assert.ThrowsAsync<RoomNotFoundException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+        }
+    }
+
+    // Context: When the room is not active
+    public class WhenTheRoomIsNotActive
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomUseCase _sut;
+
+        private const string RoomCode = "CLOSED1";
+
+        public WhenTheRoomIsNotActive()
+        {
+            var closedRoom = new EntityRoom("CLOSED1", "Closed Room", 111UL, 76561198000000001UL, false, null);
+            closedRoom.Close();
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode))
+                .ReturnsAsync(closedRoom);
+
+            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsRoomNotActiveException()
+        {
+            await Assert.ThrowsAsync<RoomNotActiveException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+        }
+    }
+
+    // Context: When the wrong password is provided for a private room
+    public class WhenTheWrongPasswordIsProvidedForAPrivateRoom
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomUseCase _sut;
+
+        private const string RoomCode = "PRIV01";
+        private const string WrongPassword = "wrong-password";
+        private const string StoredHash = "correct-hash";
+
+        public WhenTheWrongPasswordIsProvidedForAPrivateRoom()
+        {
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, 76561198000000001UL, true, StoredHash);
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode))
+                .ReturnsAsync(privateRoom);
+
+            _passwordHasherMock
+                .Setup(h => h.Verify(WrongPassword, StoredHash))
+                .Returns(false);
+
+            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsInvalidOperationExceptionWithInvalidPasswordMessage()
+        {
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, WrongPassword)));
+
+            Assert.Equal("INVALID_PASSWORD", ex.Message);
+        }
+    }
+
+    // Context: When all conditions are valid for joining a room
+    public class WhenAllConditionsAreValidForJoiningARoom
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomUseCase _sut;
+
+        private const string RoomCode = "OPEN01";
+        private readonly EntityRoom _activeRoom;
+
+        public WhenAllConditionsAreValidForJoiningARoom()
+        {
+            _activeRoom = new EntityRoom(RoomCode, "Open Room", 333UL, 76561198000000001UL, false, null);
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode))
+                .ReturnsAsync(_activeRoom);
+
+            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_UpdatesTheRoom()
+        {
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+
+            _roomRepositoryMock.Verify(r => r.UpdateAsync(
+                It.Is<EntityRoom>(room => room.RoomCode == RoomCode)), Times.Once);
+        }
+
+        [Fact]
+        public async Task It_IncreasesCurrentPlayerCount()
+        {
+            var before = _activeRoom.CurrentPlayers;
+
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+
+            Assert.Equal(before + 1, _activeRoom.CurrentPlayers);
+        }
+    }
+}
