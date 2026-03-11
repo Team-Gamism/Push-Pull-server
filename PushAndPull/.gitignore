@@ -1,4 +1,7 @@
-﻿# .NET build output
+﻿# Claude Code
+PR_BODY.md
+
+# .NET build output
 bin/
 obj/
 
