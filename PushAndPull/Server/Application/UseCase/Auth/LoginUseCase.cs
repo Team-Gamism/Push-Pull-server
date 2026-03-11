@@ -2,6 +2,7 @@ using Server.Application.Port.Input;
 using Server.Application.Port.Output;
 using Server.Application.Port.Output.Persistence;
 using Server.Domain.Entity;
+using Server.Domain.Exception.Auth;
 
 namespace Server.Application.UseCase.Auth;
 
@@ -25,6 +26,9 @@ public class LoginUseCase : ILoginUseCase
     public async Task<LoginResult> ExecuteAsync(LoginCommand request)
     {
         var authResult = await _validator.ValidateAsync(request.Ticket);
+
+        if (authResult.IsFamilySharing)
+            throw new FamilySharingNotAllowedException(authResult.SteamId);
 
         var user = await _userRepository.GetBySteamIdAsync(authResult.SteamId);
         if (user == null)

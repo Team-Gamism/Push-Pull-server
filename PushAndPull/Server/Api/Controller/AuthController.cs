@@ -28,6 +28,7 @@ namespace Server.Api.Controller
             [FromBody] LoginRequest request
             )
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
             var result = await _loginUseCase.ExecuteAsync(new LoginCommand(
                 request.SteamTicket,
                 request.Nickname
