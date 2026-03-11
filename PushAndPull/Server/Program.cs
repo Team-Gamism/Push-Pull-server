@@ -58,16 +58,18 @@ builder.Services.AddScoped<IJoinRoomUseCase, JoinRoomUseCase>();
 
 var app = builder.Build();
 
-app.UseExceptionHandler(errApp => errApp.Run(async ctx =>
+app.UseExceptionHandler(errApp => errApp.Run(ctx =>
 {
     var feature = ctx.Features.Get<IExceptionHandlerFeature>();
     ctx.Response.StatusCode = feature?.Error switch
     {
         FamilySharingNotAllowedException => StatusCodes.Status403Forbidden,
         VacBannedException               => StatusCodes.Status403Forbidden,
+        PublisherBannedException         => StatusCodes.Status403Forbidden,
         InvalidTicketException           => StatusCodes.Status401Unauthorized,
         _                                => StatusCodes.Status500InternalServerError
     };
+    return Task.CompletedTask;
 }));
 
 app.MapControllers();
