@@ -1,4 +1,7 @@
-﻿# .NET build output
+﻿# Claude Code
+PR_BODY.md
+
+# .NET build output
 bin/
 obj/
 
@@ -12,4 +15,6 @@ project.nuget.cache
 *.iws
 *.iml
 *.ipr
+
+# Visual Studio user settings
 *.DotSettings.user
