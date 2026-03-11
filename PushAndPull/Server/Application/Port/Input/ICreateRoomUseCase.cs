@@ -10,7 +10,7 @@ public record CreateRoomCommand(
     string RoomName,
     bool IsPrivate,
     string? Password,
-    long HostSteamId
+    ulong HostSteamId
     );
 
 public record CreateRoomResult(
