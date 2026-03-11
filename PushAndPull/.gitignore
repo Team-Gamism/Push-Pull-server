@@ -15,3 +15,6 @@ project.nuget.cache
 *.iws
 *.iml
 *.ipr
+
+# Visual Studio user settings
+*.DotSettings.user
