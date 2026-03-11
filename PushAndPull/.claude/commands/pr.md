@@ -1,6 +1,6 @@
 ---
 description: Generate PR title suggestions and body based on changes from develop
-allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Write
+allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(gh pr create:*), Write, AskUserQuestion
 ---
 
 Generate a PR title and body for the current branch based on changes from `develop`.
@@ -86,3 +86,15 @@ Follow this exact structure (keep the emoji headers as-is):
 
    [full body preview]
    ```
+
+5. **Ask the user** using the AskUserQuestion tool:
+   - "어떤 제목을 사용할까요? (1 / 2 / 3 또는 직접 입력)"
+
+6. **Create the PR** using the chosen title:
+   - If the user answered 1, 2, or 3, use the corresponding suggested title
+   - If the user typed a custom title, use it as-is
+   - Run:
+     ```bash
+     gh pr create --title "{chosen title}" --body-file PR_BODY.md --base develop
+     ```
+   - Output the PR URL when done
