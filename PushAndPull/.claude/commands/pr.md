@@ -1,6 +1,6 @@
 ---
 description: Generate PR title suggestions and body based on changes from develop
-allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(gh pr create:*), Write, AskUserQuestion
+allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(gh pr create:*), Bash(rm:*), Write, AskUserQuestion
 ---
 
 Generate a PR title and body for the current branch based on changes from `develop`.
@@ -98,3 +98,9 @@ Follow this exact structure (keep the emoji headers as-is):
      gh pr create --title "{chosen title}" --body-file PR_BODY.md --base develop
      ```
    - Output the PR URL when done
+
+7. **Delete PR_BODY.md** after the PR is created:
+   - Run:
+     ```bash
+     rm PR_BODY.md
+     ```
