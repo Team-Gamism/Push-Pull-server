@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Server.Application.Port.Input;
 using Server.Application.Port.Output;
@@ -6,6 +7,7 @@ using Server.Application.Port.Output.Persistence;
 using Server.Application.Service;
 using Server.Application.UseCase.Auth;
 using Server.Application.UseCase.Room;
+using Server.Domain.Exception.Auth;
 using Server.Infrastructure.Auth;
 using Server.Infrastructure.Cache;
 using Server.Infrastructure.Persistence.DbContext;
@@ -55,6 +57,20 @@ builder.Services.AddScoped<IGetAllRoomUseCase, GetAllRoomUseCase>();
 builder.Services.AddScoped<IJoinRoomUseCase, JoinRoomUseCase>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(errApp => errApp.Run(ctx =>
+{
+    var feature = ctx.Features.Get<IExceptionHandlerFeature>();
+    ctx.Response.StatusCode = feature?.Error switch
+    {
+        FamilySharingNotAllowedException => StatusCodes.Status403Forbidden,
+        VacBannedException               => StatusCodes.Status403Forbidden,
+        PublisherBannedException         => StatusCodes.Status403Forbidden,
+        InvalidTicketException           => StatusCodes.Status401Unauthorized,
+        _                                => StatusCodes.Status500InternalServerError
+    };
+    return Task.CompletedTask;
+}));
 
 app.MapControllers();
 app.Run();
