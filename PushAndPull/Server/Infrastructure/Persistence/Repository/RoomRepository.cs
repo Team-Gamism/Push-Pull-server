@@ -48,6 +48,8 @@ public class RoomRepository : IRoomRepository
         return updated > 0;
     }
 
+    // 주의: 이 메서드는 Room.Close()의 로직(Status = Closed, ExpiresAt = UtcNow)을 직접 반영하고 있습니다.
+    // Room.Close()에 새로운 비즈니스 로직이 추가될 경우 이 메서드도 함께 수정해야 합니다.
     public async Task CloseAsync(string roomCode)
     {
         await _context.Rooms
