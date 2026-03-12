@@ -36,21 +36,24 @@ public class RoomRepository : IRoomRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Room room)
+    public async Task<bool> IncrementPlayerCountAsync(string roomCode)
     {
-        _context.Rooms.Update(room);
-        await _context.SaveChangesAsync();
+        var updated = await _context.Rooms
+            .Where(x => x.RoomCode == roomCode
+                        && x.Status == RoomStatus.Active
+                        && x.CurrentPlayers < x.MaxPlayers)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1));
+
+        return updated > 0;
     }
 
     public async Task CloseAsync(string roomCode)
     {
-        var room = await _context.Rooms
-            .FirstOrDefaultAsync(x => x.RoomCode == roomCode);
-
-        if (room == null)
-            return;
-
-        room.Close();
-        await _context.SaveChangesAsync();
+        await _context.Rooms
+            .Where(x => x.RoomCode == roomCode)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.Status, RoomStatus.Closed)
+                .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow));
     }
 }

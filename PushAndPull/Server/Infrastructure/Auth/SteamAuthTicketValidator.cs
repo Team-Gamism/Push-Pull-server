@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Text.Json;
 using Server.Application.Port.Output;
 using Server.Domain.Exception.Auth;
@@ -85,13 +86,8 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
     private static async Task<SteamAuthResponse> ParseResponseAsync(
         HttpResponseMessage response)
     {
-        var json = await response.Content.ReadAsStringAsync();
-        
-        var steamResponse = JsonSerializer.Deserialize<SteamAuthResponse>(
-            json,
-            JsonOptions
-        );
-        
+        var steamResponse = await response.Content.ReadFromJsonAsync<SteamAuthResponse>(JsonOptions);
+
         if (steamResponse?.Response.Params == null)
             throw new SteamApiException("INVALID_RESPONSE");
 

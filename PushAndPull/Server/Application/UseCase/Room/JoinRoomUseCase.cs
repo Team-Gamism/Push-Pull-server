@@ -37,7 +37,18 @@ public class JoinRoomUseCase : IJoinRoomUseCase
                 throw new InvalidOperationException("INVALID_PASSWORD");
         }
 
-        room.Join();
-        await _roomRepository.UpdateAsync(room);
+        room.Join(); // 도메인 선행 검증 (FULL_ROOM)
+
+        var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode);
+        if (!success)
+        {
+            var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode);
+            if (roomAfterAttempt == null)
+                throw new RoomNotFoundException(request.RoomCode);
+            if (roomAfterAttempt.Status != RoomStatus.Active)
+                throw new RoomNotActiveException(request.RoomCode);
+
+            throw new InvalidOperationException("FULL_ROOM");
+        }
     }
 }
