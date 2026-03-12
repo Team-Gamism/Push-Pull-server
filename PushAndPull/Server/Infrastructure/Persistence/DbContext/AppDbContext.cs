@@ -95,9 +95,12 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
 
             entity.HasIndex(x => x.Status)
                 .HasDatabaseName("idx_room_status");
-            
+
             entity.HasIndex(x => new { x.Status, x.IsPrivate })
                 .HasDatabaseName("idx_room_status_private");
+
+            entity.HasIndex(x => new { x.Status, x.CreatedAt })
+                .HasDatabaseName("idx_room_status_created_at");
 
             entity.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")

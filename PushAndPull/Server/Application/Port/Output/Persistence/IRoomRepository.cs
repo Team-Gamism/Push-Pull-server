@@ -7,6 +7,6 @@ public interface IRoomRepository
     Task<Room?> GetAsync(string roomCode);
     Task<IReadOnlyList<Room>> GetAllAsync(CancellationToken ct);
     Task CreateAsync(Room room);
-    Task UpdateAsync(Room room);
+    Task<bool> IncrementPlayerCountAsync(string roomCode);
     Task CloseAsync(string roomCode);
 }
