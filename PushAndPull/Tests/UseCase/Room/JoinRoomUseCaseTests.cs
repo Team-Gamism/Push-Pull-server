@@ -115,16 +115,19 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.GetAsync(RoomCode))
                 .ReturnsAsync(_activeRoom);
 
+            _roomRepositoryMock
+                .Setup(r => r.IncrementPlayerCountAsync(RoomCode))
+                .ReturnsAsync(true);
+
             _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
-        public async Task It_UpdatesTheRoom()
+        public async Task It_CallsIncrementPlayerCount()
         {
             await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
 
-            _roomRepositoryMock.Verify(r => r.UpdateAsync(
-                It.Is<EntityRoom>(room => room.RoomCode == RoomCode)), Times.Once);
+            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode), Times.Once);
         }
 
         [Fact]
