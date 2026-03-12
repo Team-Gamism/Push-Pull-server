@@ -41,6 +41,14 @@ public class JoinRoomUseCase : IJoinRoomUseCase
 
         var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode);
         if (!success)
+        {
+            var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode);
+            if (roomAfterAttempt == null)
+                throw new RoomNotFoundException(request.RoomCode);
+            if (roomAfterAttempt.Status != RoomStatus.Active)
+                throw new RoomNotActiveException(request.RoomCode);
+
             throw new InvalidOperationException("FULL_ROOM");
+        }
     }
 }
