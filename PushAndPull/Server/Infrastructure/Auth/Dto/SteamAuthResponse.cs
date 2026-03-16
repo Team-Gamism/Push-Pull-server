@@ -11,7 +11,7 @@ public record SteamAuthResponseData(
 
 public record SteamAuthResponseError(
     int ErrorCode,
-    string ErrorDesc
+    string? ErrorDesc
 );
 
 public record SteamAuthResponseParams(
