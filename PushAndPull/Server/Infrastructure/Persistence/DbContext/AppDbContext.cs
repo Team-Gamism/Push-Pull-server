@@ -17,7 +17,7 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
         modelBuilder.Entity<User>(entity =>
         {
-            entity.ToTable("user", "user");
+            entity.ToTable("user", "game_user");
 
             entity.HasKey(x => x.SteamId);
 

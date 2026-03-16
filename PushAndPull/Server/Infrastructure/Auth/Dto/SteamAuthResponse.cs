@@ -5,7 +5,13 @@ public record SteamAuthResponse(
 );
 
 public record SteamAuthResponseData(
-    SteamAuthResponseParams Params
+    SteamAuthResponseParams? Params,
+    SteamAuthResponseError? Error
+);
+
+public record SteamAuthResponseError(
+    int ErrorCode,
+    string? ErrorDesc
 );
 
 public record SteamAuthResponseParams(

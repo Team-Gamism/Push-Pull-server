@@ -89,7 +89,12 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
         var steamResponse = await response.Content.ReadFromJsonAsync<SteamAuthResponse>(JsonOptions);
 
         if (steamResponse?.Response.Params == null)
-            throw new SteamApiException("INVALID_RESPONSE");
+        {
+            var error = steamResponse?.Response.Error;
+            throw new SteamApiException(error != null
+                ? $"STEAM_ERROR [{error.ErrorCode}]: {error.ErrorDesc}"
+                : "INVALID_RESPONSE");
+        }
 
         return steamResponse;
     }
