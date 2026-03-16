@@ -23,8 +23,17 @@ public class UserRepository : IUserRepository
 
     public async Task CreateAsync(User user, CancellationToken ct = default)
     {
-        await _context.Users.AddAsync(user, ct);
-        await _context.SaveChangesAsync(ct);
+        await _context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO game_user."user" (steam_id, nickname, created_at, last_login_at)
+            VALUES ({0}, {1}, {2}, {3})
+            ON CONFLICT (steam_id) DO UPDATE
+            SET nickname = EXCLUDED.nickname,
+                last_login_at = EXCLUDED.last_login_at
+            """,
+            [user.SteamId, user.Nickname, user.CreatedAt, user.LastLoginAt],
+            ct
+        );
     }
 
     public async Task UpdateAsync(ulong steamId, string nickname, DateTime lastLoginAt, CancellationToken ct = default)
@@ -36,4 +45,5 @@ public class UserRepository : IUserRepository
                     .SetProperty(u => u.LastLoginAt, lastLoginAt),
                 ct);
     }
+
 }

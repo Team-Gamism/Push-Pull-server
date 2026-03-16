@@ -4,12 +4,13 @@ using Server.Application.Port.Output.Persistence;
 using Server.Application.UseCase.Auth;
 using Server.Domain.Entity;
 using Server.Application.Port.Input;
+using Server.Domain.Exception.Auth;
 
 namespace Tests.UseCase.Auth;
 
 public class LoginUseCaseTests
 {
-    public class WhenANewUserLogsInForTheFirstTime
+    public class WhenAValidTicketIsProvided
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
         private readonly Mock<ISessionService> _sessionServiceMock = new();
@@ -20,15 +21,11 @@ public class LoginUseCaseTests
         private const string Nickname = "TestPlayer";
         private const ulong SteamId = 76561198000000001UL;
 
-        public WhenANewUserLogsInForTheFirstTime()
+        public WhenAValidTicketIsProvided()
         {
             _validatorMock
                 .Setup(v => v.ValidateAsync(Ticket))
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
-
-            _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
-                .ReturnsAsync((User?)null);
 
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
             _sessionServiceMock
@@ -39,7 +36,7 @@ public class LoginUseCaseTests
         }
 
         [Fact]
-        public async Task It_CreatesANewUser()
+        public async Task It_UpsertUser()
         {
             await _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname));
 
@@ -57,6 +54,15 @@ public class LoginUseCaseTests
         }
 
         [Fact]
+        public async Task It_DoesNotCallGetBySteamId()
+        {
+            await _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname));
+
+            _userRepositoryMock.Verify(r => r.GetBySteamIdAsync(
+                It.IsAny<ulong>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
         public async Task It_DoesNotCallUpdateUser()
         {
             await _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname));
@@ -66,62 +72,42 @@ public class LoginUseCaseTests
         }
     }
 
-    public class WhenAnExistingUserLogsInAgain
+    public class WhenFamilySharingIsDetected
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
         private readonly Mock<ISessionService> _sessionServiceMock = new();
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
         private readonly LoginUseCase _sut;
 
-        private const string Ticket = "valid-ticket";
-        private const string NewNickname = "UpdatedPlayer";
-        private const ulong SteamId = 76561198000000002UL;
+        private const string Ticket = "shared-ticket";
+        private const string Nickname = "SharedPlayer";
+        private const ulong SteamId = 76561198000000003UL;
+        private const ulong OwnerSteamId = 76561198000000004UL;
 
-        public WhenAnExistingUserLogsInAgain()
+        public WhenFamilySharingIsDetected()
         {
             _validatorMock
                 .Setup(v => v.ValidateAsync(Ticket))
-                .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
-
-            var existingUser = new User(SteamId, "OldNickname");
-            _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
-                .ReturnsAsync(existingUser);
-
-            var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
-            _sessionServiceMock
-                .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
-                .ReturnsAsync(session);
+                .ReturnsAsync(new AuthTicketValidationResult(SteamId, OwnerSteamId, false, false));
 
             _sut = new LoginUseCase(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
         }
 
         [Fact]
-        public async Task It_UpdatesNicknameAndLastLogin()
+        public async Task It_ThrowsFamilySharingNotAllowedException()
         {
-            await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
-
-            _userRepositoryMock.Verify(r => r.UpdateAsync(
-                SteamId,
-                NewNickname,
-                It.IsAny<DateTime>(),
-                CancellationToken.None), Times.Once);
+            await Assert.ThrowsAsync<FamilySharingNotAllowedException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
         }
 
         [Fact]
-        public async Task It_DoesNotCreateANewUser()
+        public async Task It_DoesNotCreateUser()
         {
-            await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
+            await Assert.ThrowsAsync<FamilySharingNotAllowedException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
 
-            _userRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<User>(), CancellationToken.None), Times.Never);
-        }
-
-        [Fact]
-        public async Task It_ReturnsASessionId()
-        {
-            var result = await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
-
-            Assert.NotEmpty(result.SessionId);
+            _userRepositoryMock.Verify(r => r.CreateAsync(
+                It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }
