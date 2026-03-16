@@ -39,6 +39,7 @@ jobs:
 
           docker run -d \
             --name pushandpull-server \
+            --network pushandpull-network \
             --restart unless-stopped \
             -p 21754:80 \
             -e ASPNETCORE_URLS=http://+:80 \
