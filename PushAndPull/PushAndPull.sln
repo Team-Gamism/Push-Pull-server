@@ -1,10 +1,8 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{9993E701-2E0B-4C34-B9FA-A660C3DEE75B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushAndPull", "PushAndPull\PushAndPull.csproj", "{97FF0397-9605-4C0B-AC1F-16B78FAB18B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{97FF0397-9605-4C0B-AC1F-16B78FAB18B0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BEA371F4-C6A9-4064-A9AD-3223B84117A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushAndPull.Test", "PushAndPull.Test\PushAndPull.Test.csproj", "{BEA371F4-C6A9-4064-A9AD-3223B84117A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,8 +41,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{97FF0397-9605-4C0B-AC1F-16B78FAB18B0} = {9993E701-2E0B-4C34-B9FA-A660C3DEE75B}
 	EndGlobalSection
 EndGlobal
