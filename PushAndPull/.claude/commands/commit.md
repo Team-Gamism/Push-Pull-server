@@ -26,7 +26,7 @@ Create Git commits following the project's commit conventions.
 ```
 feat: 방 생성 API 추가
 fix: 세션 DI 누락 수정
-modify: Room 엔터티 수정
+update: Room 엔터티 수정
 ```
 
 **Do NOT**:
