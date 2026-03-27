@@ -1,14 +1,14 @@
 using PushAndPull.Domain.Room.Exception;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 
 namespace PushAndPull.Domain.Room.Service;
 
-public class GetRoomUseCase : IGetRoomUseCase
+public class GetRoomService : IGetRoomService
 {
     private readonly IRoomRepository _roomRepository;
 
-    public GetRoomUseCase(IRoomRepository roomRepository)
+    public GetRoomService(IRoomRepository roomRepository)
     {
         _roomRepository = roomRepository;
     }

@@ -1,5 +1,5 @@
 using Moq;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
@@ -7,14 +7,14 @@ using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
 namespace Tests.Service.Room;
 
-public class CreateRoomUseCaseTests
+public class CreateRoomServiceTests
 {
     public class WhenCreatingAPublicRoomWithoutAPassword
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IRoomCodeGenerator> _roomCodeGeneratorMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly CreateRoomUseCase _sut;
+        private readonly CreateRoomService _sut;
 
         private const string GeneratedCode = "ABC123";
         private readonly CreateRoomCommand _command = new(
@@ -29,7 +29,7 @@ public class CreateRoomUseCaseTests
         {
             _roomCodeGeneratorMock.Setup(g => g.Generate()).Returns(GeneratedCode);
 
-            _sut = new CreateRoomUseCase(
+            _sut = new CreateRoomService(
                 _roomRepositoryMock.Object,
                 _roomCodeGeneratorMock.Object,
                 _passwordHasherMock.Object
@@ -72,7 +72,7 @@ public class CreateRoomUseCaseTests
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IRoomCodeGenerator> _roomCodeGeneratorMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly CreateRoomUseCase _sut;
+        private readonly CreateRoomService _sut;
 
         private const string GeneratedCode = "XYZ789";
         private const string RawPassword = "secret1234";
@@ -91,7 +91,7 @@ public class CreateRoomUseCaseTests
             _roomCodeGeneratorMock.Setup(g => g.Generate()).Returns(GeneratedCode);
             _passwordHasherMock.Setup(h => h.Hash(RawPassword)).Returns(HashedPassword);
 
-            _sut = new CreateRoomUseCase(
+            _sut = new CreateRoomService(
                 _roomRepositoryMock.Object,
                 _roomCodeGeneratorMock.Object,
                 _passwordHasherMock.Object

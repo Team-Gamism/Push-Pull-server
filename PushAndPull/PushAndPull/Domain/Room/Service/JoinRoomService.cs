@@ -1,17 +1,17 @@
 using PushAndPull.Domain.Room.Entity;
 using PushAndPull.Domain.Room.Exception;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
 
 namespace PushAndPull.Domain.Room.Service;
 
-public class JoinRoomUseCase : IJoinRoomUseCase
+public class JoinRoomService : IJoinRoomService
 {
     private readonly IRoomRepository _roomRepository;
     private readonly IPasswordHasher _passwordHasher;
 
-    public JoinRoomUseCase(
+    public JoinRoomService(
         IRoomRepository roomRepository,
         IPasswordHasher passwordHasher
         )

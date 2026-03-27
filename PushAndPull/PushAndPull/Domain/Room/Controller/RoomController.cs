@@ -11,22 +11,22 @@ namespace PushAndPull.Domain.Room.Controller;
 [ApiController]
 public class RoomController : ControllerBase
 {
-    private readonly ICreateRoomUseCase _createRoomUseCase;
-    private readonly IGetRoomUseCase _getRoomUseCase;
-    private readonly IGetAllRoomUseCase _getAllRoomUseCase;
-    private readonly IJoinRoomUseCase _joinRoomUseCase;
+    private readonly ICreateRoomService _createRoomService;
+    private readonly IGetRoomService _getRoomService;
+    private readonly IGetAllRoomService _getAllRoomService;
+    private readonly IJoinRoomService _joinRoomService;
 
     public RoomController(
-        ICreateRoomUseCase createRoomUseCase,
-        IGetRoomUseCase getRoomUseCase,
-        IGetAllRoomUseCase getAllRoomUseCase,
-        IJoinRoomUseCase joinRoomUseCase
+        ICreateRoomService createRoomService,
+        IGetRoomService getRoomService,
+        IGetAllRoomService getAllRoomService,
+        IJoinRoomService joinRoomService
         )
     {
-        _createRoomUseCase = createRoomUseCase;
-        _getRoomUseCase = getRoomUseCase;
-        _getAllRoomUseCase = getAllRoomUseCase;
-        _joinRoomUseCase = joinRoomUseCase;
+        _createRoomService = createRoomService;
+        _getRoomService = getRoomService;
+        _getAllRoomService = getAllRoomService;
+        _joinRoomService = joinRoomService;
     }
 
     [SessionAuthorize]
@@ -37,7 +37,7 @@ public class RoomController : ControllerBase
     {
         var hostSteamId = User.GetSteamId();
 
-        var result = await _createRoomUseCase.ExecuteAsync(new CreateRoomCommand(
+        var result = await _createRoomService.ExecuteAsync(new CreateRoomCommand(
             request.LobbyId,
             request.RoomName,
             request.IsPrivate,
@@ -54,7 +54,7 @@ public class RoomController : ControllerBase
         [FromRoute] string roomCode
     )
     {
-        var result = await _getRoomUseCase.ExecuteAsync(
+        var result = await _getRoomService.ExecuteAsync(
             new GetRoomCommand(roomCode)
         );
 
@@ -69,7 +69,7 @@ public class RoomController : ControllerBase
     [HttpGet("all")]
     public async Task<GetAllRoomResponse> GetAllRoom(CancellationToken ct)
     {
-        var result = await _getAllRoomUseCase.ExecuteAsync(ct);
+        var result = await _getAllRoomService.ExecuteAsync(ct);
 
         return new GetAllRoomResponse(
             result.Rooms.Select(r => new GetRoomResponse(
@@ -88,7 +88,7 @@ public class RoomController : ControllerBase
         [FromBody] JoinRoomRequest request
         )
     {
-        await _joinRoomUseCase.ExecuteAsync(new JoinRoomCommand(
+        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(
             roomCode,
             request.Password)
         );

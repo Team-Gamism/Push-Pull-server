@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Room.Service.Interface;
 
-public interface IJoinRoomUseCase
+public interface IJoinRoomService
 {
     Task ExecuteAsync(JoinRoomCommand request);
 }

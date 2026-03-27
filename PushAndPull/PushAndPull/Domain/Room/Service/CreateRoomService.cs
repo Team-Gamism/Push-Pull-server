@@ -1,16 +1,16 @@
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
 
 namespace PushAndPull.Domain.Room.Service;
 
-public class CreateRoomUseCase : ICreateRoomUseCase
+public class CreateRoomService : ICreateRoomService
 {
     private readonly IRoomRepository _roomRepository;
     private readonly IRoomCodeGenerator _roomCodeGenerator;
     private readonly IPasswordHasher _passwordHasher;
 
-    public CreateRoomUseCase(
+    public CreateRoomService(
         IRoomRepository roomRepository,
         IRoomCodeGenerator roomCodeGenerator,
         IPasswordHasher passwordHasher

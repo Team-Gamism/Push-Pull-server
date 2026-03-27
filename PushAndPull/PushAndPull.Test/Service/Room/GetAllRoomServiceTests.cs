@@ -1,16 +1,16 @@
 using Moq;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
 namespace Tests.Service.Room;
 
-public class GetAllRoomUseCaseTests
+public class GetAllRoomServiceTests
 {
     public class WhenMultipleActiveRoomsExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
-        private readonly GetAllRoomUseCase _sut;
+        private readonly GetAllRoomService _sut;
 
         private readonly IReadOnlyList<EntityRoom> _rooms;
 
@@ -26,7 +26,7 @@ public class GetAllRoomUseCaseTests
                 .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_rooms);
 
-            _sut = new GetAllRoomUseCase(_roomRepositoryMock.Object);
+            _sut = new GetAllRoomService(_roomRepositoryMock.Object);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ public class GetAllRoomUseCaseTests
     public class WhenNoRoomsExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
-        private readonly GetAllRoomUseCase _sut;
+        private readonly GetAllRoomService _sut;
 
         public WhenNoRoomsExist()
         {
@@ -60,7 +60,7 @@ public class GetAllRoomUseCaseTests
                 .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<EntityRoom>());
 
-            _sut = new GetAllRoomUseCase(_roomRepositoryMock.Object);
+            _sut = new GetAllRoomService(_roomRepositoryMock.Object);
         }
 
         [Fact]

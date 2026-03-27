@@ -1,6 +1,6 @@
 using PushAndPull.Domain.Room.Entity;
 
-namespace Tests.Domain.Room;
+namespace PushAndPull.Test.Domain.Room;
 
 public class RoomTests
 {

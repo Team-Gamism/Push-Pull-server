@@ -1,18 +1,18 @@
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 
 namespace PushAndPull.Domain.Room.Service;
 
-public class GetAllRoomUseCase : IGetAllRoomUseCase
+public class GetAllRoomService : IGetAllRoomService
 {
     private readonly IRoomRepository _roomRepository;
 
-    public GetAllRoomUseCase(IRoomRepository roomRepository)
+    public GetAllRoomService(IRoomRepository roomRepository)
     {
         _roomRepository = roomRepository;
     }
 
-    public async Task<GetAllRoomUseCaseResult> ExecuteAsync(CancellationToken ct = default)
+    public async Task<GetAllRoomResult> ExecuteAsync(CancellationToken ct = default)
     {
         var rooms = await _roomRepository.GetAllAsync(ct);
 
@@ -25,6 +25,6 @@ public class GetAllRoomUseCase : IGetAllRoomUseCase
             ))
             .ToList();
 
-        return new GetAllRoomUseCaseResult(summaries);
+        return new GetAllRoomResult(summaries);
     }
 }

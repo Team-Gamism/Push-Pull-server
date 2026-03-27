@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Room.Service.Interface;
 
-public interface ICreateRoomUseCase
+public interface ICreateRoomService
 {
     Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request);
 }

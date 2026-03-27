@@ -1,22 +1,22 @@
 using Moq;
 using PushAndPull.Domain.Room.Exception;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 using PushAndPull.Domain.Room.Service.Interface;
 using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
 namespace Tests.Service.Room;
 
-public class GetRoomUseCaseTests
+public class GetRoomServiceTests
 {
     public class WhenAnEmptyRoomCodeIsProvided
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
-        private readonly GetRoomUseCase _sut;
+        private readonly GetRoomService _sut;
 
         public WhenAnEmptyRoomCodeIsProvided()
         {
-            _sut = new GetRoomUseCase(_roomRepositoryMock.Object);
+            _sut = new GetRoomService(_roomRepositoryMock.Object);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ public class GetRoomUseCaseTests
     public class WhenTheRoomDoesNotExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
-        private readonly GetRoomUseCase _sut;
+        private readonly GetRoomService _sut;
 
         private const string RoomCode = "NOTFOUND";
 
@@ -40,7 +40,7 @@ public class GetRoomUseCaseTests
                 .Setup(r => r.GetAsync(RoomCode))
                 .ReturnsAsync((EntityRoom?)null);
 
-            _sut = new GetRoomUseCase(_roomRepositoryMock.Object);
+            _sut = new GetRoomService(_roomRepositoryMock.Object);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ public class GetRoomUseCaseTests
     public class WhenTheRoomExists
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
-        private readonly GetRoomUseCase _sut;
+        private readonly GetRoomService _sut;
 
         private const string RoomCode = "EXIST1";
         private const string RoomName = "Existing Room";
@@ -68,7 +68,7 @@ public class GetRoomUseCaseTests
                 .Setup(r => r.GetAsync(RoomCode))
                 .ReturnsAsync(_room);
 
-            _sut = new GetRoomUseCase(_roomRepositoryMock.Object);
+            _sut = new GetRoomService(_roomRepositoryMock.Object);
         }
 
         [Fact]

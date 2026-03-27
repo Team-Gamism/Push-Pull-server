@@ -1,6 +1,6 @@
 using Moq;
 using PushAndPull.Domain.Room.Exception;
-using PushAndPull.Domain.Room.Repository;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
@@ -8,13 +8,13 @@ using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
 namespace Tests.Service.Room;
 
-public class JoinRoomUseCaseTests
+public class JoinRoomServiceTests
 {
     public class WhenTheRoomDoesNotExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "NOTEXIST";
 
@@ -24,7 +24,7 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.GetAsync(RoomCode))
                 .ReturnsAsync((EntityRoom?)null);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "CLOSED1";
 
@@ -52,7 +52,7 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.GetAsync(RoomCode))
                 .ReturnsAsync(closedRoom);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "PRIV01";
         private const string WrongPassword = "wrong-password";
@@ -85,7 +85,7 @@ public class JoinRoomUseCaseTests
                 .Setup(h => h.Verify(WrongPassword, StoredHash))
                 .Returns(false);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -102,7 +102,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "GONE01";
 
@@ -123,7 +123,7 @@ public class JoinRoomUseCaseTests
                 .ReturnsAsync(activeRoom)
                 .ReturnsAsync((EntityRoom?)null);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "CLOS02";
 
@@ -157,7 +157,7 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.IncrementPlayerCountAsync(RoomCode))
                 .ReturnsAsync(false);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -172,7 +172,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "FULL01";
 
@@ -188,7 +188,7 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.IncrementPlayerCountAsync(RoomCode))
                 .ReturnsAsync(false);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
@@ -205,7 +205,7 @@ public class JoinRoomUseCaseTests
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
-        private readonly JoinRoomUseCase _sut;
+        private readonly JoinRoomService _sut;
 
         private const string RoomCode = "OPEN01";
         private readonly EntityRoom _activeRoom;
@@ -222,7 +222,7 @@ public class JoinRoomUseCaseTests
                 .Setup(r => r.IncrementPlayerCountAsync(RoomCode))
                 .ReturnsAsync(true);
 
-            _sut = new JoinRoomUseCase(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]

@@ -1,6 +1,6 @@
 using RoomEntity = PushAndPull.Domain.Room.Entity.Room;
 
-namespace PushAndPull.Domain.Room.Repository;
+namespace PushAndPull.Domain.Room.Repository.Interface;
 
 public interface IRoomRepository
 {

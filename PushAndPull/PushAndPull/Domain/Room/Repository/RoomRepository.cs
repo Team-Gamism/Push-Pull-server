@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PushAndPull.Domain.Room.Entity;
+using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Global.Infrastructure;
 using RoomEntity = PushAndPull.Domain.Room.Entity.Room;
 

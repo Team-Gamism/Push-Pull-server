@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Room.Service.Interface;
 
-public interface IGetRoomUseCase
+public interface IGetRoomService
 {
     Task<GetRoomResult> ExecuteAsync(GetRoomCommand request);
 }
