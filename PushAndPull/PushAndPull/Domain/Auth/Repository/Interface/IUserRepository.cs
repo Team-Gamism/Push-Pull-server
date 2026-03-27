@@ -1,6 +1,6 @@
 using PushAndPull.Domain.Auth.Entity;
 
-namespace PushAndPull.Domain.Auth.Repository;
+namespace PushAndPull.Domain.Auth.Repository.Interface;
 
 public interface IUserRepository
 {

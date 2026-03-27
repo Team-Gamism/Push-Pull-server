@@ -11,16 +11,16 @@ namespace PushAndPull.Domain.Auth.Controller;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly ILoginUseCase _loginUseCase;
-    private readonly ILogoutUseCase _logoutUseCase;
+    private readonly ILoginService _loginService;
+    private readonly ILogoutService _logoutService;
 
     public AuthController(
-        ILoginUseCase loginUseCase,
-        ILogoutUseCase logoutUseCase
+        ILoginService loginService,
+        ILogoutService logoutService
         )
     {
-        _loginUseCase = loginUseCase;
-        _logoutUseCase = logoutUseCase;
+        _loginService = loginService;
+        _logoutService = logoutService;
     }
 
     [HttpPost("login")]
@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         [FromBody] LoginRequest request
         )
     {
-        var result = await _loginUseCase.ExecuteAsync(new LoginCommand(
+        var result = await _loginService.ExecuteAsync(new LoginCommand(
             request.SteamTicket,
             request.Nickname
             )
@@ -43,7 +43,7 @@ public class AuthController : ControllerBase
     {
         var sessionId = User.GetSessionId();
 
-        await _logoutUseCase.ExecuteAsync(
+        await _logoutService.ExecuteAsync(
             new LogoutCommand(sessionId)
         );
     }

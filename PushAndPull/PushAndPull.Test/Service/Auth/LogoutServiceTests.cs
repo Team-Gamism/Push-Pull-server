@@ -2,14 +2,14 @@ using Moq;
 using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Domain.Auth.Service.Interface;
 
-namespace Tests.Service.Auth;
+namespace PushAndPull.Test.Service.Auth;
 
-public class LogoutUseCaseTests
+public class LogoutServiceTests
 {
     public class WhenAUserLogsOutWithAValidSession
     {
         private readonly Mock<ISessionService> _sessionServiceMock = new();
-        private readonly LogoutUseCase _sut;
+        private readonly LogoutService _sut;
 
         private const string SessionId = "session-xyz789";
 
@@ -19,7 +19,7 @@ public class LogoutUseCaseTests
                 .Setup(s => s.DeleteAsync(SessionId))
                 .Returns(Task.CompletedTask);
 
-            _sut = new LogoutUseCase(_sessionServiceMock.Object);
+            _sut = new LogoutService(_sessionServiceMock.Object);
         }
 
         [Fact]

@@ -1,20 +1,20 @@
 using Moq;
 using PushAndPull.Domain.Auth.Entity;
-using PushAndPull.Domain.Auth.Repository;
+using PushAndPull.Domain.Auth.Repository.Interface;
 using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Domain.Auth.Service.Interface;
 using PushAndPull.Global.Auth;
 
-namespace Tests.Service.Auth;
+namespace PushAndPull.Test.Service.Auth;
 
-public class LoginUseCaseTests
+public class LoginServiceTests
 {
     public class WhenANewUserLogsInForTheFirstTime
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
         private readonly Mock<ISessionService> _sessionServiceMock = new();
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
-        private readonly LoginUseCase _sut;
+        private readonly LoginService _sut;
 
         private const string Ticket = "valid-ticket";
         private const string Nickname = "TestPlayer";
@@ -35,7 +35,7 @@ public class LoginUseCaseTests
                 .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
                 .ReturnsAsync(session);
 
-            _sut = new LoginUseCase(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
+            _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ public class LoginUseCaseTests
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
         private readonly Mock<ISessionService> _sessionServiceMock = new();
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
-        private readonly LoginUseCase _sut;
+        private readonly LoginService _sut;
 
         private const string Ticket = "valid-ticket";
         private const string NewNickname = "UpdatedPlayer";
@@ -93,7 +93,7 @@ public class LoginUseCaseTests
                 .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
                 .ReturnsAsync(session);
 
-            _sut = new LoginUseCase(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
+            _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
         }
 
         [Fact]

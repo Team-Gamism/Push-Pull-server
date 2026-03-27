@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PushAndPull.Domain.Auth.Entity;
+using PushAndPull.Domain.Auth.Repository.Interface;
 using PushAndPull.Global.Infrastructure;
 
 namespace PushAndPull.Domain.Auth.Repository;

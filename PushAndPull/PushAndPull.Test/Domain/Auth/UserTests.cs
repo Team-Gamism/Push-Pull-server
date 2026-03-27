@@ -1,6 +1,6 @@
 using PushAndPull.Domain.Auth.Entity;
 
-namespace Tests.Domain.Auth;
+namespace PushAndPull.Test.Domain.Auth;
 
 public class UserTests
 {

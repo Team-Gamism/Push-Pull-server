@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Auth.Service.Interface;
 
-public interface ILoginUseCase
+public interface ILoginService
 {
     Task<LoginResult> ExecuteAsync(LoginCommand request);
 }

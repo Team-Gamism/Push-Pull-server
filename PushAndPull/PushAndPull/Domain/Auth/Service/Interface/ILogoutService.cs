@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Auth.Service.Interface;
 
-public interface ILogoutUseCase
+public interface ILogoutService
 {
     Task ExecuteAsync(LogoutCommand request);
 }

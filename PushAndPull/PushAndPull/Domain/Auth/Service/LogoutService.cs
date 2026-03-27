@@ -2,11 +2,11 @@ using PushAndPull.Domain.Auth.Service.Interface;
 
 namespace PushAndPull.Domain.Auth.Service;
 
-public class LogoutUseCase : ILogoutUseCase
+public class LogoutService : ILogoutService
 {
     private readonly ISessionService _sessionService;
 
-    public LogoutUseCase(ISessionService sessionService)
+    public LogoutService(ISessionService sessionService)
     {
         _sessionService = sessionService;
     }
