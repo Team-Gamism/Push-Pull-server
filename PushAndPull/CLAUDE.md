@@ -27,7 +27,7 @@ PushAndPull.sln
 Main project:
 
 ```
-Server/
+PushAndPull/
 ```
 
 Target framework:
@@ -50,31 +50,31 @@ Port: 8080
 ## Build
 
 ```bash
-dotnet build Server/Server.csproj
+dotnet build PushAndPull/PushAndPull.csproj
 ```
 
 ## Run Locally
 
 ```bash
-dotnet run --project Server/Server.csproj
+dotnet run --project PushAndPull/PushAndPull.csproj
 ```
 
 ## EF Core Migration
 
 ```bash
-dotnet ef migrations add <MigrationName> --project Server
+dotnet ef migrations add <MigrationName> --project PushAndPull
 ```
 
 ## Update Database
 
 ```bash
-dotnet ef database update --project Server
+dotnet ef database update --project PushAndPull
 ```
 
 ## Docker Build
 
 ```bash
-docker build -f Server/Dockerfile -t pushandpull-server .
+docker build -f PushAndPull/Dockerfile -t pushandpull-server .
 ```
 
 ## Docker Run
@@ -90,303 +90,172 @@ docker run -p 8080:8080 pushandpull-server
 Controllers
 
 ```
-Server/Api/Controller/
+PushAndPull/Domain/{DomainName}/Controller/
 ```
 
 Request / Response DTO
 
 ```
-Server/Api/Dto/
+PushAndPull/Domain/{DomainName}/Dto/Request/
+PushAndPull/Domain/{DomainName}/Dto/Response/
 ```
 
-UseCases
+Services
 
 ```
-Server/Application/UseCase/
+PushAndPull/Domain/{DomainName}/Service/
 ```
 
-Input Ports
+Service Interfaces (+ Command / Result records)
 
 ```
-Server/Application/Port/Input/
-```
-
-Output Ports
-
-```
-Server/Application/Port/Output/
+PushAndPull/Domain/{DomainName}/Service/Interface/
 ```
 
 Domain Entities
 
 ```
-Server/Domain/Entity/
+PushAndPull/Domain/{DomainName}/Entity/
+```
+
+Domain Exceptions
+
+```
+PushAndPull/Domain/{DomainName}/Exception/
 ```
 
 Repositories
 
 ```
-Server/Infrastructure/Persistence/Repository/
+PushAndPull/Domain/{DomainName}/Repository/
+PushAndPull/Domain/{DomainName}/Repository/Interface/
+```
+
+Service DI Registration
+
+```
+PushAndPull/Domain/{DomainName}/Config/
 ```
 
 DbContext
 
 ```
-Server/Infrastructure/Persistence/DbContext/
+PushAndPull/Global/Infrastructure/AppDbContext.cs
 ```
 
 Redis Cache
 
 ```
-Server/Infrastructure/Cache/
+PushAndPull/Global/Cache/
 ```
 
 Steam Authentication
 
 ```
-Server/Infrastructure/Auth/
+PushAndPull/Global/Auth/
+```
+
+Security (SessionAuthorize, ClaimsExtensions)
+
+```
+PushAndPull/Global/Security/
+```
+
+Shared Utilities (PasswordHasher, RoomCodeGenerator 등)
+
+```
+PushAndPull/Global/Service/
+```
+
+Global DI Registration
+
+```
+PushAndPull/Global/Config/GlobalServiceConfig.cs
 ```
 
 ---
 
 # Architecture
 
-This project strictly follows **Hexagonal Architecture (Ports & Adapters)**.
+이 프로젝트는 **도메인 중심 레이어드 아키텍처**를 따른다.
 
-Dependency direction:
+각 도메인(`Auth`, `Room`)은 독립적인 폴더 아래에 Controller, Service, Repository, Entity, Dto, Exception, Config를 포함한다.
 
-```
-Api → Application → Domain
-Infrastructure → Application (via Port interfaces)
-```
+도메인 횡단 관심사(캐시, 인증, DB, 보안, 유틸)는 `Global/`에 위치한다.
 
-Forbidden dependencies:
+의존성 방향:
 
 ```
-Application → Infrastructure ❌
-Domain → Infrastructure ❌
-Domain → Application ❌
+Controller → Service Interface
+Service → Repository Interface
+Service → Global Service Interface (IAuthTicketValidator, ISessionService 등)
+Repository → AppDbContext
+```
+
+금지 의존성:
+
+```
+Controller → Repository ❌
+Controller → 구현 클래스 직접 참조 ❌
+Service → Repository 구현 클래스 직접 참조 ❌
+Entity → Service / Repository ❌
 ```
 
 ---
 
 # Layer Responsibilities
 
-## Domain
+## Domain/{DomainName}
 
-Pure domain model layer.
+각 도메인 폴더가 해당 기능의 전체 레이어를 포함한다.
 
-Rules:
+### Controller
 
-* No external dependencies
-* Business logic belongs in Entities
-* State changes must be done through methods
+* HTTP 엔드포인트 정의
+* Request DTO → Command 변환
+* Service 호출 후 Result → Response DTO 변환
+* `[SessionAuthorize]`로 인증 처리
 
-Example:
+Controller는 **Service Interface**에만 의존해야 한다.
 
-```
-room.Join(player)
-room.Close()
-```
+### Service / Interface
 
-Entities:
+비즈니스 로직 구현.
 
-```
-User
-Room
-PlayerSession
-```
+* Service Interface 파일에 `Command` (입력) 와 `Result` (출력) record를 함께 정의
+* Service는 `ExecuteAsync(...)` 메서드를 통해 유스케이스를 노출
+* Repository Interface와 Global Service Interface에만 의존
 
-Exceptions are defined in:
+예시:
 
-```
-Domain/Exception/
-```
+```csharp
+// Interface 파일
+public interface ILoginService
+{
+    Task<LoginResult> ExecuteAsync(LoginCommand request);
+}
 
----
-
-## Application
-
-Business use cases.
-
-Contains:
-
-```
-UseCases
-Input Ports
-Output Ports
-Application Services
+public record LoginCommand(string Ticket, string Nickname);
+public record LoginResult(string SessionId);
 ```
 
-Rules:
+### Repository / Interface
 
-* UseCases expose `ExecuteAsync(...)`
-* UseCases depend only on **Port interfaces**
-* Infrastructure implementations must not be referenced
+데이터 접근 추상화.
 
-DTO rules:
+* Interface는 `Repository/Interface/`에 위치
+* 구현체는 EF Core 또는 Dapper 사용
+* 읽기 쿼리는 반드시 `AsNoTracking()` 사용
 
-```
-Command → input
-Result → output
-```
+### Entity
 
-Example:
+순수 도메인 모델.
 
-```
-CreateRoomCommand
-CreateRoomResult
-```
+* 외부 의존성 없음
+* 비즈니스 로직은 Entity 메서드로 캡슐화
+* 상태 변경은 반드시 메서드를 통해
 
----
-
-## Infrastructure
-
-External system integrations.
-
-Contains:
-
-```
-EF Core repositories
-Redis cache
-Steam Web API integration
-Password hashing
-Room code generation
-```
-
-Rules:
-
-* Implements **Output Ports**
-* Handles all external IO
-* No business logic
-
-Database mapping must be defined only in:
-
-```
-AppDbContext.OnModelCreating
-```
-
-DataAnnotations for EF mapping are forbidden.
-
----
-
-## API
-
-Presentation layer.
-
-Responsibilities:
-
-* HTTP endpoints
-* Request → Command mapping
-* Result → Response mapping
-* Session authentication
-
-Rules:
-
-Controllers must depend only on **UseCase interfaces**.
-
-Forbidden:
-
-```
-Controller → Repository ❌
-Controller → Infrastructure Service ❌
-```
-
-Authentication:
-
-```
-[SessionAuthorize]
-```
-
-User identity extraction:
-
-```
-User.GetSessionId()
-User.GetSteamId()
-```
-
----
-
-# Coding Conventions
-
-## General C#
-
-DTO types
-
-```
-record
-```
-
-Domain / Services
-
-```
-class
-```
-
-Dependency injection:
-
-```
-Constructor injection only
-```
-
-Nullable reference types enabled.
-
-Implicit usings enabled.
-
----
-
-## Naming
-
-Interfaces
-
-```
-ILoginUseCase
-IRoomRepository
-```
-
-Commands
-
-```
-CreateRoomCommand
-JoinRoomCommand
-```
-
-Results
-
-```
-CreateRoomResult
-```
-
-Request DTO
-
-```
-CreateRoomRequest
-```
-
-Response DTO
-
-```
-CreateRoomResponse
-```
-
-UseCases
-
-```
-CreateRoomUseCase
-JoinRoomUseCase
-```
-
----
-
-## Entity Design
-
-Rules:
-
-* Default constructor must be `protected` or `private`
-* Public constructor receives required fields only
-* State mutation via methods only
-
-Example:
+예시:
 
 ```
 room.Join()
@@ -394,7 +263,127 @@ room.Close()
 user.UpdateNickname()
 ```
 
-Private setters must be used to prevent external modification.
+### Dto
+
+* `Request/` — HTTP 요청 DTO
+* `Response/` — HTTP 응답 DTO
+* 모두 `record` 타입 사용
+
+### Exception
+
+도메인별 예외 클래스.
+
+### Config
+
+해당 도메인의 서비스 DI 등록 Extension 메서드.
+
+---
+
+## Global/
+
+도메인 횡단 관심사.
+
+| 폴더 | 역할 |
+|------|------|
+| `Auth/` | Steam 티켓 검증 (`IAuthTicketValidator`, `SteamAuthTicketValidator`) |
+| `Cache/` | Redis 캐시 (`ICacheStore`, `CacheStore`, `CacheKey`) |
+| `Config/` | 전역 DI 등록, DB/Redis 설정 |
+| `Infrastructure/` | `AppDbContext` (EF Core) |
+| `Security/` | `[SessionAuthorize]`, `ClaimsPrincipalExtensions` |
+| `Service/` | 공용 유틸 (`IPasswordHasher`, `IRoomCodeGenerator` 등) |
+
+---
+
+# Coding Conventions
+
+## General C#
+
+DTO 타입
+
+```
+record
+```
+
+Domain Entity / Service
+
+```
+class
+```
+
+의존성 주입:
+
+```
+생성자 주입만 사용
+```
+
+Nullable reference types 활성화.
+
+Implicit usings 활성화.
+
+---
+
+## Naming
+
+Service Interface
+
+```
+ILoginService
+ICreateRoomService
+```
+
+Repository Interface
+
+```
+IUserRepository
+IRoomRepository
+```
+
+Command (Service 입력)
+
+```
+LoginCommand
+CreateRoomCommand
+```
+
+Result (Service 출력)
+
+```
+LoginResult
+CreateRoomResult
+```
+
+Request DTO
+
+```
+LoginRequest
+CreateRoomRequest
+```
+
+Response DTO
+
+```
+LoginResponse
+CreateRoomResponse
+```
+
+Service 구현체
+
+```
+LoginService
+CreateRoomService
+```
+
+---
+
+## Entity Design
+
+규칙:
+
+* 기본 생성자는 `protected` 또는 `private`
+* Public 생성자는 필수 필드만 받음
+* 상태 변경은 메서드를 통해서만
+
+Private setter를 사용하여 외부 수정 방지.
 
 ---
 
@@ -430,37 +419,43 @@ Enum storage:
 string conversion
 ```
 
-Example:
+예시:
 
 ```
 .HasConversion<string>()
 ```
 
-Read queries must use:
+읽기 쿼리는 반드시:
 
 ```
 AsNoTracking()
 ```
 
+EF 매핑은 반드시 `AppDbContext.OnModelCreating`에서만 설정.
+
+DataAnnotations로 EF 매핑하는 것은 금지.
+
 ---
 
 # Cache Rules
 
-Redis is used for **session storage**.
+Redis는 **세션 저장소**로 사용.
 
-All keys must be generated through:
+모든 키는 반드시:
 
 ```
 CacheKey
 ```
 
-Forbidden:
+를 통해 생성.
+
+금지:
 
 ```
-Hardcoded Redis keys
+하드코딩 Redis 키
 ```
 
-Correct example:
+올바른 예시:
 
 ```
 CacheKey.Session.ById(sessionId)
@@ -470,25 +465,19 @@ CacheKey.Session.ById(sessionId)
 
 # Authentication
 
-Steam authentication uses:
+Steam 인증:
 
 ```
 ISteamUserAuth/AuthenticateUserTicket/v1
 ```
 
-Session authentication is performed using:
-
-```
-Session-Id HTTP header
-```
-
-Example:
+세션 인증은 HTTP 헤더를 통해:
 
 ```
 Session-Id: 3c4e2b1d...
 ```
 
-Bearer tokens are **not used**.
+Bearer 토큰은 **사용하지 않음**.
 
 ---
 
@@ -507,26 +496,26 @@ Bearer tokens are **not used**.
 
 # Common Mistakes
 
-Missing session authentication on protected endpoints.
+세션 인증이 필요한 엔드포인트에 `[SessionAuthorize]` 누락.
 
-SteamId type confusion:
+SteamId 타입 혼동:
 
 ```
 User.SteamId → ulong
 Claims → long
 ```
 
-Updating entity fields directly instead of using domain methods.
+Domain 메서드를 통하지 않고 Entity 필드를 직접 수정.
 
-Hardcoding Redis keys instead of using `CacheKey`.
+`CacheKey` 대신 Redis 키를 하드코딩.
 
-Controllers calling repositories directly.
+Controller가 Repository를 직접 호출.
 
-Application layer referencing Infrastructure classes.
+Service가 구현 클래스를 직접 참조 (Interface를 통해야 함).
 
-Adding EF Core mapping attributes instead of Fluent API configuration.
+`OnModelCreating` 대신 DataAnnotation으로 EF 매핑.
 
-Forgetting to register new services in `Program.cs`.
+새 서비스 추가 후 `Program.cs` 또는 `{Domain}ServiceConfig`에 DI 등록 누락.
 
 ---
 
@@ -550,9 +539,9 @@ release → 릴리즈 (release/x.x.x 형식)
 
 Rules:
 
-* Description is written in **Korean**
-* Short and imperative (단문)
-* No trailing punctuation (`.`, `!` 등 금지)
+* Description은 **한국어**로 작성
+* 단문, 명령형
+* 끝에 구두점 금지 (`.`, `!` 등)
 
 Examples:
 
@@ -566,20 +555,21 @@ modify: Room 엔터티 수정
 
 # Claude Guidelines
 
-When generating or modifying code:
+코드 생성 또는 수정 시:
 
-1. Follow **Hexagonal Architecture** strictly.
-2. Controllers must depend only on **UseCase interfaces**.
-3. UseCases must not access Infrastructure directly.
-4. Domain entities must encapsulate business logic.
-5. DTOs must use `record` types.
-6. EF mapping must be configured only in `OnModelCreating`.
-7. Do not bypass Domain logic.
+1. 도메인 중심 레이어드 아키텍처를 엄수한다.
+2. Controller는 **Service Interface**에만 의존해야 한다.
+3. Service는 **Repository Interface** 및 **Global Interface**에만 의존해야 한다.
+4. Domain Entity는 비즈니스 로직을 캡슐화해야 한다.
+5. DTO는 `record` 타입을 사용한다.
+6. EF 매핑은 `OnModelCreating`에서만 설정한다.
+7. Domain 로직을 우회하지 않는다.
 
-When adding new features:
+새 기능 추가 시:
 
-1. Define **Input Port (UseCase interface)**.
-2. Implement **UseCase in Application layer**.
-3. Define required **Output Ports**.
-4. Implement adapters in **Infrastructure layer**.
-5. Expose via **API Controller**.
+1. `Domain/{DomainName}/Service/Interface/`에 Service Interface와 Command/Result record 정의.
+2. `Domain/{DomainName}/Service/`에 Service 구현체 작성.
+3. 필요한 경우 `Domain/{DomainName}/Repository/Interface/`에 Repository Interface 추가.
+4. `Domain/{DomainName}/Repository/`에 Repository 구현체 작성.
+5. `Domain/{DomainName}/Controller/`에 Controller 엔드포인트 추가.
+6. `Domain/{DomainName}/Config/`의 DI 등록 메서드에 새 서비스 등록.
