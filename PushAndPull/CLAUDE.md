@@ -228,7 +228,8 @@ CacheKey.Session.ById(sessionId)
 |------|------|
 | `feat` | New feature |
 | `fix` | Bug fix, missing config/DI |
-| `modify` | Modification to existing code |
+| `update` | Modification to existing code |
+| `docs` | Documentation changes |
 | `merge` | Branch merge |
 | `release` | Release (`release/x.x.x`) |
 

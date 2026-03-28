@@ -15,6 +15,7 @@ Create Git commits following the project's commit conventions.
 - `feat` — new feature added
 - `fix` — bug fix, missing config, or missing DI registration
 - `update` — modification to existing code
+- `docs` — documentation changes
 
 **Description rules**:
 - Written in **Korean**
@@ -62,6 +63,7 @@ feat: 방 참여 API 추가 및 세션 버그 수정   ← two purposes in one c
    - New feature → `feat`
    - Bug fix / missing registration → `fix`
    - Modification to existing code → `update`
+   - Documentation changes → `docs`
 3. If there are 2+ groups, they must be committed separately
 4. For each group:
    - Stage only the relevant files with `git add <files>`
