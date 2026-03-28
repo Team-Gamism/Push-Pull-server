@@ -1,5 +1,5 @@
 ---
-description: EF Core migration guide (.NET/C# - PushAndPull)
+description: EF Core migration guide (.NET/C# - PushAndPull). TRIGGER when: user modifies or creates Entity classes or Entity/Config files.
 ---
 
 # EF Core Migration Guide

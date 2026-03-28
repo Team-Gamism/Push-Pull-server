@@ -1,5 +1,5 @@
 ---
-description: REST API design guide (.NET/C# - PushAndPull)
+description: REST API design guide (.NET/C# - PushAndPull). TRIGGER when: user creates a new Controller or adds a new API endpoint.
 ---
 
 # REST API Design Guide
