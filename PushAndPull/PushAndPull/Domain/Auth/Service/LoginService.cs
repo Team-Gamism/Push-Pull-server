@@ -30,8 +30,17 @@ public class LoginService : ILoginService
         if (authResult.IsFamilySharing)
             throw new FamilySharingNotAllowedException(authResult.SteamId);
 
-        var user = new User(authResult.SteamId, request.Nickname);
-        await _userRepository.CreateAsync(user);
+        var existingUser = await _userRepository.GetBySteamIdAsync(authResult.SteamId);
+
+        if (existingUser is null)
+        {
+            var user = new User(authResult.SteamId, request.Nickname);
+            await _userRepository.CreateAsync(user);
+        }
+        else
+        {
+            await _userRepository.UpdateAsync(authResult.SteamId, request.Nickname, DateTime.UtcNow);
+        }
 
         var session = await _sessionService.CreateAsync(
             authResult.SteamId, TimeSpan.FromDays(15)
