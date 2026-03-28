@@ -9,7 +9,7 @@ Build the server project and report any errors.
 
 1. Run the build command:
    ```bash
-   dotnet build Server/Server.csproj
+   dotnet build PushAndPull/PushAndPull.csproj
    ```
 2. Check the build output:
    - If the build **succeeds**: confirm success and show the summary (warnings, if any)
