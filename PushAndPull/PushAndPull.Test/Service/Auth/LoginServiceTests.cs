@@ -26,10 +26,6 @@ public class LoginServiceTests
                 .Setup(v => v.ValidateAsync(Ticket))
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
 
-            _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
-                .ReturnsAsync((User?)null);
-
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
             _sessionServiceMock
                 .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
@@ -83,11 +79,6 @@ public class LoginServiceTests
                 .Setup(v => v.ValidateAsync(Ticket))
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
 
-            var existingUser = new User(SteamId, "OldNickname");
-            _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
-                .ReturnsAsync(existingUser);
-
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
             _sessionServiceMock
                 .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
@@ -97,23 +88,22 @@ public class LoginServiceTests
         }
 
         [Fact]
-        public async Task It_UpdatesNicknameAndLastLogin()
+        public async Task It_CallsCreateAsyncWithUpdatedNickname()
         {
             await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
 
-            _userRepositoryMock.Verify(r => r.UpdateAsync(
-                SteamId,
-                NewNickname,
-                It.IsAny<DateTime>(),
+            _userRepositoryMock.Verify(r => r.CreateAsync(
+                It.Is<User>(u => u.SteamId == SteamId && u.Nickname == NewNickname),
                 CancellationToken.None), Times.Once);
         }
 
         [Fact]
-        public async Task It_DoesNotCreateANewUser()
+        public async Task It_DoesNotCallUpdateAsync()
         {
             await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
 
-            _userRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<User>(), CancellationToken.None), Times.Never);
+            _userRepositoryMock.Verify(r => r.UpdateAsync(
+                It.IsAny<ulong>(), It.IsAny<string>(), It.IsAny<DateTime>(), CancellationToken.None), Times.Never);
         }
 
         [Fact]
