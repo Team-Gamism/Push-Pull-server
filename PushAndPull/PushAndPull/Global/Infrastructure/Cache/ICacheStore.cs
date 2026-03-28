@@ -1,4 +1,4 @@
-namespace PushAndPull.Global.Cache;
+namespace PushAndPull.Global.Infrastructure.Cache;
 
 public interface ICacheStore
 {

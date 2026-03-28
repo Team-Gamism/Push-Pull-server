@@ -1,6 +1,6 @@
 using PushAndPull.Domain.Auth.Entity;
 using PushAndPull.Domain.Auth.Service.Interface;
-using PushAndPull.Global.Cache;
+using PushAndPull.Global.Infrastructure.Cache;
 
 namespace PushAndPull.Domain.Auth.Service;
 

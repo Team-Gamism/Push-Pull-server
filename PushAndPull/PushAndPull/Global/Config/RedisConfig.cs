@@ -1,5 +1,3 @@
-using StackExchange.Redis;
-
 namespace PushAndPull.Global.Config;
 
 public static class RedisConfig
@@ -8,11 +6,10 @@ public static class RedisConfig
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
+        services.AddStackExchangeRedisCache(options =>
         {
-            var connStr = configuration["Redis:ConnectionString"]
-                          ?? throw new InvalidOperationException();
-            return ConnectionMultiplexer.Connect(connStr);
+            options.Configuration = configuration["Redis:ConnectionString"]
+                ?? throw new InvalidOperationException("Redis:ConnectionString is not configured.");
         });
 
         return services;

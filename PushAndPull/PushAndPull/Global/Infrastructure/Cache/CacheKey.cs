@@ -1,4 +1,4 @@
-namespace PushAndPull.Global.Cache;
+namespace PushAndPull.Global.Infrastructure.Cache;
 
 public static class CacheKey
 {
