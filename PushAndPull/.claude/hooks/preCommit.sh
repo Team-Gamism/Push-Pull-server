@@ -1,40 +1,23 @@
 ﻿#!/bin/bash
+# .claude/hooks/preToolUse.sh
+# Ensure tests pass before allowing dotnet-related operations
 
-COMMIT_MSG="$TOOL_PARAMS_MESSAGE"
+if [[ "$TOOL_NAME" == "Bash" ]]; then
+    COMMAND="$TOOL_PARAMS_COMMAND"
 
-# allowed types
-PATTERN="^(feat|fix|update): .+"
+    # Detect dotnet-related commands (build/run/commit-like flow)
+    if [[ "$COMMAND" =~ dotnet\ (build|run|publish) ]]; then
+        echo "[Hook] Checking tests before proceeding..."
 
-if [[ ! "$COMMIT_MSG" =~ $PATTERN ]]; then
-    echo "[Hook] ✗ Invalid commit message format"
-    echo ""
-    echo "Expected:"
-    echo "  {type}: {Korean description}"
-    echo ""
-    echo "Types:"
-    echo "  feat   — new feature"
-    echo "  fix    — bug fix or missing DI/config"
-    echo "  update — modification to existing code"
-    echo ""
-    echo "Examples:"
-    echo "  feat: 로그인 로직 추가"
-    echo "  fix: 세션 DI 누락 수정"
-    echo "  update: Account 엔터티 수정"
-    exit 1
+        dotnet test --nologo --no-build
+        RESULT=$?
+
+        if [ $RESULT -ne 0 ]; then
+            echo "[Hook] ✗ Tests failed"
+            echo "Code changes must be reflected in tests before proceeding."
+            exit 2
+        fi
+
+        echo "[Hook] ✓ Tests passed"
+    fi
 fi
-
-# punctuation check
-if [[ "$COMMIT_MSG" =~ [\.\!]$ ]]; then
-    echo "[Hook] ✗ Do not end the message with punctuation"
-    echo "Example: feat: 로그인 로직 추가"
-    exit 1
-fi
-
-# ensure single line
-if [[ "$COMMIT_MSG" == *$'\n'* ]]; then
-    echo "[Hook] ✗ Commit body is not allowed"
-    echo "Use subject line only"
-    exit 1
-fi
-
-echo "[Hook] ✓ Commit message format valid"
