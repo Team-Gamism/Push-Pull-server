@@ -1,23 +1,28 @@
-﻿#!/bin/bash
-# .claude/hooks/preToolUse.sh
-# Ensure tests pass before allowing dotnet-related operations
+#!/bin/bash
+# .claude/hooks/preCommit.sh
+# Ensure tests pass before allowing dotnet build/run/publish (Claude Code PreToolUse hook)
 
-if [[ "$TOOL_NAME" == "Bash" ]]; then
-    COMMAND="$TOOL_PARAMS_COMMAND"
+INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
-    # Detect dotnet-related commands (build/run/commit-like flow)
-    if [[ "$COMMAND" =~ dotnet\ (build|run|publish) ]]; then
-        echo "[Hook] Checking tests before proceeding..."
-
-        dotnet test --nologo --no-build
-        RESULT=$?
-
-        if [ $RESULT -ne 0 ]; then
-            echo "[Hook] ✗ Tests failed"
-            echo "Code changes must be reflected in tests before proceeding."
-            exit 2
-        fi
-
-        echo "[Hook] ✓ Tests passed"
-    fi
+if [[ "$TOOL_NAME" != "Bash" ]]; then
+    exit 0
 fi
+
+if [[ ! "$COMMAND" =~ dotnet[[:space:]]+(build|run|publish) ]]; then
+    exit 0
+fi
+
+echo "[Hook] Checking tests before proceeding..."
+
+dotnet test PushAndPull/PushAndPull.sln --nologo --no-build 2>/dev/null
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo "[Hook] ✗ Tests failed — fix tests before running dotnet $BASH_REMATCH[1]"
+    exit 2
+fi
+
+echo "[Hook] ✓ Tests passed"
+exit 0
