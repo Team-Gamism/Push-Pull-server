@@ -34,7 +34,7 @@ Generate a PR based on the current branch. Behavior differs depending on the bra
 **Step 3. Ask user for version number**
 
 Use AskUserQuestion:
-> "현재 버전: {current_version}
+> 현재 버전: {current_version}
 > 추천 버전 업: {Major/Minor/Patch} → {recommended_version}
 > 이유: {brief reason}
 >
@@ -143,8 +143,9 @@ Format: `{type}: {Korean description}`
 **Types:**
 - `feature` — new feature added
 - `fix` — bug fix or missing configuration/DI registration
-- `modify` — modification to existing code
+- `update` — modification to existing code
 - `refactor` — refactoring without behavior change
+- `docs` - documentation changes
 
 **Rules:**
 - Description in Korean
