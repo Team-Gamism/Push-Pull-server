@@ -9,8 +9,9 @@ public static class DatabaseConfig
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("Default")
-                               ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+        var connectionString = configuration.GetConnectionString("Default");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("ConnectionStrings:Default is not configured or is empty.");
 
         services.AddDbContext<AppDbContext>(options =>
         {
