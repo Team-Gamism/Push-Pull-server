@@ -9,8 +9,8 @@ public static class DatabaseConfig
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration[configuration["KeyVault:DbConnectionSecretName"]!]
-                               ?? throw new InvalidOperationException("DB 연결 문자열을 Key Vault에서 가져올 수 없습니다.");
+        var connectionString = configuration.GetConnectionString("Default")
+                               ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
 
         services.AddDbContext<AppDbContext>(options =>
         {
