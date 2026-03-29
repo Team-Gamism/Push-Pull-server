@@ -7,6 +7,14 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/preToolUse.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/preCommit.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/commit-msg.sh"
           }
         ]
       }

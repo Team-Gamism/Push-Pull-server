@@ -1,6 +1,6 @@
 namespace PushAndPull.Domain.Auth.Exception;
 
-public class SteamApiException : SteamAuthException
+public class SteamApiException : System.Exception
 {
     public int? StatusCode { get; }
 

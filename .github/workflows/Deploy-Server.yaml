@@ -3,12 +3,14 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -34,8 +36,10 @@ jobs:
           docker pull seanyee1227/pushandpull-server:latest
           docker stop pushandpull-server || true
           docker rm pushandpull-server || true
+
           docker run -d \
             --name pushandpull-server \
+            --network pushandpull-network \
             --restart unless-stopped \
             -p 21754:80 \
             -e ASPNETCORE_URLS=http://+:80 \
