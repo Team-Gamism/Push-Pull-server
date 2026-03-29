@@ -34,7 +34,7 @@ Generate a PR based on the current branch. Behavior differs depending on the bra
 **Step 3. Ask user for version number**
 
 Use AskUserQuestion:
-> "현재 버전: {current_version}
+> 현재 버전: {current_version}
 > 추천 버전 업: {Major/Minor/Patch} → {recommended_version}
 > 이유: {brief reason}
 >
