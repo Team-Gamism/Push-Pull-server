@@ -143,8 +143,9 @@ Format: `{type}: {Korean description}`
 **Types:**
 - `feature` — new feature added
 - `fix` — bug fix or missing configuration/DI registration
-- `modify` — modification to existing code
+- `update` — modification to existing code
 - `refactor` — refactoring without behavior change
+- `docs` - documentation changes
 
 **Rules:**
 - Description in Korean
