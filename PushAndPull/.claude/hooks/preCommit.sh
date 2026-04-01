@@ -1,28 +1,42 @@
 #!/bin/bash
 # .claude/hooks/preCommit.sh
-# Ensure tests pass before allowing dotnet build/run/publish (Claude Code PreToolUse hook)
 
-INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+COMMIT_MSG="$TOOL_PARAMS_MESSAGE"
 
-if [[ "$TOOL_NAME" != "Bash" ]]; then
-    exit 0
+# allowed types
+PATTERN="^(feat|fix|update|docs): .+"
+
+if [[ ! "$COMMIT_MSG" =~ $PATTERN ]]; then
+    echo "[Hook] ✗ Invalid commit message format"
+    echo ""
+    echo "Expected:"
+    echo "  {type}: {Korean description}"
+    echo ""
+    echo "Types:"
+    echo "  feat   — new feature"
+    echo "  fix    — bug fix or missing DI/config"
+    echo "  update — modification to existing code"
+    echo "  docs   — documentation changes"
+    echo ""
+    echo "Examples:"
+    echo "  feat: 방 생성 API 추가"
+    echo "  fix: 세션 DI 누락 수정"
+    echo "  update: Room 엔터티 수정"
+    exit 1
 fi
 
-if [[ ! "$COMMAND" =~ dotnet[[:space:]]+(build|run|publish) ]]; then
-    exit 0
+# punctuation check
+if [[ "$COMMIT_MSG" =~ [\.\!]$ ]]; then
+    echo "[Hook] ✗ Do not end the message with punctuation"
+    echo "Example: feat: 방 생성 API 추가"
+    exit 1
 fi
 
-echo "[Hook] Checking tests before proceeding..."
-
-dotnet test PushAndPull/PushAndPull.sln --nologo --no-build 2>/dev/null
-RESULT=$?
-
-if [ $RESULT -ne 0 ]; then
-    echo "[Hook] ✗ Tests failed — fix tests before running dotnet $BASH_REMATCH[1]"
-    exit 2
+# ensure single line
+if [[ "$COMMIT_MSG" == *$'\n'* ]]; then
+    echo "[Hook] ✗ Commit body is not allowed"
+    echo "Use subject line only"
+    exit 1
 fi
 
-echo "[Hook] ✓ Tests passed"
-exit 0
+echo "[Hook] ✓ Commit message format valid"

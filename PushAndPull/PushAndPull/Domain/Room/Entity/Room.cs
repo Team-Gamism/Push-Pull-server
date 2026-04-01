@@ -22,6 +22,8 @@ public class Room
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? ExpiresAt { get; set; }
 
+    private const int DefaultMaxPlayers = 2;
+
     protected Room() { }
 
     public Room(
@@ -38,7 +40,7 @@ public class Room
         SteamLobbyId = steamLobbyId;
         HostSteamId = hostSteamId;
         CurrentPlayers = 1;
-        MaxPlayers = 2;
+        MaxPlayers = DefaultMaxPlayers;
         IsPrivate = isPrivate;
         PasswordHash = passwordHash;
         Status = RoomStatus.Active;

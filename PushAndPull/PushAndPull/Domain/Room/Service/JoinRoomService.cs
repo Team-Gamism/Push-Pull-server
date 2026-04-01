@@ -28,12 +28,12 @@ public class JoinRoomService : IJoinRoomService
         if (room.Status != RoomStatus.Active)
             throw new RoomNotActiveException(request.RoomCode);
 
-        if (request.Password != null)
+        if (room.IsPrivate)
         {
             if (string.IsNullOrWhiteSpace(request.Password))
                 throw new InvalidOperationException("PASSWORD_REQUIRED");
 
-            if (!_passwordHasher.Verify( request.Password, room.PasswordHash!))
+            if (!_passwordHasher.Verify(request.Password, room.PasswordHash!))
                 throw new InvalidOperationException("INVALID_PASSWORD");
         }
 
