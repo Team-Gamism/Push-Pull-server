@@ -63,6 +63,35 @@ public class JoinRoomServiceTests
         }
     }
 
+    public class WhenAPrivateRoomIsJoinedWithoutAPassword
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomService _sut;
+
+        private const string RoomCode = "PRIV02";
+
+        public WhenAPrivateRoomIsJoinedWithoutAPassword()
+        {
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, 76561198000000001UL, true, "some-hash");
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode))
+                .ReturnsAsync(privateRoom);
+
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsInvalidOperationExceptionWithPasswordRequiredMessage()
+        {
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+
+            Assert.Equal("PASSWORD_REQUIRED", ex.Message);
+        }
+    }
+
     public class WhenTheWrongPasswordIsProvidedForAPrivateRoom
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

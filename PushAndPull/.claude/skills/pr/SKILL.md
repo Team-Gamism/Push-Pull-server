@@ -1,7 +1,7 @@
 ---
 name: pr
 description: Generates a PR title suggestion and body based on the current branch, then creates a GitHub PR. Supports develop/release/feature branches.
-allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(git tag:*), Bash(git checkout:*), Bash(gh pr create:*), Bash(rm:*), Write, AskUserQuestion
+allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(git tag:*), Bash(git checkout:*), Bash(gh pr create:*), Bash(rm:*), Write, Read, AskUserQuestion
 context: fork
 ---
 
@@ -114,20 +114,15 @@ rm PR_BODY.md
 
 **Step 4. Output** in this format:
 ```
-## 추천 PR 제목
-
-1. [title1]
-2. [title2]
-3. [title3]
-
 ## PR 본문 (PR_BODY.md에 저장됨)
 
 [full body preview]
 ```
 
-**Step 5. Ask the user** using AskUserQuestion with a `choices` array:
-- Options: the 3 generated titles + "직접 입력" as the last option
-- If the user selects "직접 입력", ask a follow-up AskUserQuestion for the custom title
+**Step 5. Ask the user** using AskUserQuestion — you MUST call this tool, do NOT print a text prompt:
+- `question`: "PR 제목을 선택해주세요."
+- `choices`: the 3 generated titles + "직접 입력" as the last option
+- If the user selects "직접 입력", immediately call AskUserQuestion again with `question`: "PR 제목을 입력해주세요."
 
 **Step 6. Create PR to `{Base Branch}`**
 
