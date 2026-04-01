@@ -30,7 +30,7 @@ public class JoinRoomService : IJoinRoomService
 
         if (room.IsPrivate)
         {
-            if (request.Password == null)
+            if (string.IsNullOrWhiteSpace(request.Password))
                 throw new InvalidOperationException("PASSWORD_REQUIRED");
 
             if (!_passwordHasher.Verify(request.Password, room.PasswordHash!))
