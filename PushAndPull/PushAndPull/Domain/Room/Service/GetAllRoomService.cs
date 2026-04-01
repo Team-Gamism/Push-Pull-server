@@ -1,3 +1,4 @@
+using PushAndPull.Domain.Room.Dto.Response;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 
@@ -16,15 +17,15 @@ public class GetAllRoomService : IGetAllRoomService
     {
         var rooms = await _roomRepository.GetAllAsync(ct);
 
-        var summaries = rooms
-            .Select(room => new RoomSummary(
-                room.RoomName,
+        var responses = rooms
+            .Select(room => new GetRoomResponse(
                 room.RoomCode,
+                room.RoomName,
                 room.CurrentPlayers,
                 room.IsPrivate
             ))
             .ToList();
 
-        return new GetAllRoomResult(summaries);
+        return new GetAllRoomResult(responses);
     }
 }
