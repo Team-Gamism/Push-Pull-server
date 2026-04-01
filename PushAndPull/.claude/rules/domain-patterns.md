@@ -45,7 +45,6 @@ public class CreateRoomService : ICreateRoomService
 
 - Interface in `Repository/Interface/`, implementation in `Repository/`.
 - Only repositories access `AppDbContext`.
-- Use `AsNoTracking()` for read-only queries.
 
 ```csharp
 public class RoomRepository : IRoomRepository

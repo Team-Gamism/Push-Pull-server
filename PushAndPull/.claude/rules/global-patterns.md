@@ -29,15 +29,7 @@ Sessions are stored in Redis via `ISessionService` / `ISessionStore`:
 - Session contains `SteamId` (`ulong`)
 - TTL: 15 days (configurable)
 
-**All Redis keys must use `CacheKey` — no hardcoded strings:**
-
-```csharp
-// Correct
-CacheKey.Session.ById(sessionId)
-
-// Forbidden
-"session:" + sessionId
-```
+**All Redis keys must use `CacheKey` — no hardcoded strings.**
 
 ## Security
 
