@@ -19,8 +19,8 @@ jobs:
       run: |
         docker build \
           -t seanyee1227/pushandpull-server:latest \
-          -f PushAndPull/Server/Dockerfile \
-          PushAndPull/Server
+          -f PushAndPull/PushAndPull/Dockerfile \
+          PushAndPull/PushAndPull
 
     - name: Push Docker image
       run: docker push seanyee1227/pushandpull-server:latest
@@ -44,10 +44,7 @@ jobs:
             -p 21754:80 \
             -e ASPNETCORE_URLS=http://+:80 \
             -e ASPNETCORE_ENVIRONMENT=Production \
-            -e Steam__ApiKey=${{ secrets.STEAM_API_KEY }} \
-            -e AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }} \
-            -e AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }} \
-            -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }} \
+            -e "ConnectionStrings__Default=${{ secrets.DB_CONNECTION_STRING }}" \
             seanyee1227/pushandpull-server:latest
 
           sleep 5
