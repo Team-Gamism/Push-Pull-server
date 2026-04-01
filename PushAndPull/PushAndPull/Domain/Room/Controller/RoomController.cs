@@ -43,54 +43,43 @@ public class RoomController : ControllerBase
             request.IsPrivate,
             request.Password,
             hostSteamId
-            )
-        );
+        ));
 
         return CommonApiResponse.Created("방이 생성되었습니다.", new CreateRoomResponse(result.RoomCode));
     }
 
     [HttpGet("{roomCode}")]
-    public async Task<GetRoomResponse> GetRoom(
+    public async Task<CommonApiResponse<GetRoomResponse>> GetRoom(
         [FromRoute] string roomCode
     )
     {
-        var result = await _getRoomService.ExecuteAsync(
-            new GetRoomCommand(roomCode)
-        );
+        var result = await _getRoomService.ExecuteAsync(new GetRoomCommand(roomCode));
 
-        return new GetRoomResponse(
+        return CommonApiResponse.Success("방 조회 성공.", new GetRoomResponse(
             result.RoomCode,
             result.RoomName,
             result.CurrentPlayers,
             result.IsPrivate
-        );
+        ));
     }
 
     [HttpGet("all")]
-    public async Task<GetAllRoomResponse> GetAllRoom(CancellationToken ct)
+    public async Task<CommonApiResponse<GetAllRoomResponse>> GetAllRoom(CancellationToken ct)
     {
         var result = await _getAllRoomService.ExecuteAsync(ct);
 
-        return new GetAllRoomResponse(
-            result.Rooms.Select(r => new GetRoomResponse(
-                r.RoomCode,
-                r.RoomName,
-                r.CurrentPlayers,
-                r.IsPrivate
-            )).ToList()
-        );
+        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(result.Rooms));
     }
 
     [SessionAuthorize]
     [HttpPost("{roomCode}/join")]
-    public async Task JoinRoom(
+    public async Task<CommonApiResponse> JoinRoom(
         [FromRoute] string roomCode,
         [FromBody] JoinRoomRequest request
         )
     {
-        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(
-            roomCode,
-            request.Password)
-        );
+        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password));
+
+        return CommonApiResponse.Success("방에 참여했습니다.");
     }
 }
