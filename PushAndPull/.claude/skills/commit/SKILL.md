@@ -17,6 +17,7 @@ Create Git commits following the project's commit conventions.
 - `fix` — bug fix, missing config, or missing DI registration
 - `update` — modification to existing code
 - `docs` — documentation changes
+- `chore` — tooling, CI/CD, dependency updates, config changes without code behavior change
 
 **Description rules**:
 - Written in **Korean**
@@ -47,6 +48,7 @@ See `.claude/skills/commit/examples/type-guide.md` for a boundary-rule table and
    - Bug / missing registration fix → `fix`
    - Modification to existing code → `update`
    - Documentation changes → `docs`
+   - Tooling / config / dependency changes → `chore`
 3. Group files by each logical unit
 4. For each group:
    - Stage only the relevant files with `git add <files>`

@@ -2,7 +2,6 @@
 name: pr
 description: Generates a PR title suggestion and body based on the current branch, then creates a GitHub PR. Supports develop/release/feature branches.
 allowed-tools: Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(git tag:*), Bash(git checkout:*), Bash(gh pr create:*), Bash(rm:*), Write, Read, AskUserQuestion
-context: fork
 ---
 
 Generate a PR based on the current branch. Behavior differs depending on the branch.
