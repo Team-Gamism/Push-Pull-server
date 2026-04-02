@@ -27,8 +27,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - DOTNET_USE_POLLING_FILE_WATCHER=1
-      - ConnectionStrings__Default=Host=localhost;Port=5434;Database=pushandpull_dev;Username=pushandpull;Password=pushandpull
-      - Redis__ConnectionString=localhost:6381,abortConnect=false
+      - ConnectionStrings__Default=Host=pushandpull-db;Port=5432;Database=pushandpull_dev;Username=pushandpull;Password=pushandpull
+      - Redis__ConnectionString=pushandpull-redis:6379,abortConnect=false
       - Steam__WebApiKey=Steam-ApiKey
     volumes:
       - ..:/src
