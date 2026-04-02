@@ -7,7 +7,7 @@ public class UserConfig : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("user", "game_user");
+        builder.ToTable("user", "auth");
 
         builder.HasKey(x => x.SteamId);
 
