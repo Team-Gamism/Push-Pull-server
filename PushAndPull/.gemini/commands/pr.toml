@@ -1,0 +1,157 @@
+description = "현재 브랜치 기반으로 GitHub PR을 생성합니다. 사용법: /pr 또는 /pr {base-branch}"
+
+prompt = """
+Generate and create a GitHub Pull Request based on the current branch.
+
+## Runtime Context
+
+### Current branch
+!{git branch --show-current}
+
+### Recent tags
+!{git tag --sort=-v:refname | head -10}
+
+### Existing release branches
+!{git branch -a | grep release}
+
+### User-provided argument (base branch override)
+{{args}}
+
+---
+
+## Step 0. Determine behavior
+
+- If `{{args}}` is **not empty**: set Base Branch = `{{args}}`, skip to **Case 3** immediately.
+- If `{{args}}` is **empty**: check the current branch name and follow the rules below.
+
+---
+
+## Case 1: Current branch is `develop`
+
+**Step 1.** Determine the latest version from tags and release branches.
+
+**Step 2.** Analyze changes from `main`:
+- `git log main..HEAD --oneline`
+- `git diff main...HEAD --stat`
+
+**Step 3.** Recommend a version bump (Major / Minor / Patch) and explain why briefly.
+
+**Step 4.** Ask the user: "현재 버전: {current_version} / 추천: {recommended_version} ({reason}) — 사용할 버전 번호를 입력해주세요. (예: 1.0.1)"
+
+**Step 5.** After the user replies with a version number:
+- Run: `git checkout -b release/{version}`
+- Analyze changes from `main` for the PR body
+
+**Step 6.** Write the PR body following the **PR Body Template** below. Save to `PR_BODY.md`.
+
+**Step 7.** Run:
+```
+gh pr create --title "release/{version}" --body-file PR_BODY.md --base main
+```
+
+**Step 8.** Run: `rm PR_BODY.md`
+
+---
+
+## Case 2: Current branch matches `release/x.x.x`
+
+**Step 1.** Extract version from branch name (e.g., `release/1.2.0` → `1.2.0`).
+
+**Step 2.** Analyze changes from `main`:
+- `git log main..HEAD --oneline`
+- `git diff main...HEAD --stat`
+
+**Step 3.** Write PR body following the **PR Body Template** below. Save to `PR_BODY.md`.
+
+**Step 4.** Run:
+```
+gh pr create --title "release/{version}" --body-file PR_BODY.md --base main
+```
+
+**Step 5.** Run: `rm PR_BODY.md`
+
+---
+
+## Case 3: Any other branch (or base branch was specified via argument)
+
+**Step 1.** Set Base Branch:
+- If `{{args}}` is not empty → Base Branch = `{{args}}`
+- Otherwise → Base Branch = `develop`
+
+**Step 2.** Analyze changes from Base Branch:
+- `git log {Base Branch}..HEAD --oneline`
+- `git diff {Base Branch}...HEAD --stat`
+- `git diff {Base Branch}...HEAD`
+
+**Step 3.** Suggest **three PR title options** following the **PR Title Convention** below.
+
+**Step 4.** Write the PR body following the **PR Body Template** below. Save to `PR_BODY.md`.
+
+**Step 5.** Show the PR body preview and the three title options to the user. Ask:
+"PR 제목을 선택해주세요. (1 / 2 / 3 / 직접 입력)"
+
+**Step 6.** After the user selects or types a title:
+```
+gh pr create --title "{chosen title}" --body-file PR_BODY.md --base {Base Branch}
+```
+
+**Step 7.** Run: `rm PR_BODY.md`
+
+---
+
+## PR Title Convention
+
+Format: `{type}: {Korean description}`
+
+**Types:**
+- `feature` — new feature added
+- `fix` — bug fix or missing configuration/DI registration
+- `update` — modification to existing code
+- `refactor` — refactoring without behavior change
+- `docs` — documentation changes
+- `chore` — tooling, CI/CD, dependency updates
+
+**Rules:**
+- Description in Korean
+- Short and imperative (단문)
+- No trailing punctuation
+
+**Examples:**
+- `feature: 방 생성 API 추가`
+- `fix: 세션 DI 누락 수정`
+- `refactor: Room 서비스 리팩토링`
+
+---
+
+## PR Body Template
+
+Use this exact structure (keep the emoji headers):
+
+```
+## 📚작업 내용
+
+- {change item 1}
+- {change item 2}
+
+## ◀️참고 사항
+
+{additional notes, context, before/after comparisons if relevant. Write "." if nothing to add.}
+
+## ✅체크리스트
+
+> `[ ]`안에 x를 작성하면 체크박스를 체크할 수 있습니다.
+
+- [x] 현재 의도하고자 하는 기능이 정상적으로 작동하나요?
+- [x] 변경한 기능이 다른 기능을 깨뜨리지 않나요?
+
+
+> *추후 필요한 체크리스트는 업데이트 될 예정입니다.*
+```
+
+**Writing rules:**
+- Fill `작업 내용` bullets by grouping commits meaningfully — not one bullet per commit
+- `참고 사항`: configuration notes, before/after comparisons, etc. Write `"."` if nothing to add
+- Keep total body under 2500 characters
+- All text content in Korean (keep section header emojis as-is)
+- No emojis in body text — section headers only
+"""
