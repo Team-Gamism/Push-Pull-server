@@ -23,7 +23,18 @@ jobs:
     - name: Push Docker image
       run: docker push seanyee1227/pushandpull-server:latest
 
-    - name: Deploy to server via SSH
+    - name: Copy compose file to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        port: ${{ secrets.SSH_PORT }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "PushAndPull/deploy/compose.prod.yaml"
+        target: "~/deploy/"
+        strip_components: 2
+
+    - name: Deploy via Docker Compose
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.SSH_HOST }}
@@ -31,18 +42,17 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          docker pull seanyee1227/pushandpull-server:latest
-          docker stop pushandpull-server || true
-          docker rm pushandpull-server || true
-          docker run -d \
-            --name pushandpull-server \
-            --restart unless-stopped \
-            -p 21754:80 \
-            -e ASPNETCORE_URLS=http://+:80 \
-            -e ASPNETCORE_ENVIRONMENT=Production \
-            -e "ConnectionStrings__Default=${{ secrets.DB_CONNECTION_STRING }}" \
-            seanyee1227/pushandpull-server:latest
+          mkdir -p ~/deploy
+
+          printf 'DB_CONNECTION_STRING=%s\nREDIS_CONNECTION_STRING=%s\nSTEAM_WEB_API_KEY=%s\n' \
+            "${{ secrets.DB_CONNECTION_STRING }}" \
+            "${{ secrets.REDIS_CONNECTION_STRING }}" \
+            "${{ secrets.STEAM_WEB_API_KEY }}" \
+            > ~/deploy/.env
+
+          docker compose -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env pull
+          docker compose -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env up -d
 
           sleep 5
-          docker ps | grep pushandpull-server
-          docker logs pushandpull-server --tail 20
+          docker ps | grep pushpull-server
+          docker logs pushpull-server --tail 20
