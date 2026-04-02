@@ -16,11 +16,11 @@ namespace PushAndPull.Migrations
                 name: "room");
 
             migrationBuilder.EnsureSchema(
-                name: "game_user");
+                name: "auth");
 
             migrationBuilder.CreateTable(
                 name: "user",
-                schema: "game_user",
+                schema: "auth",
                 columns: table => new
                 {
                     steam_id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
@@ -58,7 +58,7 @@ namespace PushAndPull.Migrations
                     table.ForeignKey(
                         name: "FK_room_user_host_steam_id",
                         column: x => x.host_steam_id,
-                        principalSchema: "game_user",
+                        principalSchema: "auth",
                         principalTable: "user",
                         principalColumn: "steam_id",
                         onDelete: ReferentialAction.Restrict);
@@ -111,7 +111,7 @@ namespace PushAndPull.Migrations
 
             migrationBuilder.DropTable(
                 name: "user",
-                schema: "game_user");
+                schema: "auth");
         }
     }
 }

@@ -48,7 +48,7 @@ namespace PushAndPull.Migrations
 
                     b.HasKey("SteamId");
 
-                    b.ToTable("user", "game_user");
+                    b.ToTable("user", "auth");
                 });
 
             modelBuilder.Entity("PushAndPull.Domain.Room.Entity.Room", b =>
