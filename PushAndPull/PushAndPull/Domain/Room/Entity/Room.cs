@@ -3,12 +3,12 @@ namespace PushAndPull.Domain.Room.Entity;
 public class Room
 {
     public long Id { get; set; }
-    public string RoomName { get; set; } = null!;
+    public string RoomName { get; set; }
 
     public string RoomCode { get; set; } = null!;
     public ulong SteamLobbyId { get; set; }
 
-    public Auth.Entity.User Host { get; private set; } = null!;
+    public Auth.Entity.User Host { get; private set; }
     public ulong HostSteamId { get; set; }
 
     public int CurrentPlayers { get; set; }

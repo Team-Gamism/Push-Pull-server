@@ -101,7 +101,7 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
     private static AuthTicketValidationResult ValidateAndCreateResult(
         SteamAuthResponse steamResponse)
     {
-        var param = steamResponse.Response.Params!;
+        var param = steamResponse.Response.Params;
 
         if (param.Result != "OK")
             throw new InvalidTicketException($"FAIL_TO_VALIDATE: {param.Result}");
