@@ -3,7 +3,7 @@ namespace PushAndPull.Domain.Auth.Entity;
 public class User
 {
     public ulong SteamId { get; private set; }
-    public string Nickname { get; private set; }
+    public string Nickname { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
     public DateTime LastLoginAt { get; private set; }
 
