@@ -16,7 +16,7 @@ public static class DatabaseConfig
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseNpgsql(connectionString, npgsql =>
-                npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "room"));
+                npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "public"));
         });
 
         return services;
