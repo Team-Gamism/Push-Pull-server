@@ -12,8 +12,8 @@ using PushAndPull.Global.Infrastructure;
 namespace PushAndPull.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260312060119_AddRoomStatusCreatedAtIndex")]
-    partial class AddRoomStatusCreatedAtIndex
+    [Migration("20260402065544_InitialCreateTables")]
+    partial class InitialCreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,33 @@ namespace PushAndPull.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Server.Domain.Entity.Room", b =>
+            modelBuilder.Entity("PushAndPull.Domain.Auth.Entity.User", b =>
+                {
+                    b.Property<decimal>("SteamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("steam_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("LastLoginAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("last_login_at");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("nickname");
+
+                    b.HasKey("SteamId");
+
+                    b.ToTable("user", "auth");
+                });
+
+            modelBuilder.Entity("PushAndPull.Domain.Room.Entity.Room", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -109,35 +135,9 @@ namespace PushAndPull.Migrations
                     b.ToTable("room", "room");
                 });
 
-            modelBuilder.Entity("Server.Domain.Entity.User", b =>
+            modelBuilder.Entity("PushAndPull.Domain.Room.Entity.Room", b =>
                 {
-                    b.Property<decimal>("SteamId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("steam_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("LastLoginAt")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("last_login_at");
-
-                    b.Property<string>("Nickname")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("nickname");
-
-                    b.HasKey("SteamId");
-
-                    b.ToTable("user", "user");
-                });
-
-            modelBuilder.Entity("Server.Domain.Entity.Room", b =>
-                {
-                    b.HasOne("Server.Domain.Entity.User", "Host")
+                    b.HasOne("PushAndPull.Domain.Auth.Entity.User", "Host")
                         .WithMany()
                         .HasForeignKey("HostSteamId")
                         .OnDelete(DeleteBehavior.Restrict)

@@ -17,8 +17,8 @@ jobs:
       run: |
         docker build \
           -t seanyee1227/pushandpull-server:latest \
-          -f PushAndPull/PushAndPull/Dockerfile \
-          PushAndPull/PushAndPull
+          -f PushAndPull/deploy/prod.dockerfile \
+          PushAndPull
 
     - name: Push Docker image
       run: docker push seanyee1227/pushandpull-server:latest

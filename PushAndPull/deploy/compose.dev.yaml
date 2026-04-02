@@ -1,0 +1,40 @@
+name: pushandpull-dev
+
+services:
+  pushandpull-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pushandpull_dev
+      POSTGRES_USER: pushandpull
+      POSTGRES_PASSWORD: pushandpull
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pushandpull-redis:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+
+  pushandpull-server:
+    image: pushpull.server
+    build:
+      context: ..
+      dockerfile: deploy/dev.dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ConnectionStrings__Default=Host=pushandpull-db;Port=5432;Database=pushandpull_dev;Username=pushandpull;Password=pushandpull
+      - Redis__ConnectionString=pushandpull-redis:6379,abortConnect=false
+      - Steam__WebApiKey=Steam-ApiKey
+    volumes:
+      - ..:/src
+    depends_on:
+      - pushandpull-db
+      - pushandpull-redis
+
+volumes:
+  postgres_data:

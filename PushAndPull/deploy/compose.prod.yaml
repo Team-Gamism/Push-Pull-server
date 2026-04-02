@@ -1,0 +1,40 @@
+name: pushandpull-prod
+
+services:
+  pushpull-db:
+    image: postgres:17
+    container_name: pushpull-db
+    environment:
+      POSTGRES_DB: pushpull
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pushpull-redis:
+    image: redis:7-alpine
+    container_name: pushpull-redis
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  pushpull-server:
+    image: seanyee1227/pushandpull-server:latest
+    container_name: pushpull-server
+    ports:
+      - "21754:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__Default=${DB_CONNECTION_STRING}
+      - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
+      - Steam__WebApiKey=${STEAM_WEB_API_KEY}
+    depends_on:
+      - pushpull-db
+      - pushpull-redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
