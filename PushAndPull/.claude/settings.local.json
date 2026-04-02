@@ -29,7 +29,10 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Skill(pr)",
       "Bash(dotnet tool update:*)",
-      "Bash(dotnet tool:*)"
+      "Bash(dotnet tool:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(dotnet list:*)"
     ]
   }
 }
