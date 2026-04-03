@@ -70,7 +70,11 @@ public class RoomController : ControllerBase
     {
         var result = await _getAllRoomService.ExecuteAsync(ct);
 
-        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(result.Rooms));
+        var rooms = result.Rooms
+            .Select(s => new GetRoomResponse(s.RoomCode, s.RoomName, s.CurrentPlayers, s.IsPrivate))
+            .ToList();
+
+        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(rooms));
     }
 
     [SessionAuthorize]

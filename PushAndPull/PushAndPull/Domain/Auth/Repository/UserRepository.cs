@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using PushAndPull.Domain.Auth.Entity;
 using PushAndPull.Domain.Auth.Repository.Interface;
 using PushAndPull.Global.Infrastructure;
@@ -23,8 +24,16 @@ public class UserRepository : IUserRepository
 
     public async Task CreateAsync(User user, CancellationToken ct = default)
     {
-        await _context.Users.AddAsync(user, ct);
-        await _context.SaveChangesAsync(ct);
+        try
+        {
+            await _context.Users.AddAsync(user, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" })
+        {
+            _context.Entry(user).State = EntityState.Detached;
+            await UpdateAsync(user.SteamId, user.Nickname, DateTime.UtcNow, ct);
+        }
     }
 
     public async Task UpdateAsync(ulong steamId, string nickname, DateTime lastLoginAt, CancellationToken ct = default)

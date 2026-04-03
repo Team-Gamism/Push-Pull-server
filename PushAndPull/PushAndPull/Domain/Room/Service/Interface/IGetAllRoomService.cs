@@ -1,5 +1,3 @@
-using PushAndPull.Domain.Room.Dto.Response;
-
 namespace PushAndPull.Domain.Room.Service.Interface;
 
 public interface IGetAllRoomService
@@ -7,6 +5,11 @@ public interface IGetAllRoomService
     Task<GetAllRoomResult> ExecuteAsync(CancellationToken ct = default);
 }
 
-public record GetAllRoomResult(
-    IReadOnlyList<GetRoomResponse> Rooms
+public record GetAllRoomResult(IReadOnlyList<RoomSummary> Rooms);
+
+public record RoomSummary(
+    string RoomCode,
+    string RoomName,
+    int CurrentPlayers,
+    bool IsPrivate
 );
