@@ -5,9 +5,9 @@ public interface IGetAllRoomService
     Task<GetAllRoomResult> ExecuteAsync(CancellationToken ct = default);
 }
 
-public record GetAllRoomResult(IReadOnlyList<RoomSummary> Rooms);
+public record GetAllRoomResult(IReadOnlyList<RoomInfo> Rooms);
 
-public record RoomSummary(
+public record RoomInfo(
     string RoomCode,
     string RoomName,
     int CurrentPlayers,

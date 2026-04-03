@@ -17,7 +17,7 @@ public class GetAllRoomService : IGetAllRoomService
         var rooms = await _roomRepository.GetAllAsync(ct);
 
         var summaries = rooms
-            .Select(room => new RoomSummary(
+            .Select(room => new RoomInfo(
                 room.RoomCode,
                 room.RoomName,
                 room.CurrentPlayers,
