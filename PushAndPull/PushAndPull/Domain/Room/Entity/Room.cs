@@ -2,25 +2,25 @@ namespace PushAndPull.Domain.Room.Entity;
 
 public class Room
 {
-    public long Id { get; set; }
-    public string RoomName { get; set; }
+    public long Id { get; private set; }
+    public string RoomName { get; private set; }
 
-    public string RoomCode { get; set; } = null!;
-    public ulong SteamLobbyId { get; set; }
+    public string RoomCode { get; private set; } = null!;
+    public ulong SteamLobbyId { get; private set; }
 
     public Auth.Entity.User Host { get; private set; }
-    public ulong HostSteamId { get; set; }
+    public ulong HostSteamId { get; private set; }
 
-    public int CurrentPlayers { get; set; }
+    public int CurrentPlayers { get; private set; }
     public int MaxPlayers { get; private set; }
 
-    public bool IsPrivate { get; set; }
-    public string? PasswordHash { get; set; }
+    public bool IsPrivate { get; private set; }
+    public string? PasswordHash { get; private set; }
 
-    public RoomStatus Status { get; set; }
+    public RoomStatus Status { get; private set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? ExpiresAt { get; set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset? ExpiresAt { get; private set; }
 
     private const int DefaultMaxPlayers = 2;
 
