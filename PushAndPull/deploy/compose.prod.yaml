@@ -1,27 +1,18 @@
 name: pushandpull-prod
 
 services:
-  pushpull-db:
-    image: postgres:17
-    container_name: pushpull-db
-    environment:
-      POSTGRES_DB: pushpull
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  pushpull-redis:
+  pushandpull-redis:
     image: redis:7-alpine
-    container_name: pushpull-redis
+    container_name: pushandpull-redis
     volumes:
       - redis_data:/data
+    networks:
+      - pushandpull-network
     restart: unless-stopped
 
-  pushpull-server:
+  pushandpull-server:
     image: seanyee1227/pushandpull-server:latest
-    container_name: pushpull-server
+    container_name: pushandpull-server
     ports:
       - "21754:80"
     environment:
@@ -31,10 +22,14 @@ services:
       - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
       - Steam__WebApiKey=${STEAM_WEB_API_KEY}
     depends_on:
-      - pushpull-db
-      - pushpull-redis
+      - pushandpull-redis
+    networks:
+      - pushandpull-network
     restart: unless-stopped
 
 volumes:
-  postgres_data:
   redis_data:
+
+networks:
+  pushandpull-network:
+    driver: bridge
