@@ -54,5 +54,5 @@ jobs:
           docker compose -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env up -d
 
           sleep 5
-          docker ps | grep pushpull-server
-          docker logs pushpull-server --tail 20
+          docker ps | grep pushandpull-server
+          docker logs pushandpull-server --tail 20

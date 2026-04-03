@@ -12,7 +12,7 @@ services:
 
   pushandpull-server:
     image: seanyee1227/pushandpull-server:latest
-    container_name: pushpull-server
+    container_name: pushandpull-server
     ports:
       - "21754:80"
     environment:
