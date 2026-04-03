@@ -16,7 +16,7 @@ public class LogoutServiceTests
         public WhenAUserLogsOutWithAValidSession()
         {
             _sessionServiceMock
-                .Setup(s => s.DeleteAsync(SessionId))
+                .Setup(s => s.DeleteAsync(SessionId, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             _sut = new LogoutService(_sessionServiceMock.Object);
@@ -27,7 +27,7 @@ public class LogoutServiceTests
         {
             await _sut.ExecuteAsync(new LogoutCommand(SessionId));
 
-            _sessionServiceMock.Verify(s => s.DeleteAsync(SessionId), Times.Once);
+            _sessionServiceMock.Verify(s => s.DeleteAsync(SessionId, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

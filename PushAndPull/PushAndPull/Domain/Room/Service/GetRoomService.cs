@@ -13,12 +13,12 @@ public class GetRoomService : IGetRoomService
         _roomRepository = roomRepository;
     }
 
-    public async Task<GetRoomResult> ExecuteAsync(GetRoomCommand request)
+    public async Task<GetRoomResult> ExecuteAsync(GetRoomCommand request, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(request.RoomCode))
             throw new ArgumentException("REQUIRED_ROOMCODE");
 
-        var room = await _roomRepository.GetAsync(request.RoomCode)
+        var room = await _roomRepository.GetAsync(request.RoomCode, ct)
                    ?? throw new RoomNotFoundException(request.RoomCode);
 
         return new GetRoomResult(

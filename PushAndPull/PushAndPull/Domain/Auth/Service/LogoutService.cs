@@ -11,8 +11,8 @@ public class LogoutService : ILogoutService
         _sessionService = sessionService;
     }
 
-    public async Task ExecuteAsync(LogoutCommand request)
+    public async Task ExecuteAsync(LogoutCommand request, CancellationToken ct = default)
     {
-        await _sessionService.DeleteAsync(request.SessionId);
+        await _sessionService.DeleteAsync(request.SessionId, ct);
     }
 }

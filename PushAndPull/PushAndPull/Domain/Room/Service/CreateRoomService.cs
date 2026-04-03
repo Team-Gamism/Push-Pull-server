@@ -21,7 +21,7 @@ public class CreateRoomService : ICreateRoomService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request)
+    public async Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request, CancellationToken ct = default)
     {
         string? passwordHash = null;
         if (!string.IsNullOrWhiteSpace(request.Password))
@@ -38,7 +38,7 @@ public class CreateRoomService : ICreateRoomService
             passwordHash: passwordHash
         );
 
-        await _roomRepository.CreateAsync(room);
+        await _roomRepository.CreateAsync(room, ct);
 
         return new CreateRoomResult(
             room.RoomCode

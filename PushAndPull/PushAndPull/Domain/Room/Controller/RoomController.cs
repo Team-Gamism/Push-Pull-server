@@ -32,7 +32,8 @@ public class RoomController : ControllerBase
     [SessionAuthorize]
     [HttpPost]
     public async Task<CommonApiResponse<CreateRoomResponse>> CreateRoom(
-        [FromBody] CreateRoomRequest request
+        [FromBody] CreateRoomRequest request,
+        CancellationToken ct
         )
     {
         var hostSteamId = User.GetSteamId();
@@ -43,17 +44,18 @@ public class RoomController : ControllerBase
             request.IsPrivate,
             request.Password,
             hostSteamId
-        ));
+        ), ct);
 
         return CommonApiResponse.Created("방이 생성되었습니다.", new CreateRoomResponse(result.RoomCode));
     }
 
     [HttpGet("{roomCode}")]
     public async Task<CommonApiResponse<GetRoomResponse>> GetRoom(
-        [FromRoute] string roomCode
+        [FromRoute] string roomCode,
+        CancellationToken ct
     )
     {
-        var result = await _getRoomService.ExecuteAsync(new GetRoomCommand(roomCode));
+        var result = await _getRoomService.ExecuteAsync(new GetRoomCommand(roomCode), ct);
 
         return CommonApiResponse.Success("방 조회 성공.", new GetRoomResponse(
             result.RoomCode,
@@ -75,10 +77,11 @@ public class RoomController : ControllerBase
     [HttpPost("{roomCode}/join")]
     public async Task<CommonApiResponse> JoinRoom(
         [FromRoute] string roomCode,
-        [FromBody] JoinRoomRequest request
+        [FromBody] JoinRoomRequest request,
+        CancellationToken ct
         )
     {
-        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password));
+        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password), ct);
 
         return CommonApiResponse.Success("방에 참여했습니다.");
     }
