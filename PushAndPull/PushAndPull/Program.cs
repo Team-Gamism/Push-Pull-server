@@ -18,9 +18,11 @@ builder.Services.AddRedis(builder.Configuration);
 builder.Services.AddGlobalServices();
 builder.Services.AddAuthServices();
 builder.Services.AddRoomServices();
+builder.Services.AddRateLimit();
 
 var app = builder.Build();
 
+app.UseRateLimiter();
 app.UseGamismSdk();
 app.MapControllers();
 app.Run();
