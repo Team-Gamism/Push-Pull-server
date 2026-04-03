@@ -44,10 +44,11 @@ jobs:
         script: |
           mkdir -p ~/deploy
 
-          printf 'DB_CONNECTION_STRING=%s\nREDIS_CONNECTION_STRING=%s\nSTEAM_WEB_API_KEY=%s\n' \
+          printf 'DB_CONNECTION_STRING=%s\nREDIS_CONNECTION_STRING=%s\nSTEAM_WEB_API_KEY=%s\nSTEAM_APP_ID=%s\n' \
             "${{ secrets.DB_CONNECTION_STRING }}" \
             "${{ secrets.REDIS_CONNECTION_STRING }}" \
             "${{ secrets.STEAM_WEB_API_KEY }}" \
+            "${{ secrets.STEAM_APP_ID }}" \
             > ~/deploy/.env
 
           docker compose -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env pull

@@ -21,6 +21,7 @@ services:
       - ConnectionStrings__Default=${DB_CONNECTION_STRING}
       - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
       - Steam__WebApiKey=${STEAM_WEB_API_KEY}
+      - Steam__AppId=${STEAM_APP_ID}
     depends_on:
       - pushandpull-redis
     networks:
