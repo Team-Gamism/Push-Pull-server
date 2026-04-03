@@ -20,7 +20,7 @@ services:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__Default=${DB_CONNECTION_STRING}
       - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
-      - Steam__WebApiKey=${STEAM_API_KEY}
+      - Steam__WebApiKey=${STEAM_WEB_API_KEY}
     depends_on:
       - pushandpull-redis
     networks:
