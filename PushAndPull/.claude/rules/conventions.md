@@ -30,7 +30,24 @@ alwaysApply: false
 - Use `IEntityTypeConfiguration<T>` Fluent API — **never DataAnnotations on entities**.
 - Place in `Domain/{Name}/Entity/Config/`.
 - `AppDbContext.OnModelCreating` calls only `modelBuilder.ApplyConfigurationsFromAssembly(...)`.
-- See `/db-migration-guide` skill for full examples.
+
+```csharp
+public class RoomConfig : IEntityTypeConfiguration<Room>
+{
+    public void Configure(EntityTypeBuilder<Room> builder)
+    {
+        builder.ToTable("room", "room");
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).HasColumnName("id");
+        builder.Property(e => e.Status)
+               .HasColumnName("status")
+               .HasConversion<string>();
+        builder.Property(e => e.CreatedAt)
+               .HasColumnName("created_at")
+               .HasColumnType("timestamptz");
+    }
+}
+```
 
 ## Cache (Redis)
 

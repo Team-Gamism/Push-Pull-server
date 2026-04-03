@@ -56,6 +56,7 @@ mcp__context7__query-docs(libraryId: "/stackexchange/stackexchange.redis", query
 - `.claude/rules/architecture.md` — directory structure and layering rules (Controllers → Services → Repositories)
 - `.claude/rules/code-style.md` — C# naming conventions, entity/DTO/async/Command-Result patterns
 - `.claude/rules/conventions.md` — DB naming, EF Core Fluent API config, CacheKey usage, DI registration
+- `.claude/rules/db-migration.md` — migration workflow, naming convention, entity modification patterns, rollback strategy
 - `.claude/rules/domain-patterns.md` — service, repository, and controller implementation patterns
 - `.claude/rules/global-patterns.md` — Steam auth, Redis session store, CacheKey, SessionAuthorize
 - `.claude/rules/testing.md` — test project structure, naming conventions, Moq patterns
