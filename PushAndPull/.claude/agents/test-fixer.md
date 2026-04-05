@@ -16,7 +16,7 @@ Your job is to keep the test suite in `PushAndPull.Test/` accurate and green aft
 
 - Production code: `PushAndPull/`
 - Test code: `PushAndPull.Test/`
-- Working directory: `/mnt/c/Users/USER/Documents/GitHub/Push-Pull-server/PushAndPull`
+- Working directory: `.`
 
 ## Step 1: Understand What Changed
 
@@ -41,11 +41,11 @@ Read each changed file to understand:
 ## Step 2: Run Build and Tests
 
 ```bash
-cd /mnt/c/Users/USER/Documents/GitHub/Push-Pull-server/PushAndPull && dotnet build --no-restore 2>&1
+dotnet build --no-restore 2>&1
 ```
 
 ```bash
-cd /mnt/c/Users/USER/Documents/GitHub/Push-Pull-server/PushAndPull && dotnet test --no-build 2>&1
+dotnet test --no-build 2>&1
 ```
 
 Collect all errors and failures. Categorize them:
@@ -120,7 +120,7 @@ public class ExampleServiceTests
 After all changes, run the full test suite:
 
 ```bash
-cd /mnt/c/Users/USER/Documents/GitHub/Push-Pull-server/PushAndPull && dotnet build --no-restore 2>&1 && dotnet test --no-build 2>&1
+dotnet build --no-restore 2>&1 && dotnet test --no-build 2>&1
 ```
 
 Repeat Steps 3–5 until the build succeeds and all tests pass.

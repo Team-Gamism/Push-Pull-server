@@ -33,10 +33,7 @@
       "Bash(cmd.exe:*)",
       "Bash(dotnet --list-sdks)",
       "Bash(dotnet list:*)",
-      "Bash(~/.dotnet/dotnet build:*)",
-      "Bash(/home/seanyee1227/.dotnet/dotnet build:*)",
-      "Bash(/home/seanyee1227/.dotnet/dotnet test:*)",
-      "Bash(export PATH=\"$PATH:$HOME/.dotnet\")"
+      "Bash(~/.dotnet/dotnet build:*)"
     ]
   }
 }
