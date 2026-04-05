@@ -1,0 +1,71 @@
+description = "Git 변경사항을 논리적 단위로 분리하여 커밋합니다."
+
+prompt = """
+Create Git commits following the project's commit conventions.
+
+## Current Changes
+
+### git status
+!{git status}
+
+### git diff (unstaged)
+!{git diff}
+
+### git diff (staged)
+!{git diff --cached}
+
+---
+
+## Commit Message Format
+
+{type}: {Korean description}
+
+**Types:**
+| Type   | When to use |
+|--------|-------------|
+| feat   | New file(s) added (new service / controller / entity / test class / migration) |
+| fix    | Broken behavior fixed, or missing DI registration / config corrected |
+| update | Existing file(s) modified — rename, restructure, method added to existing class |
+| docs   | Documentation changes only |
+| chore  | Tooling, CI/CD, dependency updates, config changes with no behavior change |
+
+**Boundary rules:**
+- New .cs service/repository/controller file added → `feat`
+- New method added to an existing .cs file → `update`
+- DI registration line added alone (no new service file) → `fix`
+- New service file + its DI registration together → `feat` (one logical unit)
+- New migration file → `feat`
+- Existing migration corrected → `fix`
+- New test class → `feat`
+- Test method added to existing test class → `update`
+- Refactoring without behavior change → `update`
+
+**Description rules:**
+- Written in **Korean**
+- Short and imperative (단문)
+- No trailing punctuation (`.`, `!`, etc.)
+- Prefer verb style over noun style
+
+**Examples:**
+- feat: 방 생성 API 추가
+- fix: 세션 DI 누락 수정
+- update: Room 엔터티 수정
+- chore: 의존성 버전 업데이트
+
+**Do NOT:**
+- Add Claude/Gemini as co-author
+- Write descriptions in English
+- Add a commit body — subject line only
+
+---
+
+## Steps
+
+1. Analyze all changes from the git status and diff above.
+2. Categorize changes into **logical units** — group files that belong to the same feature or fix.
+3. For each logical unit:
+   a. Stage only the relevant files with `git add <files>`
+   b. Write a concise commit message following the format above
+   c. Execute `git commit -m "message"`
+4. After all commits, verify with `git log --oneline -n {number of commits made}`.
+"""

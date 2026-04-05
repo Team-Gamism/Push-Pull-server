@@ -1,6 +1,8 @@
 ---
-description: Build the server project and report errors
-allowed-tools: Bash
+name: build
+description: Builds the PushAndPull project and reports errors. Use for checking build failures and debugging compile errors.
+allowed-tools: Bash(dotnet build:*)
+context: fork
 ---
 
 Build the server project and report any errors.

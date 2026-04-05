@@ -20,29 +20,27 @@ public class JoinRoomService : IJoinRoomService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task ExecuteAsync(JoinRoomCommand request)
+    public async Task ExecuteAsync(JoinRoomCommand request, CancellationToken ct = default)
     {
-        var room = await _roomRepository.GetAsync(request.RoomCode)
+        var room = await _roomRepository.GetAsync(request.RoomCode, ct)
             ?? throw new RoomNotFoundException(request.RoomCode);
 
         if (room.Status != RoomStatus.Active)
             throw new RoomNotActiveException(request.RoomCode);
 
-        if (request.Password != null)
+        if (room.IsPrivate)
         {
             if (string.IsNullOrWhiteSpace(request.Password))
                 throw new InvalidOperationException("PASSWORD_REQUIRED");
 
-            if (!_passwordHasher.Verify( request.Password, room.PasswordHash!))
+            if (!_passwordHasher.Verify(request.Password, room.PasswordHash!))
                 throw new InvalidOperationException("INVALID_PASSWORD");
         }
 
-        room.Join();
-
-        var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode);
+        var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode, ct);
         if (!success)
         {
-            var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode);
+            var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode, ct);
             if (roomAfterAttempt == null)
                 throw new RoomNotFoundException(request.RoomCode);
             if (roomAfterAttempt.Status != RoomStatus.Active)

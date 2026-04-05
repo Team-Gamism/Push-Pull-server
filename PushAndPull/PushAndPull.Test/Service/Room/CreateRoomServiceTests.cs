@@ -55,7 +55,7 @@ public class CreateRoomServiceTests
                     room.RoomName == _command.RoomName &&
                     room.IsPrivate == false &&
                     room.PasswordHash == null
-                )), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -106,7 +106,7 @@ public class CreateRoomServiceTests
             _roomRepositoryMock.Verify(r => r.CreateAsync(
                 It.Is<EntityRoom>(room =>
                     room.PasswordHash == HashedPassword
-                )), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]

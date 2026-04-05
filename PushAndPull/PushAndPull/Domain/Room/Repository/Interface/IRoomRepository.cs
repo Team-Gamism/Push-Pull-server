@@ -4,9 +4,9 @@ namespace PushAndPull.Domain.Room.Repository.Interface;
 
 public interface IRoomRepository
 {
-    Task<RoomEntity?> GetAsync(string roomCode);
-    Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct);
-    Task CreateAsync(RoomEntity room);
-    Task<bool> IncrementPlayerCountAsync(string roomCode);
-    Task CloseAsync(string roomCode);
+    Task<RoomEntity?> GetAsync(string roomCode, CancellationToken ct = default);
+    Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct = default);
+    Task CreateAsync(RoomEntity room, CancellationToken ct = default);
+    Task<bool> IncrementPlayerCountAsync(string roomCode, CancellationToken ct = default);
+    Task CloseAsync(string roomCode, CancellationToken ct = default);
 }

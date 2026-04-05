@@ -15,14 +15,14 @@ public class RoomRepository : IRoomRepository
         _context = context;
     }
 
-    public async Task<RoomEntity?> GetAsync(string roomCode)
+    public async Task<RoomEntity?> GetAsync(string roomCode, CancellationToken ct = default)
     {
         return await _context.Rooms
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.RoomCode == roomCode);
+            .FirstOrDefaultAsync(x => x.RoomCode == roomCode, ct);
     }
 
-    public async Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct)
+    public async Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Rooms
             .AsNoTracking()
@@ -31,32 +31,30 @@ public class RoomRepository : IRoomRepository
             .ToListAsync(ct);
     }
 
-    public async Task CreateAsync(RoomEntity room)
+    public async Task CreateAsync(RoomEntity room, CancellationToken ct = default)
     {
         _context.Rooms.Add(room);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<bool> IncrementPlayerCountAsync(string roomCode)
+    public async Task<bool> IncrementPlayerCountAsync(string roomCode, CancellationToken ct = default)
     {
         var updated = await _context.Rooms
             .Where(x => x.RoomCode == roomCode
                         && x.Status == RoomStatus.Active
                         && x.CurrentPlayers < x.MaxPlayers)
             .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1));
+                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1), ct);
 
         return updated > 0;
     }
 
-    // 주의: 이 메서드는 Room.Close()의 로직(Status = Closed, ExpiresAt = UtcNow)을 직접 반영하고 있습니다.
-    // Room.Close()에 새로운 비즈니스 로직이 추가될 경우 이 메서드도 함께 수정해야 합니다.
-    public async Task CloseAsync(string roomCode)
+    public async Task CloseAsync(string roomCode, CancellationToken ct = default)
     {
         await _context.Rooms
             .Where(x => x.RoomCode == roomCode)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.Status, RoomStatus.Closed)
-                .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow));
+                .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);
     }
 }

@@ -31,7 +31,7 @@ public class SessionService : ISessionService
         return await _cacheStore.GetAsync<PlayerSession>(CacheKey.Session.ById(sessionId));
     }
 
-    public async Task DeleteAsync(string sessionId)
+    public async Task DeleteAsync(string sessionId, CancellationToken ct = default)
     {
         await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
     }

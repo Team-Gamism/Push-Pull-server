@@ -2,7 +2,7 @@ namespace PushAndPull.Domain.Room.Service.Interface;
 
 public interface ICreateRoomService
 {
-    Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request);
+    Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request, CancellationToken ct = default);
 }
 
 public record CreateRoomCommand(

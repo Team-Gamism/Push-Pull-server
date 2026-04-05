@@ -37,7 +37,7 @@ public class GetRoomServiceTests
         public WhenTheRoomDoesNotExist()
         {
             _roomRepositoryMock
-                .Setup(r => r.GetAsync(RoomCode))
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((EntityRoom?)null);
 
             _sut = new GetRoomService(_roomRepositoryMock.Object);
@@ -65,7 +65,7 @@ public class GetRoomServiceTests
             _room = new EntityRoom(RoomCode, RoomName, 444UL, 76561198000000001UL, false, null);
 
             _roomRepositoryMock
-                .Setup(r => r.GetAsync(RoomCode))
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_room);
 
             _sut = new GetRoomService(_roomRepositoryMock.Object);

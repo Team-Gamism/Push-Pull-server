@@ -1,0 +1,36 @@
+name: pushandpull-prod
+
+services:
+  pushandpull-redis:
+    image: redis:7-alpine
+    container_name: pushandpull-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - pushandpull-network
+    restart: unless-stopped
+
+  pushandpull-server:
+    image: seanyee1227/pushandpull-server:latest
+    container_name: pushandpull-server
+    ports:
+      - "21754:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__Default=${DB_CONNECTION_STRING}
+      - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
+      - Steam__WebApiKey=${STEAM_WEB_API_KEY}
+      - Steam__AppId=${STEAM_APP_ID}
+    depends_on:
+      - pushandpull-redis
+    networks:
+      - pushandpull-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  pushandpull-network:
+    driver: bridge

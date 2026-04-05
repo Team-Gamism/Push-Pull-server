@@ -1,5 +1,6 @@
 using Gamism.SDK.Core.Network;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PushAndPull.Domain.Auth.Dto.Request;
 using PushAndPull.Domain.Auth.Dto.Response;
 using PushAndPull.Domain.Auth.Service.Interface;
@@ -24,27 +25,28 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<LoginResponse> Login(
-        [FromBody] LoginRequest request
+    [EnableRateLimiting("login")]
+    public async Task<CommonApiResponse<LoginResponse>> Login(
+        [FromBody] LoginRequest request,
+        CancellationToken ct
         )
     {
         var result = await _loginService.ExecuteAsync(new LoginCommand(
             request.SteamTicket,
             request.Nickname
-            )
-        );
+        ), ct);
 
-        return new LoginResponse(result.SessionId);
+        return CommonApiResponse.Success("로그인되었습니다.", new LoginResponse(result.SessionId));
     }
 
     [SessionAuthorize]
     [HttpPost("logout")]
-    public async Task Logout()
+    public async Task<CommonApiResponse> Logout(CancellationToken ct)
     {
         var sessionId = User.GetSessionId();
 
-        await _logoutService.ExecuteAsync(
-            new LogoutCommand(sessionId)
-        );
+        await _logoutService.ExecuteAsync(new LogoutCommand(sessionId), ct);
+
+        return CommonApiResponse.Success("로그아웃되었습니다.");
     }
 }
