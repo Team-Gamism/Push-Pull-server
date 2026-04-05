@@ -35,7 +35,8 @@
       "Bash(dotnet list:*)",
       "Bash(~/.dotnet/dotnet build:*)",
       "Bash(/home/seanyee1227/.dotnet/dotnet build:*)",
-      "Bash(/home/seanyee1227/.dotnet/dotnet test:*)"
+      "Bash(/home/seanyee1227/.dotnet/dotnet test:*)",
+      "Bash(export PATH=\"$PATH:$HOME/.dotnet\")"
     ]
   }
 }
