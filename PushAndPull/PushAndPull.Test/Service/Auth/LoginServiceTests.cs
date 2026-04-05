@@ -1,5 +1,6 @@
 using Moq;
 using PushAndPull.Domain.Auth.Entity;
+using PushAndPull.Domain.Auth.Exception;
 using PushAndPull.Domain.Auth.Repository.Interface;
 using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Domain.Auth.Service.Interface;
@@ -63,6 +64,57 @@ public class LoginServiceTests
 
             _userRepositoryMock.Verify(r => r.UpdateAsync(
                 It.IsAny<ulong>(), It.IsAny<string>(), It.IsAny<DateTime>(), CancellationToken.None), Times.Never);
+        }
+    }
+
+    public class WhenAFamilySharingUserTriesToLogIn
+    {
+        private readonly Mock<IAuthTicketValidator> _validatorMock = new();
+        private readonly Mock<ISessionService> _sessionServiceMock = new();
+        private readonly Mock<IUserRepository> _userRepositoryMock = new();
+        private readonly LoginService _sut;
+
+        private const string Ticket = "family-ticket";
+        private const string Nickname = "FamilyPlayer";
+        private const ulong PlayerSteamId = 76561198000000099UL;
+        private const ulong OwnerSteamId = 76561198000000001UL;
+
+        public WhenAFamilySharingUserTriesToLogIn()
+        {
+            _validatorMock
+                .Setup(v => v.ValidateAsync(Ticket))
+                .ReturnsAsync(new AuthTicketValidationResult(PlayerSteamId, OwnerSteamId, false, false));
+
+            _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsFamilySharingNotAllowedException()
+        {
+            await Assert.ThrowsAsync<FamilySharingNotAllowedException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
+        }
+
+        [Fact]
+        public async Task It_DoesNotCreateASession()
+        {
+            await Assert.ThrowsAsync<FamilySharingNotAllowedException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
+
+            _sessionServiceMock.Verify(
+                s => s.CreateAsync(It.IsAny<ulong>(), It.IsAny<TimeSpan>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task It_DoesNotAccessTheUserRepository()
+        {
+            await Assert.ThrowsAsync<FamilySharingNotAllowedException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
+
+            _userRepositoryMock.Verify(
+                r => r.GetBySteamIdAsync(It.IsAny<ulong>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
     }
 
