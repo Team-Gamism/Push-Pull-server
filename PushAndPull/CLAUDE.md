@@ -62,3 +62,5 @@ mcp__context7__query-docs(libraryId: "/stackexchange/stackexchange.redis", query
 - `.claude/rules/testing.md` — test project structure, naming conventions, Moq patterns
 - `.claude/rules/flows.md` — Mermaid sequence diagrams for each API endpoint
 - `.claude/rules/verify.md` — build-and-verify workflow (auto build + test after every C# code change)
+- `.claude/rules/ask-user.md` — when to use AskUserQuestion (always applied)
+- `.claude/rules/test-fixer-trigger.md` — when to proactively offer the test-fixer agent (always applied)

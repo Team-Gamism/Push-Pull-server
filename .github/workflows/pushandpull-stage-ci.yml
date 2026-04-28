@@ -1,0 +1,115 @@
+name: pushandpull stage CI
+
+on:
+  pull_request:
+    branches:
+      - 'develop'
+  push:
+    branches:
+      - 'develop'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Validate PR Title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const allowedTypes = ['feat', 'fix', 'update', 'docs', 'refactor', 'test', 'chore'];
+
+            const titlePattern = /^(\w+)(\([^)]+\))?:\s.+$/;
+            const match = title.match(titlePattern);
+            if (!match) {
+              core.setFailed('PR 제목 형식이 올바르지 않습니다.\n형식: {type}: {description} 또는 {type}({scope}): {description}\n허용 타입: ' + allowedTypes.join(', '));
+              return;
+            }
+
+            const type = match[1];
+            if (!allowedTypes.includes(type)) {
+              core.setFailed(`허용되지 않는 타입: "${type}"\n허용 타입: ${allowedTypes.join(', ')}`);
+            }
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: [validate-title]
+    if: always() && (needs.validate-title.result == 'success' || needs.validate-title.result == 'skipped')
+
+    env:
+      SOLUTION: PushAndPull/PushAndPull.sln
+      DOTNET_VERSION: 9.0.x
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore Dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION }} --no-build --configuration Release --verbosity minimal
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [validate-title, build-and-test]
+    if: always()
+
+    steps:
+      - name: Get Short SHA
+        id: sha
+        run: echo "short=$(echo '${{ github.sha }}' | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Determine Status
+        id: status
+        run: |
+          if [[ "${{ needs.validate-title.result }}" == "failure" ]] || \
+             [[ "${{ needs.build-and-test.result }}" == "failure" ]]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "color=0xFF4C4C" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.build-and-test.result }}" == "success" ]] || \
+               [[ "${{ needs.build-and-test.result }}" == "skipped" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "color=0x4CAF50" >> $GITHUB_OUTPUT
+          else
+            echo "status=cancelled" >> $GITHUB_OUTPUT
+            echo "color=0xFFA500" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ steps.status.outputs.status }}
+          color: ${{ steps.status.outputs.color }}
+          title: "PushAndPull Stage CI"
+          description: |
+            `${{ github.ref_name }}` · `${{ steps.sha.outputs.short }}` · by **${{ github.actor }}**
+            ─────────────────────────────
+            **Validate Title:** ${{ needs.validate-title.result }}
+            **Build & Test:** ${{ needs.build-and-test.result }}

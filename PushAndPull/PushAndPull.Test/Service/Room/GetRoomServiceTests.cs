@@ -19,11 +19,13 @@ public class GetRoomServiceTests
             _sut = new GetRoomService(_roomRepositoryMock.Object);
         }
 
-        [Fact]
-        public async Task It_ThrowsArgumentException()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task It_ThrowsArgumentException(string? roomCode)
         {
             await Assert.ThrowsAsync<ArgumentException>(
-                () => _sut.ExecuteAsync(new GetRoomCommand("")));
+                () => _sut.ExecuteAsync(new GetRoomCommand(roomCode!)));
         }
     }
 

@@ -40,6 +40,22 @@ public class UserTests
         }
     }
 
+    public class WhenUpdatingNicknameWithNull
+    {
+        private readonly User _user;
+
+        public WhenUpdatingNicknameWithNull()
+        {
+            _user = new User(76561198000000006UL, "SomePlayer");
+        }
+
+        [Fact]
+        public void It_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _user.UpdateNickname(null!));
+        }
+    }
+
     public class WhenUpdatingLastLoginTime
     {
         private readonly User _user;

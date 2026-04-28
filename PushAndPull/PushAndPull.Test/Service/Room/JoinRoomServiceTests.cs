@@ -264,4 +264,48 @@ public class JoinRoomServiceTests
             await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
         }
     }
+
+    public class WhenCorrectPasswordIsProvidedForAPrivateRoom
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomService _sut;
+
+        private const string RoomCode = "PRIV03";
+        private const string CorrectPassword = "correct-password";
+        private const string StoredHash = "correct-hash";
+
+        public WhenCorrectPasswordIsProvidedForAPrivateRoom()
+        {
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 777UL, 76561198000000001UL, true, StoredHash);
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(privateRoom);
+
+            _passwordHasherMock
+                .Setup(h => h.Verify(CorrectPassword, StoredHash))
+                .Returns(true);
+
+            _roomRepositoryMock
+                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_CallsIncrementPlayerCount()
+        {
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword));
+
+            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task It_DoesNotThrowAnyException()
+        {
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword));
+        }
+    }
 }

@@ -119,5 +119,21 @@ public class RoomTests
 
             Assert.Equal(RoomStatus.Active, room.Status);
         }
+
+        [Fact]
+        public void It_SetsMaxPlayerToTwo()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM07", "Two-Player Room", 777UL, 76561198000000001UL, false, null);
+
+            Assert.Equal(2, room.MaxPlayers);
+        }
+
+        [Fact]
+        public void It_SetsExpiresAtToNull()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM08", "Fresh Room", 888UL, 76561198000000001UL, false, null);
+
+            Assert.Null(room.ExpiresAt);
+        }
     }
 }
