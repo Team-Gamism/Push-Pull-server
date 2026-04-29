@@ -47,14 +47,6 @@ public class Room
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void Join()
-    {
-        if (CurrentPlayers >= MaxPlayers)
-            throw new InvalidOperationException("FULL_ROOM");
-
-        CurrentPlayers++;
-    }
-
     public void MarkDeleting(TimeSpan ttl)
     {
         Status = RoomStatus.Deleting;

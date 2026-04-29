@@ -31,10 +31,10 @@ public class JoinRoomService : IJoinRoomService
         if (room.IsPrivate)
         {
             if (string.IsNullOrWhiteSpace(request.Password))
-                throw new InvalidOperationException("PASSWORD_REQUIRED");
+                throw new PasswordRequiredException(request.RoomCode);
 
             if (!_passwordHasher.Verify(request.Password, room.PasswordHash!))
-                throw new InvalidOperationException("INVALID_PASSWORD");
+                throw new InvalidPasswordException(request.RoomCode);
         }
 
         var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode, ct);
@@ -46,7 +46,7 @@ public class JoinRoomService : IJoinRoomService
             if (roomAfterAttempt.Status != RoomStatus.Active)
                 throw new RoomNotActiveException(request.RoomCode);
 
-            throw new InvalidOperationException("FULL_ROOM");
+            throw new RoomFullException(request.RoomCode);
         }
     }
 }

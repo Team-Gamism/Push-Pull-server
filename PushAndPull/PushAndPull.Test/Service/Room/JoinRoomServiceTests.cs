@@ -83,12 +83,10 @@ public class JoinRoomServiceTests
         }
 
         [Fact]
-        public async Task It_ThrowsInvalidOperationExceptionWithPasswordRequiredMessage()
+        public async Task It_ThrowsPasswordRequiredException()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<PasswordRequiredException>(
                 () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
-
-            Assert.Equal("PASSWORD_REQUIRED", ex.Message);
         }
     }
 
@@ -118,12 +116,10 @@ public class JoinRoomServiceTests
         }
 
         [Fact]
-        public async Task It_ThrowsInvalidOperationExceptionWithInvalidPasswordMessage()
+        public async Task It_ThrowsInvalidPasswordException()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidPasswordException>(
                 () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, WrongPassword)));
-
-            Assert.Equal("INVALID_PASSWORD", ex.Message);
         }
     }
 
@@ -217,12 +213,10 @@ public class JoinRoomServiceTests
         }
 
         [Fact]
-        public async Task It_ThrowsFullRoomException()
+        public async Task It_ThrowsRoomFullException()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<RoomFullException>(
                 () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
-
-            Assert.Equal("FULL_ROOM", ex.Message);
         }
     }
 
