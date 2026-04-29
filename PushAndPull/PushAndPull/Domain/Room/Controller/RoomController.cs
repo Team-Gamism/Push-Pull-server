@@ -1,5 +1,6 @@
 using Gamism.SDK.Core.Network;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PushAndPull.Domain.Room.Dto.Request;
 using PushAndPull.Domain.Room.Dto.Response;
 using PushAndPull.Domain.Room.Service.Interface;
@@ -31,6 +32,7 @@ public class RoomController : ControllerBase
 
     [SessionAuthorize]
     [HttpPost]
+    [EnableRateLimiting("create_room")]
     public async Task<CommonApiResponse<CreateRoomResponse>> CreateRoom(
         [FromBody] CreateRoomRequest request,
         CancellationToken ct
@@ -75,6 +77,7 @@ public class RoomController : ControllerBase
 
     [SessionAuthorize]
     [HttpPost("{roomCode}/join")]
+    [EnableRateLimiting("join_room")]
     public async Task<CommonApiResponse> JoinRoom(
         [FromRoute] string roomCode,
         [FromBody] JoinRoomRequest request,

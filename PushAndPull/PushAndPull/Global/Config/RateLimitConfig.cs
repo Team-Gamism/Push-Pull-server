@@ -14,6 +14,18 @@ public static class RateLimitConfig
                 opt.Window = TimeSpan.FromMinutes(1);
             });
 
+            options.AddFixedWindowLimiter("create_room", opt =>
+            {
+                opt.PermitLimit = 10;
+                opt.Window = TimeSpan.FromMinutes(1);
+            });
+
+            options.AddFixedWindowLimiter("join_room", opt =>
+            {
+                opt.PermitLimit = 20;
+                opt.Window = TimeSpan.FromMinutes(1);
+            });
+
             options.OnRejected = async (context, token) =>
             {
                 context.HttpContext.Response.StatusCode = 429;
