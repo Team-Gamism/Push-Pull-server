@@ -1,23 +1,16 @@
 ---
 paths:
-  - "**/*.java"
-  - "**/application*.yml"
-  - "**/application*.yaml"
-  - "**/bootstrap*.yml"
-  - "**/bootstrap*.yaml"
+  - "PushAndPull/**/*.cs"
+  - "PushAndPull/appsettings*.json"
+  - "deploy/*.yaml"
 ---
 
 # Security Rules
 
-- Never hardcode sensitive values (DB credentials, JWT secrets, API keys). Always inject via environment variables.
-  ```yaml
-  # correct
-  password: ${DB_PASSWORD}
-
-  # wrong — never commit
-  password: mypassword123
-  ```
-- Never parse JWT in downstream services. Gateway validates the token and forwards user info via headers.
-- Downstream services must trust `X-User-Id` (Long) and `X-User-Role` (String: ADMIN | MEMBER) headers from Gateway.
-- Block direct calls that bypass Gateway in production environments.
-- Handle CORS consistently at the gateway level (`cowork-gateway`) and avoid duplicating service-level CORS configuration unless a service has a documented exception.
+- Never commit secrets or credentials in appsettings, compose files, or source code.
+- Steam auth ticket validation must stay behind `IAuthTicketValidator`.
+- Session authentication uses the `Session-Id` header and `SessionAuthorizeAttribute`.
+- Do not introduce JWT/Bearer auth unless the project explicitly changes auth strategy.
+- Never store raw private-room passwords; store only hashes created by `IPasswordHasher`.
+- Keep session data in Redis through `ISessionService` and `ICacheStore`.
+- Apply rate limiting to login and other abuse-prone endpoints.
