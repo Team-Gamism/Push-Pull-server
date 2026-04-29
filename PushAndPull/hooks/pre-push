@@ -69,7 +69,7 @@ fi
 # ------------------------------------------------------------------
 DIFF=$(git diff "$BASE"...HEAD 2>/dev/null)
 WARNED=false
-for pattern in 'api_key\s*=' 'Bearer [A-Za-z0-9._-]\{20,\}' 'sk-[A-Za-z0-9]\{20,\}' 'ghp_[A-Za-z0-9]\{36,\}'; do
+for pattern in 'api_key\s*=' 'Bearer [A-Za-z0-9._-]{20,}' 'sk-[A-Za-z0-9]{20,}' 'ghp_[A-Za-z0-9]{36,}'; do
   if echo "$DIFF" | grep -qE "^\+.*${pattern}"; then
     echo "[pre-push] WARNING: possible secret pattern matched: ${pattern}"
     WARNED=true

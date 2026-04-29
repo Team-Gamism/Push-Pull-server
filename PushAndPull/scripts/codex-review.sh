@@ -31,7 +31,7 @@ json_out() {  # status reason body
     jq -n --arg s "$status" --arg r "$reason" --arg b "$body" \
       '{status:$s,reason:$r,body:$b}'
   else
-    local esc_body; esc_body=$(printf '%s' "$body" | sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' | tr -d '\n')
+    local esc_body; esc_body=$(printf '%s' "$body" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/$/\\n/' | tr -d '\n')
     printf '{"status":"%s","reason":"%s","body":"%s"}\n' "$status" "$reason" "$esc_body"
   fi
 }
