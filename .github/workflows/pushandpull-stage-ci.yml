@@ -26,18 +26,18 @@ jobs:
         with:
           script: |
             const title = context.payload.pull_request.title;
-            const allowedTypes = ['feat', 'fix', 'update', 'docs', 'refactor', 'test', 'chore'];
+            const allowedScopes = ['auth', 'room', 'config', 'database', 'security', 'ci', 'global'];
 
-            const titlePattern = /^(\w+)(\([^)]+\))?:\s.+$/;
+            const titlePattern = /^\[([^\]]+)\]\s.+$/;
             const match = title.match(titlePattern);
             if (!match) {
-              core.setFailed('PR 제목 형식이 올바르지 않습니다.\n형식: {type}: {description} 또는 {type}({scope}): {description}\n허용 타입: ' + allowedTypes.join(', '));
+              core.setFailed('PR 제목 형식이 올바르지 않습니다.\n형식: [scope] {description}\n허용 scope: ' + allowedScopes.join(', '));
               return;
             }
 
-            const type = match[1];
-            if (!allowedTypes.includes(type)) {
-              core.setFailed(`허용되지 않는 타입: "${type}"\n허용 타입: ${allowedTypes.join(', ')}`);
+            const scope = match[1];
+            if (!allowedScopes.includes(scope)) {
+              core.setFailed(`허용되지 않는 scope: "${scope}"\n허용 scope: ${allowedScopes.join(', ')}`);
             }
 
   build-and-test:

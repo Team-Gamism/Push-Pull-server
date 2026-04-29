@@ -25,7 +25,7 @@ Read `references/labels.md` and select 1–2 appropriate labels based on the nat
 ## Step 3 — Generate PR Content
 
 **Title** — Generate 3 options in the format `[scope] description`:
-- Scope: Module name (`[user]`, `[authorization]`, `[gateway]`, `[chat]`, etc.) or `[global]` / `[ci/cd]` for cross-cutting changes
+- Scope: Must be one of the GitHub Actions `validate-title` allowed scopes: `[auth]`, `[room]`, `[config]`, `[database]`, `[security]`, `[ci]`, `[global]`
 - Description: Korean, concise, no emojis, max 50 characters total
 - Mark the best option with `← 추천`
 
