@@ -4,8 +4,8 @@ public class User
 {
     public ulong SteamId { get; private set; }
     public string Nickname { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime LastLoginAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset LastLoginAt { get; private set; }
 
     private User() { }
 
@@ -13,8 +13,8 @@ public class User
     {
         SteamId = steamId;
         Nickname = nickname;
-        CreatedAt = DateTime.UtcNow;
-        LastLoginAt = DateTime.UtcNow;
+        CreatedAt = DateTimeOffset.UtcNow;
+        LastLoginAt = DateTimeOffset.UtcNow;
     }
 
     public void UpdateNickname(string nickname)
@@ -27,6 +27,6 @@ public class User
 
     public void UpdateLastLogin()
     {
-        LastLoginAt = DateTime.UtcNow;
+        LastLoginAt = DateTimeOffset.UtcNow;
     }
 }
