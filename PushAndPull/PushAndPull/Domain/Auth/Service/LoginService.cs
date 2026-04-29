@@ -26,7 +26,7 @@ public class LoginService : ILoginService
     public async Task<LoginResult> ExecuteAsync(LoginCommand request, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(request.Nickname))
-            throw new ArgumentException("INVALID_NICKNAME");
+            throw new InvalidNicknameException();
 
         var authResult = await _validator.ValidateAsync(request.Ticket);
 

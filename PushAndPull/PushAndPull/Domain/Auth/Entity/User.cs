@@ -11,6 +11,9 @@ public class User
 
     public User(ulong steamId, string nickname)
     {
+        if (string.IsNullOrWhiteSpace(nickname))
+            throw new ArgumentException("INVALID_NICKNAME");
+
         SteamId = steamId;
         Nickname = nickname;
         CreatedAt = DateTimeOffset.UtcNow;

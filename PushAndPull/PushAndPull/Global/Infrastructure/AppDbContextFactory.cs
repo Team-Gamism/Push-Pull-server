@@ -7,9 +7,13 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
+        var connectionString =
+            Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+            ?? "Host=localhost;Database=pushpull_design;Username=postgres";
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(
-                "Host=localhost;Database=pushpull_design;Username=postgres",
+                connectionString,
                 npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "public"))
             .Options;
 
