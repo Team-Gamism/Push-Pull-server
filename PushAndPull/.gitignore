@@ -1,6 +1,9 @@
 ﻿# Claude Code
 PR_BODY.md
 
+# Local environment secrets
+.env
+
 # .NET build output
 bin/
 obj/

@@ -29,11 +29,11 @@ namespace PushAndPull.Migrations
                         .HasColumnType("numeric(20,0)")
                         .HasColumnName("steam_id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTime>("LastLoginAt")
+                    b.Property<DateTimeOffset>("LastLoginAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("last_login_at");
 

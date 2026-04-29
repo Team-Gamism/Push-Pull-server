@@ -9,4 +9,6 @@ RUN dotnet publish PushAndPull/PushAndPull.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
 ENTRYPOINT ["dotnet", "PushAndPull.dll"]

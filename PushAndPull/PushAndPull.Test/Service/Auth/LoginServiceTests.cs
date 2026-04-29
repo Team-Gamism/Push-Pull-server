@@ -28,7 +28,7 @@ public class LoginServiceTests
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
 
             _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
+                .Setup(r => r.GetBySteamIdAsync(SteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
@@ -46,7 +46,7 @@ public class LoginServiceTests
 
             _userRepositoryMock.Verify(r => r.CreateAsync(
                 It.Is<User>(u => u.SteamId == SteamId && u.Nickname == Nickname),
-                CancellationToken.None), Times.Once);
+                It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ public class LoginServiceTests
             await _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname));
 
             _userRepositoryMock.Verify(r => r.UpdateAsync(
-                It.IsAny<ulong>(), It.IsAny<string>(), It.IsAny<DateTime>(), CancellationToken.None), Times.Never);
+                It.IsAny<ulong>(), It.IsAny<string>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 
@@ -137,7 +137,7 @@ public class LoginServiceTests
 
             var existingUser = new User(SteamId, "OldNickname");
             _userRepositoryMock
-                .Setup(r => r.GetBySteamIdAsync(SteamId, CancellationToken.None))
+                .Setup(r => r.GetBySteamIdAsync(SteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingUser);
 
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
@@ -156,8 +156,8 @@ public class LoginServiceTests
             _userRepositoryMock.Verify(r => r.UpdateAsync(
                 SteamId,
                 NewNickname,
-                It.IsAny<DateTime>(),
-                CancellationToken.None), Times.Once);
+                It.IsAny<DateTimeOffset>(),
+                It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -165,7 +165,7 @@ public class LoginServiceTests
         {
             await _sut.ExecuteAsync(new LoginCommand(Ticket, NewNickname));
 
-            _userRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<User>(), CancellationToken.None), Times.Never);
+            _userRepositoryMock.Verify(r => r.CreateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]

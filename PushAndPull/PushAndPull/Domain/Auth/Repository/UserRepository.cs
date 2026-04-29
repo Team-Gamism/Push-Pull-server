@@ -27,7 +27,7 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task UpdateAsync(ulong steamId, string nickname, DateTime lastLoginAt, CancellationToken ct = default)
+    public async Task UpdateAsync(ulong steamId, string nickname, DateTimeOffset lastLoginAt, CancellationToken ct = default)
     {
         await _context.Users
             .Where(u => u.SteamId == steamId)

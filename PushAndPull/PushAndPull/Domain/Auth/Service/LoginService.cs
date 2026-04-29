@@ -25,6 +25,9 @@ public class LoginService : ILoginService
 
     public async Task<LoginResult> ExecuteAsync(LoginCommand request, CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(request.Nickname))
+            throw new InvalidNicknameException();
+
         var authResult = await _validator.ValidateAsync(request.Ticket);
 
         if (authResult.IsFamilySharing)
@@ -39,7 +42,7 @@ public class LoginService : ILoginService
         }
         else
         {
-            await _userRepository.UpdateAsync(authResult.SteamId, request.Nickname, DateTime.UtcNow, ct);
+            await _userRepository.UpdateAsync(authResult.SteamId, request.Nickname, DateTimeOffset.UtcNow, ct);
         }
 
         var session = await _sessionService.CreateAsync(

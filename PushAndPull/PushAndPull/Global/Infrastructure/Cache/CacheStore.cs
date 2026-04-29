@@ -37,9 +37,4 @@ public class CacheStore : ICacheStore
     {
         await _cache.RemoveAsync(key);
     }
-
-    public async Task<bool> ExistsAsync(string key)
-    {
-        return await _cache.GetAsync(key) is not null;
-    }
 }
