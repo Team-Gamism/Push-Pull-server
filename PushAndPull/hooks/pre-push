@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# Advisory Codex review on every push.
+# - Layer 1: blocks pushes containing secret files (exit 1)
+# - Layer 2: warns on inline secret patterns (non-blocking)
+# - Layer 3: advisory Codex review (non-blocking, always exit 0)
+#
+# Skip entirely: SKIP_CODEX=1 git push
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+if [[ "${SKIP_CODEX:-0}" == "1" ]]; then
+  echo "[pre-push] SKIP_CODEX=1 — advisory review skipped."
+  exit 0
+fi
+
+# ------------------------------------------------------------------
+# Resolve base branch
+# ------------------------------------------------------------------
+BASE="${CODEX_BASE_BRANCH:-}"
+if [[ -z "$BASE" ]]; then
+  for candidate in origin/main origin/develop main develop; do
+    if git rev-parse --verify "$candidate" &>/dev/null; then
+      BASE="$candidate"
+      break
+    fi
+  done
+fi
+
+if [[ -z "$BASE" ]]; then
+  echo "[pre-push] Could not determine base branch — advisory review skipped."
+  exit 0
+fi
+
+# ------------------------------------------------------------------
+# Detect committed changes vs base
+# ------------------------------------------------------------------
+CHANGED_FILES=$(git diff --name-only "$BASE"...HEAD 2>/dev/null)
+if [[ -z "$CHANGED_FILES" ]]; then
+  echo "[pre-push] No changes vs ${BASE} — advisory review skipped."
+  exit 0
+fi
+
+# ------------------------------------------------------------------
+# Layer 1: block secret files
+# ------------------------------------------------------------------
+BLOCKED=false
+while IFS= read -r file; do
+  # allowlist
+  case "$file" in
+    *.env.example|*.env.sample|*.env.template) continue ;;
+  esac
+  # blocklist patterns
+  case "$file" in
+    *.env|*.pem|*.key|*.p12|*.pfx)
+      echo "[pre-push] BLOCKED: secret file detected — ${file}"
+      BLOCKED=true
+      ;;
+  esac
+done <<< "$CHANGED_FILES"
+
+if $BLOCKED; then
+  echo "[pre-push] Push aborted. Remove secret files and try again."
+  echo "           To skip advisory review only: SKIP_CODEX=1 git push"
+  exit 1
+fi
+
+# ------------------------------------------------------------------
+# Layer 2: warn on inline secret patterns (non-blocking)
+# ------------------------------------------------------------------
+DIFF=$(git diff "$BASE"...HEAD 2>/dev/null)
+WARNED=false
+for pattern in 'api_key\s*=' 'Bearer [A-Za-z0-9._-]\{20,\}' 'sk-[A-Za-z0-9]\{20,\}' 'ghp_[A-Za-z0-9]\{36,\}'; do
+  if echo "$DIFF" | grep -qE "^\+.*${pattern}"; then
+    echo "[pre-push] WARNING: possible secret pattern matched: ${pattern}"
+    WARNED=true
+  fi
+done
+$WARNED && echo "[pre-push] Review the warnings above before pushing."
+
+# ------------------------------------------------------------------
+# Layer 3: Codex advisory review (non-blocking)
+# ------------------------------------------------------------------
+echo ""
+echo "╔══════════════════════════════════════════════════════╗"
+echo "║  Advisory Codex Review  (push proceeds regardless)  ║"
+echo "╚══════════════════════════════════════════════════════╝"
+
+REVIEW_SCRIPT="${REPO_ROOT}/scripts/codex-review.sh"
+if [[ -x "$REVIEW_SCRIPT" ]]; then
+  bash "$REVIEW_SCRIPT" --base "$BASE" --raw --timeout 90
+else
+  echo "[pre-push] scripts/codex-review.sh not found — advisory review skipped."
+fi
+
+echo ""
+exit 0

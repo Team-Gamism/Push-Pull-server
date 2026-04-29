@@ -48,3 +48,27 @@ mcp__context7__query-docs(libraryId: "/stackexchange/stackexchange.redis", query
 ```
 
 `BCrypt.Net-Next`, `Moq`, and `Gamism.SDK.Extensions.AspNetCore` have no Context7 entry — refer to the source code directly.
+
+## Reference Docs
+
+- `.claude/rules/architecture.md` — directory structure and layering rules (Controllers → Services → Repositories)
+- `.claude/rules/code-style.md` — C# naming conventions, entity/DTO/async/Command-Result patterns
+- `.claude/rules/conventions.md` — DB naming, EF Core Fluent API config, CacheKey usage, DI registration
+- `.claude/rules/db-migration.md` — migration workflow, naming convention, entity modification patterns, rollback strategy
+- `.claude/rules/domain-patterns.md` — service, repository, and controller implementation patterns
+- `.claude/rules/global-patterns.md` — Steam auth, Redis session store, CacheKey, SessionAuthorize
+- `.claude/rules/testing.md` — test project structure, naming conventions, Moq patterns
+- `.claude/rules/flows.md` — Mermaid sequence diagrams for each API endpoint
+- `.claude/rules/verify.md` — build-and-verify workflow (auto build + test after every C# code change)
+- `.claude/rules/ask-user.md` — when to use AskUserQuestion (always applied)
+- `.claude/rules/test-fixer-trigger.md` — when to proactively offer the test-fixer agent (always applied)
+
+## Dual-Agent Workflow Setup
+
+This repo uses Claude Code (author) + Codex (advisory reviewer). One-time setup:
+
+```bash
+git config core.hooksPath ./hooks   # enable tracked pre-push hook
+```
+
+To skip Codex review on a push: `SKIP_CODEX=1 git push`
