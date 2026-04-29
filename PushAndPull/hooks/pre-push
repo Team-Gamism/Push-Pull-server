@@ -4,14 +4,10 @@
 # - Layer 2: warns on inline secret patterns (non-blocking)
 # - Layer 3: advisory Codex review (non-blocking, always exit 0)
 #
-# Skip entirely: SKIP_CODEX=1 git push
+# Skip advisory review: SKIP_CODEX=1 git push
 
-REPO_ROOT=$(git rev-parse --show-toplevel)
-
-if [[ "${SKIP_CODEX:-0}" == "1" ]]; then
-  echo "[pre-push] SKIP_CODEX=1 — advisory review skipped."
-  exit 0
-fi
+HOOK_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PROJECT_ROOT=$(cd "${HOOK_DIR}/.." && pwd)
 
 # ------------------------------------------------------------------
 # Resolve base branch
@@ -80,12 +76,17 @@ $WARNED && echo "[pre-push] Review the warnings above before pushing."
 # ------------------------------------------------------------------
 # Layer 3: Codex advisory review (non-blocking)
 # ------------------------------------------------------------------
+if [[ "${SKIP_CODEX:-0}" == "1" ]]; then
+  echo "[pre-push] SKIP_CODEX=1 — advisory review skipped."
+  exit 0
+fi
+
 echo ""
 echo "╔══════════════════════════════════════════════════════╗"
 echo "║  Advisory Codex Review  (push proceeds regardless)  ║"
 echo "╚══════════════════════════════════════════════════════╝"
 
-REVIEW_SCRIPT="${REPO_ROOT}/scripts/codex-review.sh"
+REVIEW_SCRIPT="${PROJECT_ROOT}/scripts/codex-review.sh"
 if [[ -x "$REVIEW_SCRIPT" ]]; then
   bash "$REVIEW_SCRIPT" --base "$BASE" --raw --timeout 90
 else

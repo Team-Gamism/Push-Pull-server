@@ -68,7 +68,7 @@ mcp__context7__query-docs(libraryId: "/stackexchange/stackexchange.redis", query
 This repo uses Claude Code (author) + Codex (advisory reviewer). One-time setup:
 
 ```bash
-git config core.hooksPath ./hooks   # enable tracked pre-push hook
+git config core.hooksPath PushAndPull/hooks   # enable tracked pre-push hook
 ```
 
-To skip Codex review on a push: `SKIP_CODEX=1 git push`
+To skip Codex advisory review on a push: `SKIP_CODEX=1 git push`
