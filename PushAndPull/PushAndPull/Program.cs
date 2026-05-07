@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using PushAndPull.Domain.Auth.Config;
 using PushAndPull.Domain.Room.Config;
 using PushAndPull.Global.Config;
+using PushAndPull.Global.Filter;
 using PushAndPull.Global.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    options.Filters.Add<CircuitBreakerExceptionFilter>());
 builder.Services.AddGamismSdk(options =>
 {
     options.Swagger.Title = "Push & Pull API";
@@ -18,7 +20,7 @@ builder.Services.AddGamismSdk(options =>
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddRedis(builder.Configuration);
 builder.Services.AddGlobalServices();
-builder.Services.AddAuthServices();
+builder.Services.AddAuthServices(builder.Configuration);
 builder.Services.AddRoomServices();
 builder.Services.AddRateLimit();
 

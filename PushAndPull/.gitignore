@@ -1,5 +1,6 @@
 ﻿# Claude Code
 PR_BODY.md
+specs/
 
 # Local environment secrets
 .env

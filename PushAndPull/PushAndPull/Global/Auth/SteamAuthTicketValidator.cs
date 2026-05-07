@@ -1,5 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 using PushAndPull.Domain.Auth.Exception;
 using PushAndPull.Global.Auth.Dto;
 
@@ -40,6 +42,14 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
             var response = await CallSteamApiAsync(ticket);
             var steamResponse = await ParseResponseAsync(response);
             return ValidateAndCreateResult(steamResponse);
+        }
+        catch (BrokenCircuitException ex)
+        {
+            throw new SteamCircuitOpenException(ex);
+        }
+        catch (TimeoutRejectedException ex)
+        {
+            throw new SteamApiException("STEAM_API_TIMEOUT", ex);
         }
         catch (HttpRequestException ex)
         {
