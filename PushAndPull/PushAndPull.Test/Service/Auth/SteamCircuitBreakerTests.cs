@@ -31,13 +31,16 @@ public class SteamCircuitBreakerTests
 
     private static (IAuthTicketValidator Validator, CountingHandler Handler) BuildValidator(
         Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> respond,
-        IConfiguration? config = null)
+        IConfiguration? config = null,
+        TimeProvider? timeProvider = null)
     {
         var resolvedConfig = config ?? BuildConfig();
         var handler = new CountingHandler(respond);
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(resolvedConfig);
         services.AddLogging();
+        if (timeProvider != null)
+            services.AddSingleton<TimeProvider>(timeProvider);
         services.AddAuthServices(resolvedConfig);
         services.AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>()
             .ConfigurePrimaryHttpMessageHandler(() => handler);
@@ -92,8 +95,10 @@ public class SteamCircuitBreakerTests
         [Fact]
         public async Task It_AllowsProbeRequest()
         {
+            var fakeTime = new FakeTimeProvider();
             var (validator, handler) = BuildValidator(
-                (_, _) => Task.FromResult(ServerError()));
+                (_, _) => Task.FromResult(ServerError()),
+                timeProvider: fakeTime);
 
             for (var i = 0; i < 2; i++)
                 await Assert.ThrowsAsync<SteamApiException>(() => validator.ValidateAsync("ticket"));
@@ -102,8 +107,8 @@ public class SteamCircuitBreakerTests
             await Assert.ThrowsAsync<SteamCircuitOpenException>(
                 () => validator.ValidateAsync("ticket"));
 
-            // Wait for BreakDuration (1s) to pass → Half-Open
-            await Task.Delay(TimeSpan.FromSeconds(1.5));
+            // Advance past BreakDuration (1s) without real wall-clock wait
+            fakeTime.Advance(TimeSpan.FromSeconds(2));
 
             // Probe request should reach the handler (still fails, but circuit was half-open)
             await Assert.ThrowsAsync<SteamApiException>(() => validator.ValidateAsync("ticket"));
@@ -170,6 +175,22 @@ public class SteamCircuitBreakerTests
 
             Assert.Null(context.Result);
             Assert.False(context.ExceptionHandled);
+        }
+    }
+
+    private sealed class FakeTimeProvider : TimeProvider
+    {
+        private DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
+        private long _timestamp = global::System.Diagnostics.Stopwatch.GetTimestamp();
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
+        public override long GetTimestamp() => _timestamp;
+        public override long TimestampFrequency => global::System.Diagnostics.Stopwatch.Frequency;
+
+        public void Advance(TimeSpan duration)
+        {
+            _utcNow = _utcNow.Add(duration);
+            _timestamp += (long)(duration.TotalSeconds * global::System.Diagnostics.Stopwatch.Frequency);
         }
     }
 
