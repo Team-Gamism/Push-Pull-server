@@ -35,6 +35,8 @@ public static class AuthServiceConfig
             .AddHttpClient<IAuthTicketValidator, SteamAuthTicketValidator>()
             .AddResilienceHandler("steam-cb", (builder, context) =>
             {
+                builder.TimeProvider = context.ServiceProvider.GetService<TimeProvider>() ?? TimeProvider.System;
+
                 var logger = context.ServiceProvider
                     .GetRequiredService<ILogger<SteamAuthTicketValidator>>();
 
