@@ -1,6 +1,7 @@
 ﻿# Claude Code
 PR_BODY.md
 specs/
+.claude/worktrees/
 
 # Local environment secrets
 .env
