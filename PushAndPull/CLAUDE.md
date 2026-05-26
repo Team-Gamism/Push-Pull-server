@@ -32,19 +32,3 @@
 | `xunit` | 2.9.2 | `/xunit/xunit.net` |
 | `Moq` | 4.20.72 | — (no Context7 entry) |
 
-## Context7 Usage
-
-When working with any library listed above, use the Context7 MCP to fetch version-accurate official documentation before writing or modifying code.
-
-```
-# Example: EF Core Fluent API
-mcp__context7__query-docs(libraryId: "/dotnet/docs", query: "EF Core IEntityTypeConfiguration fluent API", version: "9.0")
-
-# Example: Npgsql EF Core setup
-mcp__context7__query-docs(libraryId: "/npgsql/efcore.pg", query: "UseNpgsql configuration")
-
-# Example: Redis session
-mcp__context7__query-docs(libraryId: "/stackexchange/stackexchange.redis", query: "IDistributedCache SetString GetString")
-```
-
-`BCrypt.Net-Next`, `Moq`, and `Gamism.SDK.Extensions.AspNetCore` have no Context7 entry — refer to the source code directly.
