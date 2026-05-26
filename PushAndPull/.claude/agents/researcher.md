@@ -39,7 +39,7 @@ Thoroughly investigate a question or task by reading code, searching the codebas
 
 This is a .NET 9 ASP.NET Core backend with:
 - Domain-driven structure: `Domain/{Feature}/Controller|Service|Repository|Entity`
-- PostgreSQL via EF Core 9 + Npgsql
+- PostgreSQL via EF Core 9 + Npgsql and Dapper
 - Redis for session caching
 - Steam authentication (ticket-based, Session-Id header)
 - xUnit + Moq for testing

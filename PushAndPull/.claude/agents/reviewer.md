@@ -25,7 +25,7 @@ Find real bugs, security issues, and convention violations. Avoid nitpicks and s
 - Are exceptions thrown/caught at the right layer?
 
 ### 2. Security (OWASP alignment)
-- No SQL injection (parameterized queries, EF Core only)
+- No SQL injection (parameterized queries via EF Core or Dapper)
 - No mass assignment (DTOs used, not entities in controllers)
 - Session validation on all authenticated endpoints
 - No sensitive data in logs or error responses
