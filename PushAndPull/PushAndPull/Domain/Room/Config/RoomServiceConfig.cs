@@ -14,6 +14,8 @@ public static class RoomServiceConfig
         services.AddScoped<IGetRoomService, GetRoomService>();
         services.AddScoped<IGetAllRoomService, GetAllRoomService>();
         services.AddScoped<IJoinRoomService, JoinRoomService>();
+        services.AddScoped<ILeaveRoomService, LeaveRoomService>();
+        services.AddScoped<ICloseRoomService, CloseRoomService>();
         return services;
     }
 }

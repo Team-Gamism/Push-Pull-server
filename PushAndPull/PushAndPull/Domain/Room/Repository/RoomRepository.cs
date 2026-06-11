@@ -52,10 +52,23 @@ public class RoomRepository : IRoomRepository
         return updated > 0;
     }
 
+    public async Task<bool> TryRemoveGuestAsync(string roomCode, ulong steamId, CancellationToken ct = default)
+    {
+        var updated = await _context.Rooms
+            .Where(x => x.RoomCode == roomCode
+                        && x.GuestSteamId == steamId
+                        && x.CurrentPlayers > 1)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers - 1)
+                .SetProperty(x => x.GuestSteamId, (ulong?)null), ct);
+
+        return updated > 0;
+    }
+
     public async Task CloseAsync(string roomCode, CancellationToken ct = default)
     {
         await _context.Rooms
-            .Where(x => x.RoomCode == roomCode)
+            .Where(x => x.RoomCode == roomCode && x.Status == RoomStatus.Active)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.Status, RoomStatus.Closed)
                 .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);

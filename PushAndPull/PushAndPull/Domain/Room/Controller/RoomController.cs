@@ -16,18 +16,24 @@ public class RoomController : ControllerBase
     private readonly IGetRoomService _getRoomService;
     private readonly IGetAllRoomService _getAllRoomService;
     private readonly IJoinRoomService _joinRoomService;
+    private readonly ILeaveRoomService _leaveRoomService;
+    private readonly ICloseRoomService _closeRoomService;
 
     public RoomController(
         ICreateRoomService createRoomService,
         IGetRoomService getRoomService,
         IGetAllRoomService getAllRoomService,
-        IJoinRoomService joinRoomService
+        IJoinRoomService joinRoomService,
+        ILeaveRoomService leaveRoomService,
+        ICloseRoomService closeRoomService
         )
     {
         _createRoomService = createRoomService;
         _getRoomService = getRoomService;
         _getAllRoomService = getAllRoomService;
         _joinRoomService = joinRoomService;
+        _leaveRoomService = leaveRoomService;
+        _closeRoomService = closeRoomService;
     }
 
     [SessionAuthorize]
@@ -86,6 +92,30 @@ public class RoomController : ControllerBase
         var result = await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password, User.GetSteamId()), ct);
 
         return CommonApiResponse.Success("방에 참여했습니다.", new JoinRoomResponse(result.SteamLobbyId));
+    }
+
+    [SessionAuthorize]
+    [HttpPost("{roomCode}/leave")]
+    public async Task<CommonApiResponse> LeaveRoom(
+        [FromRoute] string roomCode,
+        CancellationToken ct
+        )
+    {
+        await _leaveRoomService.ExecuteAsync(new LeaveRoomCommand(roomCode, User.GetSteamId()), ct);
+
+        return CommonApiResponse.Success("방에서 나갔습니다.");
+    }
+
+    [SessionAuthorize]
+    [HttpDelete("{roomCode}")]
+    public async Task<CommonApiResponse> CloseRoom(
+        [FromRoute] string roomCode,
+        CancellationToken ct
+        )
+    {
+        await _closeRoomService.ExecuteAsync(new CloseRoomCommand(roomCode, User.GetSteamId()), ct);
+
+        return CommonApiResponse.Success("방을 닫았습니다.");
     }
 
     private static GetRoomResponse ToGetRoomResponse(GetRoomResult result) =>
