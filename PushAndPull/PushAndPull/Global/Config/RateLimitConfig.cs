@@ -9,8 +9,8 @@ public static class RateLimitConfig
     {
         services.AddRateLimiter(options =>
         {
-            // 레이트리밋 미들웨어는 세션 인증 필터보다 먼저 실행되므로
-            // claims 대신 클라이언트 IP 또는 Session-Id 헤더를 파티션 키로 사용한다.
+            // 레이트리밋 미들웨어는 세션 인증 필터보다 먼저 실행되므로 claims를 쓸 수 없고,
+            // 클라이언트가 조작 가능한 헤더(Session-Id)는 우회 가능하므로 IP를 파티션 키로 사용한다.
             options.AddPolicy("login", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: GetIpKey(httpContext),
@@ -22,7 +22,7 @@ public static class RateLimitConfig
 
             options.AddPolicy("create_room", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: GetSessionOrIpKey(httpContext),
+                    partitionKey: GetIpKey(httpContext),
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = 10,
@@ -31,7 +31,7 @@ public static class RateLimitConfig
 
             options.AddPolicy("join_room", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: GetSessionOrIpKey(httpContext),
+                    partitionKey: GetIpKey(httpContext),
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = 20,
@@ -50,10 +50,4 @@ public static class RateLimitConfig
 
     internal static string GetIpKey(HttpContext httpContext)
         => $"ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
-
-    internal static string GetSessionOrIpKey(HttpContext httpContext)
-        => httpContext.Request.Headers.TryGetValue("Session-Id", out var sessionId)
-           && !string.IsNullOrWhiteSpace(sessionId)
-            ? $"session:{sessionId}"
-            : GetIpKey(httpContext);
 }
