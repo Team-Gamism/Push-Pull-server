@@ -33,14 +33,14 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
             throw new ArgumentException("APPID_REQUIRED");
     }
 
-    public async Task<AuthTicketValidationResult> ValidateAsync(string ticket)
+    public async Task<AuthTicketValidationResult> ValidateAsync(string ticket, CancellationToken ct = default)
     {
         ValidateTicketFormat(ticket);
 
         try
         {
-            var response = await CallSteamApiAsync(ticket);
-            var steamResponse = await ParseResponseAsync(response);
+            var response = await CallSteamApiAsync(ticket, ct);
+            var steamResponse = await ParseResponseAsync(response, ct);
             return ValidateAndCreateResult(steamResponse);
         }
         catch (BrokenCircuitException ex)
@@ -67,11 +67,11 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
             throw new InvalidTicketException("EMPTY_TICKET");
     }
 
-    private async Task<HttpResponseMessage> CallSteamApiAsync(string ticket)
+    private async Task<HttpResponseMessage> CallSteamApiAsync(string ticket, CancellationToken ct)
     {
         var url = BuildSteamApiUrl(ticket);
 
-        var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
+        var response = await _httpClient.GetAsync(url, ct).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -93,9 +93,9 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
     }
 
     private static async Task<SteamAuthResponse> ParseResponseAsync(
-        HttpResponseMessage response)
+        HttpResponseMessage response, CancellationToken ct)
     {
-        var steamResponse = await response.Content.ReadFromJsonAsync<SteamAuthResponse>(JsonOptions);
+        var steamResponse = await response.Content.ReadFromJsonAsync<SteamAuthResponse>(JsonOptions, ct);
 
         if (steamResponse?.Response.Params == null)
         {

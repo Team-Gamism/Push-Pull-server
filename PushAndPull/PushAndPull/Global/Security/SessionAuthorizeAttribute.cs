@@ -20,7 +20,7 @@ public class SessionAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
         var sessionService =
             httpContext.RequestServices.GetRequiredService<ISessionService>();
 
-        var playerSession = await sessionService.GetAsync(sessionId!);
+        var playerSession = await sessionService.GetAsync(sessionId!, httpContext.RequestAborted);
 
         if (playerSession == null)
         {

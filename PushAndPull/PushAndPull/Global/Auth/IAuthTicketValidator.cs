@@ -2,7 +2,7 @@ namespace PushAndPull.Global.Auth;
 
 public interface IAuthTicketValidator
 {
-    Task<AuthTicketValidationResult> ValidateAsync(string ticket);
+    Task<AuthTicketValidationResult> ValidateAsync(string ticket, CancellationToken ct = default);
 }
 
 public record AuthTicketValidationResult(

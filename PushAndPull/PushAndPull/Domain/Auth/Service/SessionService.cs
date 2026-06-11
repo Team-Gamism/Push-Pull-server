@@ -13,26 +13,27 @@ public class SessionService : ISessionService
         _cacheStore = cacheStore;
     }
 
-    public async Task<PlayerSession> CreateAsync(ulong steamId, TimeSpan ttl)
+    public async Task<PlayerSession> CreateAsync(ulong steamId, TimeSpan ttl, CancellationToken ct = default)
     {
         var session = new PlayerSession(steamId, ttl);
 
         await _cacheStore.SetAsync(
             CacheKey.Session.ById(session.SessionId),
             session,
-            session.Ttl
+            session.Ttl,
+            ct
         );
 
         return session;
     }
 
-    public async Task<PlayerSession?> GetAsync(string sessionId)
+    public async Task<PlayerSession?> GetAsync(string sessionId, CancellationToken ct = default)
     {
-        return await _cacheStore.GetAsync<PlayerSession>(CacheKey.Session.ById(sessionId));
+        return await _cacheStore.GetAsync<PlayerSession>(CacheKey.Session.ById(sessionId), ct);
     }
 
     public async Task DeleteAsync(string sessionId, CancellationToken ct = default)
     {
-        await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId));
+        await _cacheStore.DeleteAsync(CacheKey.Session.ById(sessionId), ct);
     }
 }
