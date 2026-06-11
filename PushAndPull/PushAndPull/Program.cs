@@ -21,7 +21,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddRedis(builder.Configuration);
 builder.Services.AddGlobalServices();
 builder.Services.AddAuthServices(builder.Configuration);
-builder.Services.AddRoomServices();
+builder.Services.AddRoomServices(builder.Configuration);
 builder.Services.AddRateLimit();
 
 var app = builder.Build();

@@ -12,7 +12,7 @@ public class CacheStore : ICacheStore
         _cache = cache;
     }
 
-    public async Task SetAsync<T>(string key, T value, TimeSpan? ttl = null)
+    public async Task SetAsync<T>(string key, T value, TimeSpan? ttl = null, CancellationToken ct = default)
     {
         var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
 
@@ -20,12 +20,12 @@ public class CacheStore : ICacheStore
         if (ttl.HasValue)
             options.AbsoluteExpirationRelativeToNow = ttl;
 
-        await _cache.SetAsync(key, bytes, options);
+        await _cache.SetAsync(key, bytes, options, ct);
     }
 
-    public async Task<T?> GetAsync<T>(string key)
+    public async Task<T?> GetAsync<T>(string key, CancellationToken ct = default)
     {
-        var bytes = await _cache.GetAsync(key);
+        var bytes = await _cache.GetAsync(key, ct);
 
         if (bytes is null)
             return default;
@@ -33,8 +33,8 @@ public class CacheStore : ICacheStore
         return JsonSerializer.Deserialize<T>(bytes);
     }
 
-    public async Task DeleteAsync(string key)
+    public async Task DeleteAsync(string key, CancellationToken ct = default)
     {
-        await _cache.RemoveAsync(key);
+        await _cache.RemoveAsync(key, ct);
     }
 }

@@ -1,3 +1,4 @@
+using PushAndPull.Domain.Room.Exception;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
@@ -21,27 +22,45 @@ public class CreateRoomService : ICreateRoomService
         _passwordHasher = passwordHasher;
     }
 
+    private const int MaxRoomNameLength = 50;
+    private const int MaxCreateAttempts = 3;
+
     public async Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request, CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(request.RoomName) || request.RoomName.Length > MaxRoomNameLength)
+            throw new InvalidRoomNameException();
+
         string? passwordHash = null;
         if (!string.IsNullOrWhiteSpace(request.Password))
             passwordHash = _passwordHasher.Hash(request.Password);
 
-        var roomCode = _roomCodeGenerator.Generate();
+        for (var attempt = 0; attempt < MaxCreateAttempts; attempt++)
+        {
+            var roomCode = _roomCodeGenerator.Generate();
 
-        var room = new Entity.Room(
-            roomCode: roomCode,
-            roomName: request.RoomName,
-            steamLobbyId: request.LobbyId,
-            hostSteamId: request.HostSteamId,
-            isPrivate: request.IsPrivate,
-            passwordHash: passwordHash
-        );
+            var room = new Entity.Room(
+                roomCode: roomCode,
+                roomName: request.RoomName,
+                steamLobbyId: request.LobbyId,
+                hostSteamId: request.HostSteamId,
+                isPrivate: request.IsPrivate,
+                passwordHash: passwordHash
+            );
 
-        await _roomRepository.CreateAsync(room, ct);
+            try
+            {
+                await _roomRepository.CreateAsync(room, ct);
 
-        return new CreateRoomResult(
-            room.RoomCode
-        );
+                return new CreateRoomResult(
+                    room.RoomCode
+                );
+            }
+            catch (DuplicateRoomCodeException)
+            {
+                // 코드 충돌 — 새 코드로 재시도
+            }
+        }
+
+        throw new RoomCodeGenerationFailedException();
     }
 }

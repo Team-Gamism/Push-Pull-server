@@ -20,7 +20,7 @@ public class JoinRoomService : IJoinRoomService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task ExecuteAsync(JoinRoomCommand request, CancellationToken ct = default)
+    public async Task<JoinRoomResult> ExecuteAsync(JoinRoomCommand request, CancellationToken ct = default)
     {
         var room = await _roomRepository.GetAsync(request.RoomCode, ct)
             ?? throw new RoomNotFoundException(request.RoomCode);
@@ -28,16 +28,19 @@ public class JoinRoomService : IJoinRoomService
         if (room.Status != RoomStatus.Active)
             throw new RoomNotActiveException(request.RoomCode);
 
-        if (room.IsPrivate)
+        if (room.HostSteamId == request.SteamId || room.GuestSteamId == request.SteamId)
+            throw new AlreadyJoinedRoomException(request.RoomCode);
+
+        if (room.PasswordHash != null)
         {
             if (string.IsNullOrWhiteSpace(request.Password))
                 throw new PasswordRequiredException(request.RoomCode);
 
-            if (!_passwordHasher.Verify(request.Password, room.PasswordHash!))
+            if (!_passwordHasher.Verify(request.Password, room.PasswordHash))
                 throw new InvalidPasswordException(request.RoomCode);
         }
 
-        var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode, ct);
+        var success = await _roomRepository.TryJoinAsync(request.RoomCode, request.SteamId, ct);
         if (!success)
         {
             var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode, ct);
@@ -45,8 +48,12 @@ public class JoinRoomService : IJoinRoomService
                 throw new RoomNotFoundException(request.RoomCode);
             if (roomAfterAttempt.Status != RoomStatus.Active)
                 throw new RoomNotActiveException(request.RoomCode);
+            if (roomAfterAttempt.GuestSteamId == request.SteamId)
+                throw new AlreadyJoinedRoomException(request.RoomCode);
 
             throw new RoomFullException(request.RoomCode);
         }
+
+        return new JoinRoomResult(room.SteamLobbyId);
     }
 }

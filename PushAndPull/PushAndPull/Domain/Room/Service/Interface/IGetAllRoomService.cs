@@ -1,12 +1,18 @@
-using PushAndPull.Domain.Room.Dto.Response;
-
 namespace PushAndPull.Domain.Room.Service.Interface;
 
 public interface IGetAllRoomService
 {
-    Task<GetAllRoomResult> ExecuteAsync(CancellationToken ct = default);
+    Task<GetAllRoomResult> ExecuteAsync(GetAllRoomQuery request, CancellationToken ct = default);
 }
 
+public record GetAllRoomQuery(
+    int Page = 1,
+    int Size = 20
+    );
+
 public record GetAllRoomResult(
-    IReadOnlyList<GetRoomResponse> Rooms
+    IReadOnlyList<GetRoomResult> Rooms,
+    int Page,
+    int Size,
+    bool HasNext
 );

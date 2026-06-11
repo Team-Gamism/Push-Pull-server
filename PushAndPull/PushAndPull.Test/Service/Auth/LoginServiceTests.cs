@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using PushAndPull.Domain.Auth.Entity;
 using PushAndPull.Domain.Auth.Exception;
 using PushAndPull.Domain.Auth.Repository.Interface;
@@ -10,6 +10,48 @@ namespace PushAndPull.Test.Service.Auth;
 
 public class LoginServiceTests
 {
+    public class WhenAnInvalidNicknameIsProvided
+    {
+        private readonly Mock<IAuthTicketValidator> _validatorMock = new();
+        private readonly Mock<ISessionService> _sessionServiceMock = new();
+        private readonly Mock<IUserRepository> _userRepositoryMock = new();
+        private readonly LoginService _sut;
+
+        private const string Ticket = "valid-ticket";
+
+        public WhenAnInvalidNicknameIsProvided()
+        {
+            _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task It_ThrowsInvalidNicknameExceptionForBlankNicknames(string nickname)
+        {
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, nickname)));
+        }
+
+        [Fact]
+        public async Task It_ThrowsInvalidNicknameExceptionWhenTheNicknameIsTooLong()
+        {
+            var nickname = new string('a', 33);
+
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, nickname)));
+        }
+
+        [Fact]
+        public async Task It_DoesNotValidateTheTicket()
+        {
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, "")));
+
+            _validatorMock.Verify(v => v.ValidateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+    }
+
     public class WhenANewUserLogsInForTheFirstTime
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();
@@ -24,7 +66,7 @@ public class LoginServiceTests
         public WhenANewUserLogsInForTheFirstTime()
         {
             _validatorMock
-                .Setup(v => v.ValidateAsync(Ticket))
+                .Setup(v => v.ValidateAsync(Ticket, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
 
             _userRepositoryMock
@@ -33,7 +75,7 @@ public class LoginServiceTests
 
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
             _sessionServiceMock
-                .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
+                .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(session);
 
             _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
@@ -82,7 +124,7 @@ public class LoginServiceTests
         public WhenAFamilySharingUserTriesToLogIn()
         {
             _validatorMock
-                .Setup(v => v.ValidateAsync(Ticket))
+                .Setup(v => v.ValidateAsync(Ticket, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new AuthTicketValidationResult(PlayerSteamId, OwnerSteamId, false, false));
 
             _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
@@ -102,7 +144,7 @@ public class LoginServiceTests
                 () => _sut.ExecuteAsync(new LoginCommand(Ticket, Nickname)));
 
             _sessionServiceMock.Verify(
-                s => s.CreateAsync(It.IsAny<ulong>(), It.IsAny<TimeSpan>()),
+                s => s.CreateAsync(It.IsAny<ulong>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()),
                 Times.Never);
         }
 
@@ -132,7 +174,7 @@ public class LoginServiceTests
         public WhenAnExistingUserLogsInAgain()
         {
             _validatorMock
-                .Setup(v => v.ValidateAsync(Ticket))
+                .Setup(v => v.ValidateAsync(Ticket, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new AuthTicketValidationResult(SteamId, SteamId, false, false));
 
             var existingUser = new User(SteamId, "OldNickname");
@@ -142,7 +184,7 @@ public class LoginServiceTests
 
             var session = new PlayerSession(SteamId, TimeSpan.FromDays(15));
             _sessionServiceMock
-                .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15)))
+                .Setup(s => s.CreateAsync(SteamId, TimeSpan.FromDays(15), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(session);
 
             _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);

@@ -10,6 +10,7 @@ public class Room
 
     public Auth.Entity.User Host { get; private set; }
     public ulong HostSteamId { get; private set; }
+    public ulong? GuestSteamId { get; private set; }
 
     public int CurrentPlayers { get; private set; }
     public int MaxPlayers { get; private set; }
@@ -21,6 +22,7 @@ public class Room
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? ExpiresAt { get; private set; }
+    public DateTimeOffset? LastHeartbeatAt { get; private set; }
 
     private const int DefaultMaxPlayers = 2;
 
@@ -45,12 +47,6 @@ public class Room
         PasswordHash = passwordHash;
         Status = RoomStatus.Active;
         CreatedAt = DateTimeOffset.UtcNow;
-    }
-
-    public void MarkDeleting(TimeSpan ttl)
-    {
-        Status = RoomStatus.Deleting;
-        ExpiresAt = DateTimeOffset.UtcNow.Add(ttl);
     }
 
     public void Close()

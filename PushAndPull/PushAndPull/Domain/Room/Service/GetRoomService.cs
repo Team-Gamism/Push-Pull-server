@@ -25,7 +25,9 @@ public class GetRoomService : IGetRoomService
             room.RoomName,
             room.RoomCode,
             room.CurrentPlayers,
-            room.IsPrivate
+            room.MaxPlayers,
+            room.IsPrivate,
+            room.PasswordHash != null
         );
     }
 }

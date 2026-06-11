@@ -4,75 +4,14 @@ namespace PushAndPull.Test.Domain.Auth;
 
 public class UserTests
 {
-    public class WhenUpdatingNicknameWithAValidValue
+    public class WhenAUserIsCreatedWithAnInvalidNickname
     {
-        private readonly User _user;
-
-        public WhenUpdatingNicknameWithAValidValue()
-        {
-            _user = new User(76561198000000001UL, "OriginalName");
-        }
-
-        [Fact]
-        public void It_ChangesTheNickname()
-        {
-            _user.UpdateNickname("NewName");
-
-            Assert.Equal("NewName", _user.Nickname);
-        }
-    }
-
-    public class WhenUpdatingNicknameWithAnEmptyString
-    {
-        private readonly User _user;
-
-        public WhenUpdatingNicknameWithAnEmptyString()
-        {
-            _user = new User(76561198000000002UL, "SomePlayer");
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
         public void It_ThrowsArgumentException(string invalidNickname)
         {
-            Assert.Throws<ArgumentException>(() => _user.UpdateNickname(invalidNickname));
-        }
-    }
-
-    public class WhenUpdatingNicknameWithNull
-    {
-        private readonly User _user;
-
-        public WhenUpdatingNicknameWithNull()
-        {
-            _user = new User(76561198000000006UL, "SomePlayer");
-        }
-
-        [Fact]
-        public void It_ThrowsArgumentException()
-        {
-            Assert.Throws<ArgumentException>(() => _user.UpdateNickname(null!));
-        }
-    }
-
-    public class WhenUpdatingLastLoginTime
-    {
-        private readonly User _user;
-
-        public WhenUpdatingLastLoginTime()
-        {
-            _user = new User(76561198000000003UL, "LoginPlayer");
-        }
-
-        [Fact]
-        public void It_UpdatesLastLoginAt()
-        {
-            var before = _user.LastLoginAt;
-
-            _user.UpdateLastLogin();
-
-            Assert.True(_user.LastLoginAt >= before);
+            Assert.Throws<ArgumentException>(() => new User(76561198000000002UL, invalidNickname));
         }
     }
 

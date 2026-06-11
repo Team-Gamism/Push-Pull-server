@@ -4,36 +4,6 @@ namespace PushAndPull.Test.Domain.Room;
 
 public class RoomTests
 {
-    public class WhenARoomIsMarkedAsDeleting
-    {
-        private readonly PushAndPull.Domain.Room.Entity.Room _room;
-        private readonly TimeSpan _ttl = TimeSpan.FromMinutes(5);
-
-        public WhenARoomIsMarkedAsDeleting()
-        {
-            _room = new PushAndPull.Domain.Room.Entity.Room("ROOM03", "Deleting Room", 333UL, 76561198000000001UL, false, null);
-        }
-
-        [Fact]
-        public void It_ChangesStatusToDeleting()
-        {
-            _room.MarkDeleting(_ttl);
-
-            Assert.Equal(RoomStatus.Deleting, _room.Status);
-        }
-
-        [Fact]
-        public void It_SetsExpiresAt()
-        {
-            var before = DateTimeOffset.UtcNow;
-
-            _room.MarkDeleting(_ttl);
-
-            Assert.NotNull(_room.ExpiresAt);
-            Assert.True(_room.ExpiresAt >= before.Add(_ttl));
-        }
-    }
-
     public class WhenARoomIsClosed
     {
         private readonly PushAndPull.Domain.Room.Entity.Room _room;

@@ -16,7 +16,7 @@ public class UserConfig : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Nickname)
             .HasColumnName("nickname")
-            .HasMaxLength(50)
+            .HasMaxLength(32)
             .IsRequired();
 
         builder.Property(x => x.CreatedAt)
