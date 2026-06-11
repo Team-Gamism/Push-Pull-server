@@ -23,9 +23,11 @@ public class LoginService : ILoginService
         _userRepository = userRepository;
     }
 
+    private const int MaxNicknameLength = 32;
+
     public async Task<LoginResult> ExecuteAsync(LoginCommand request, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(request.Nickname))
+        if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Length > MaxNicknameLength)
             throw new InvalidNicknameException();
 
         var authResult = await _validator.ValidateAsync(request.Ticket);

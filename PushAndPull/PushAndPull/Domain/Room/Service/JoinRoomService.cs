@@ -28,6 +28,9 @@ public class JoinRoomService : IJoinRoomService
         if (room.Status != RoomStatus.Active)
             throw new RoomNotActiveException(request.RoomCode);
 
+        if (room.HostSteamId == request.SteamId || room.GuestSteamId == request.SteamId)
+            throw new AlreadyJoinedRoomException(request.RoomCode);
+
         if (room.PasswordHash != null)
         {
             if (string.IsNullOrWhiteSpace(request.Password))
@@ -37,7 +40,7 @@ public class JoinRoomService : IJoinRoomService
                 throw new InvalidPasswordException(request.RoomCode);
         }
 
-        var success = await _roomRepository.IncrementPlayerCountAsync(request.RoomCode, ct);
+        var success = await _roomRepository.TryJoinAsync(request.RoomCode, request.SteamId, ct);
         if (!success)
         {
             var roomAfterAttempt = await _roomRepository.GetAsync(request.RoomCode, ct);
@@ -45,6 +48,8 @@ public class JoinRoomService : IJoinRoomService
                 throw new RoomNotFoundException(request.RoomCode);
             if (roomAfterAttempt.Status != RoomStatus.Active)
                 throw new RoomNotActiveException(request.RoomCode);
+            if (roomAfterAttempt.GuestSteamId == request.SteamId)
+                throw new AlreadyJoinedRoomException(request.RoomCode);
 
             throw new RoomFullException(request.RoomCode);
         }

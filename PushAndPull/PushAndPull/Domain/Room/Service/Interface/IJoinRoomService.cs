@@ -7,7 +7,8 @@ public interface IJoinRoomService
 
 public record JoinRoomCommand(
     string RoomCode,
-    string? Password
+    string? Password,
+    ulong SteamId
     );
 
 public record JoinRoomResult(

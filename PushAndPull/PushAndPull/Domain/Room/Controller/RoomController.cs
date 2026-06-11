@@ -83,7 +83,7 @@ public class RoomController : ControllerBase
         CancellationToken ct
         )
     {
-        var result = await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password), ct);
+        var result = await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password, User.GetSteamId()), ct);
 
         return CommonApiResponse.Success("방에 참여했습니다.", new JoinRoomResponse(result.SteamLobbyId));
     }

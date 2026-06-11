@@ -1,3 +1,4 @@
+using PushAndPull.Domain.Room.Exception;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
@@ -21,8 +22,13 @@ public class CreateRoomService : ICreateRoomService
         _passwordHasher = passwordHasher;
     }
 
+    private const int MaxRoomNameLength = 50;
+
     public async Task<CreateRoomResult> ExecuteAsync(CreateRoomCommand request, CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(request.RoomName) || request.RoomName.Length > MaxRoomNameLength)
+            throw new InvalidRoomNameException();
+
         string? passwordHash = null;
         if (!string.IsNullOrWhiteSpace(request.Password))
             passwordHash = _passwordHasher.Hash(request.Password);

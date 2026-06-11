@@ -10,6 +10,48 @@ namespace PushAndPull.Test.Service.Auth;
 
 public class LoginServiceTests
 {
+    public class WhenAnInvalidNicknameIsProvided
+    {
+        private readonly Mock<IAuthTicketValidator> _validatorMock = new();
+        private readonly Mock<ISessionService> _sessionServiceMock = new();
+        private readonly Mock<IUserRepository> _userRepositoryMock = new();
+        private readonly LoginService _sut;
+
+        private const string Ticket = "valid-ticket";
+
+        public WhenAnInvalidNicknameIsProvided()
+        {
+            _sut = new LoginService(_validatorMock.Object, _sessionServiceMock.Object, _userRepositoryMock.Object);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task It_ThrowsInvalidNicknameExceptionForBlankNicknames(string nickname)
+        {
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, nickname)));
+        }
+
+        [Fact]
+        public async Task It_ThrowsInvalidNicknameExceptionWhenTheNicknameIsTooLong()
+        {
+            var nickname = new string('a', 33);
+
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, nickname)));
+        }
+
+        [Fact]
+        public async Task It_DoesNotValidateTheTicket()
+        {
+            await Assert.ThrowsAsync<InvalidNicknameException>(
+                () => _sut.ExecuteAsync(new LoginCommand(Ticket, "")));
+
+            _validatorMock.Verify(v => v.ValidateAsync(It.IsAny<string>()), Times.Never);
+        }
+    }
+
     public class WhenANewUserLogsInForTheFirstTime
     {
         private readonly Mock<IAuthTicketValidator> _validatorMock = new();

@@ -1,4 +1,5 @@
 using Moq;
+using PushAndPull.Domain.Room.Exception;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 using PushAndPull.Domain.Room.Service.Interface;
@@ -9,6 +10,53 @@ namespace Tests.Service.Room;
 
 public class CreateRoomServiceTests
 {
+    public class WhenAnInvalidRoomNameIsProvided
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IRoomCodeGenerator> _roomCodeGeneratorMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly CreateRoomService _sut;
+
+        public WhenAnInvalidRoomNameIsProvided()
+        {
+            _sut = new CreateRoomService(
+                _roomRepositoryMock.Object,
+                _roomCodeGeneratorMock.Object,
+                _passwordHasherMock.Object
+            );
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task It_ThrowsInvalidRoomNameExceptionForBlankNames(string roomName)
+        {
+            var command = new CreateRoomCommand(111UL, roomName, false, null, 76561198000000001UL);
+
+            await Assert.ThrowsAsync<InvalidRoomNameException>(() => _sut.ExecuteAsync(command));
+        }
+
+        [Fact]
+        public async Task It_ThrowsInvalidRoomNameExceptionWhenTheNameIsTooLong()
+        {
+            var command = new CreateRoomCommand(111UL, new string('a', 51), false, null, 76561198000000001UL);
+
+            await Assert.ThrowsAsync<InvalidRoomNameException>(() => _sut.ExecuteAsync(command));
+        }
+
+        [Fact]
+        public async Task It_DoesNotSaveTheRoom()
+        {
+            var command = new CreateRoomCommand(111UL, "", false, null, 76561198000000001UL);
+
+            await Assert.ThrowsAsync<InvalidRoomNameException>(() => _sut.ExecuteAsync(command));
+
+            _roomRepositoryMock.Verify(
+                r => r.CreateAsync(It.IsAny<EntityRoom>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+    }
+
     public class WhenCreatingAPublicRoomWithoutAPassword
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

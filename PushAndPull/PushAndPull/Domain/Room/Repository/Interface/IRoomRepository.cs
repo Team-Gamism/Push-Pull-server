@@ -7,6 +7,6 @@ public interface IRoomRepository
     Task<RoomEntity?> GetAsync(string roomCode, CancellationToken ct = default);
     Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct = default);
     Task CreateAsync(RoomEntity room, CancellationToken ct = default);
-    Task<bool> IncrementPlayerCountAsync(string roomCode, CancellationToken ct = default);
+    Task<bool> TryJoinAsync(string roomCode, ulong steamId, CancellationToken ct = default);
     Task CloseAsync(string roomCode, CancellationToken ct = default);
 }

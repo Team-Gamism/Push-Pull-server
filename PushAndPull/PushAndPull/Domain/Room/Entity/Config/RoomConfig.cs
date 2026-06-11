@@ -16,6 +16,7 @@ public class RoomConfig : IEntityTypeConfiguration<Room>
 
         builder.Property(x => x.RoomName)
             .HasColumnName("room_name")
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.RoomCode)
@@ -37,6 +38,9 @@ public class RoomConfig : IEntityTypeConfiguration<Room>
 
         builder.HasIndex(x => x.HostSteamId)
             .HasDatabaseName("idx_room_host_steam_id");
+
+        builder.Property(x => x.GuestSteamId)
+            .HasColumnName("guest_steam_id");
 
         builder.Property(x => x.CurrentPlayers)
             .HasColumnName("current_players")
@@ -79,6 +83,10 @@ public class RoomConfig : IEntityTypeConfiguration<Room>
 
         builder.HasIndex(x => x.ExpiresAt)
             .HasDatabaseName("idx_room_expires_at");
+
+        builder.Property(x => x.LastHeartbeatAt)
+            .HasColumnName("last_heartbeat_at")
+            .HasColumnType("timestamptz");
 
         builder.HasOne(r => r.Host)
             .WithMany()

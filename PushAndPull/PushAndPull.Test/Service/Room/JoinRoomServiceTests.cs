@@ -10,6 +10,9 @@ namespace Tests.Service.Room;
 
 public class JoinRoomServiceTests
 {
+    private const ulong HostSteamId = 76561198000000001UL;
+    private const ulong JoinerSteamId = 76561198000000002UL;
+
     public class WhenTheRoomDoesNotExist
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
@@ -31,7 +34,7 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsRoomNotFoundException()
         {
             await Assert.ThrowsAsync<RoomNotFoundException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
@@ -45,7 +48,7 @@ public class JoinRoomServiceTests
 
         public WhenTheRoomIsNotActive()
         {
-            var closedRoom = new EntityRoom("CLOSED1", "Closed Room", 111UL, 76561198000000001UL, false, null);
+            var closedRoom = new EntityRoom(RoomCode, "Closed Room", 111UL, HostSteamId, false, null);
             closedRoom.Close();
 
             _roomRepositoryMock
@@ -59,7 +62,45 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsRoomNotActiveException()
         {
             await Assert.ThrowsAsync<RoomNotActiveException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
+        }
+    }
+
+    public class WhenTheHostJoinsTheirOwnRoom
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomService _sut;
+
+        private const string RoomCode = "HOST01";
+
+        public WhenTheHostJoinsTheirOwnRoom()
+        {
+            var room = new EntityRoom(RoomCode, "Host Room", 111UL, HostSteamId, false, null);
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(room);
+
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsAlreadyJoinedRoomException()
+        {
+            await Assert.ThrowsAsync<AlreadyJoinedRoomException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, HostSteamId)));
+        }
+
+        [Fact]
+        public async Task It_DoesNotAttemptToJoin()
+        {
+            await Assert.ThrowsAsync<AlreadyJoinedRoomException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, HostSteamId)));
+
+            _roomRepositoryMock.Verify(
+                r => r.TryJoinAsync(It.IsAny<string>(), It.IsAny<ulong>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
     }
 
@@ -73,7 +114,7 @@ public class JoinRoomServiceTests
 
         public WhenAPrivateRoomIsJoinedWithoutAPassword()
         {
-            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, 76561198000000001UL, true, "some-hash");
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, HostSteamId, true, "some-hash");
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
@@ -86,7 +127,7 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsPasswordRequiredException()
         {
             await Assert.ThrowsAsync<PasswordRequiredException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
@@ -100,14 +141,14 @@ public class JoinRoomServiceTests
 
         public WhenAPrivateRoomWithoutAPasswordIsJoined()
         {
-            var privateRoomWithoutPassword = new EntityRoom(RoomCode, "Hidden Room", 888UL, 76561198000000001UL, true, null);
+            var privateRoomWithoutPassword = new EntityRoom(RoomCode, "Hidden Room", 888UL, HostSteamId, true, null);
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(privateRoomWithoutPassword);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
@@ -116,10 +157,10 @@ public class JoinRoomServiceTests
         [Fact]
         public async Task It_JoinsWithoutPasswordVerification()
         {
-            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId));
 
             _passwordHasherMock.Verify(h => h.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()), Times.Once);
+            _roomRepositoryMock.Verify(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 
@@ -133,7 +174,7 @@ public class JoinRoomServiceTests
 
         public WhenAPublicRoomWithAPasswordIsJoinedWithoutAPassword()
         {
-            var publicRoomWithPassword = new EntityRoom(RoomCode, "Locked Public Room", 999UL, 76561198000000001UL, false, "some-hash");
+            var publicRoomWithPassword = new EntityRoom(RoomCode, "Locked Public Room", 999UL, HostSteamId, false, "some-hash");
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
@@ -146,7 +187,7 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsPasswordRequiredException()
         {
             await Assert.ThrowsAsync<PasswordRequiredException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
@@ -162,7 +203,7 @@ public class JoinRoomServiceTests
 
         public WhenTheWrongPasswordIsProvidedForAPrivateRoom()
         {
-            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, 76561198000000001UL, true, StoredHash);
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 222UL, HostSteamId, true, StoredHash);
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
@@ -179,11 +220,11 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsInvalidPasswordException()
         {
             await Assert.ThrowsAsync<InvalidPasswordException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, WrongPassword)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, WrongPassword, JoinerSteamId)));
         }
     }
 
-    public class WhenIncrementFailsBecauseRoomDisappearedConcurrently
+    public class WhenJoinFailsBecauseRoomDisappearedConcurrently
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
@@ -191,12 +232,12 @@ public class JoinRoomServiceTests
 
         private const string RoomCode = "GONE01";
 
-        public WhenIncrementFailsBecauseRoomDisappearedConcurrently()
+        public WhenJoinFailsBecauseRoomDisappearedConcurrently()
         {
-            var activeRoom = new EntityRoom(RoomCode, "Disappearing Room", 444UL, 76561198000000001UL, false, null);
+            var activeRoom = new EntityRoom(RoomCode, "Disappearing Room", 444UL, HostSteamId, false, null);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             _roomRepositoryMock
@@ -211,11 +252,11 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsRoomNotFoundException()
         {
             await Assert.ThrowsAsync<RoomNotFoundException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
-    public class WhenIncrementFailsBecauseRoomBecameInactiveConcurrently
+    public class WhenJoinFailsBecauseRoomBecameInactiveConcurrently
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
@@ -223,10 +264,10 @@ public class JoinRoomServiceTests
 
         private const string RoomCode = "CLOS02";
 
-        public WhenIncrementFailsBecauseRoomBecameInactiveConcurrently()
+        public WhenJoinFailsBecauseRoomBecameInactiveConcurrently()
         {
-            var activeRoom = new EntityRoom(RoomCode, "Closing Room", 555UL, 76561198000000001UL, false, null);
-            var closedRoom = new EntityRoom(RoomCode, "Closing Room", 555UL, 76561198000000001UL, false, null);
+            var activeRoom = new EntityRoom(RoomCode, "Closing Room", 555UL, HostSteamId, false, null);
+            var closedRoom = new EntityRoom(RoomCode, "Closing Room", 555UL, HostSteamId, false, null);
             closedRoom.Close();
 
             _roomRepositoryMock
@@ -235,7 +276,7 @@ public class JoinRoomServiceTests
                 .ReturnsAsync(closedRoom);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
@@ -245,11 +286,11 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsRoomNotActiveException()
         {
             await Assert.ThrowsAsync<RoomNotActiveException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
-    public class WhenIncrementFailsBecauseRoomIsFullConcurrently
+    public class WhenJoinFailsBecauseRoomIsFullConcurrently
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
@@ -257,16 +298,16 @@ public class JoinRoomServiceTests
 
         private const string RoomCode = "FULL01";
 
-        public WhenIncrementFailsBecauseRoomIsFullConcurrently()
+        public WhenJoinFailsBecauseRoomIsFullConcurrently()
         {
-            var activeRoom = new EntityRoom(RoomCode, "Full Room", 666UL, 76561198000000001UL, false, null);
+            var activeRoom = new EntityRoom(RoomCode, "Full Room", 666UL, HostSteamId, false, null);
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(activeRoom);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
@@ -276,7 +317,7 @@ public class JoinRoomServiceTests
         public async Task It_ThrowsRoomFullException()
         {
             await Assert.ThrowsAsync<RoomFullException>(
-                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId)));
         }
     }
 
@@ -291,37 +332,37 @@ public class JoinRoomServiceTests
 
         public WhenAllConditionsAreValidForJoiningARoom()
         {
-            _activeRoom = new EntityRoom(RoomCode, "Open Room", 333UL, 76561198000000001UL, false, null);
+            _activeRoom = new EntityRoom(RoomCode, "Open Room", 333UL, HostSteamId, false, null);
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_activeRoom);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
-        public async Task It_CallsIncrementPlayerCount()
+        public async Task It_CallsTryJoin()
         {
-            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId));
 
-            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()), Times.Once);
+            _roomRepositoryMock.Verify(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task It_DoesNotThrowAnyException()
         {
-            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId));
         }
 
         [Fact]
         public async Task It_ReturnsTheSteamLobbyId()
         {
-            var result = await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+            var result = await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null, JoinerSteamId));
 
             Assert.Equal(_activeRoom.SteamLobbyId, result.SteamLobbyId);
         }
@@ -339,7 +380,7 @@ public class JoinRoomServiceTests
 
         public WhenCorrectPasswordIsProvidedForAPrivateRoom()
         {
-            var privateRoom = new EntityRoom(RoomCode, "Private Room", 777UL, 76561198000000001UL, true, StoredHash);
+            var privateRoom = new EntityRoom(RoomCode, "Private Room", 777UL, HostSteamId, true, StoredHash);
 
             _roomRepositoryMock
                 .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
@@ -350,24 +391,24 @@ public class JoinRoomServiceTests
                 .Returns(true);
 
             _roomRepositoryMock
-                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .Setup(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
         }
 
         [Fact]
-        public async Task It_CallsIncrementPlayerCount()
+        public async Task It_CallsTryJoin()
         {
-            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword));
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword, JoinerSteamId));
 
-            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()), Times.Once);
+            _roomRepositoryMock.Verify(r => r.TryJoinAsync(RoomCode, JoinerSteamId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task It_DoesNotThrowAnyException()
         {
-            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword));
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, CorrectPassword, JoinerSteamId));
         }
     }
 }

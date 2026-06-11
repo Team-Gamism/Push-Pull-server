@@ -37,14 +37,17 @@ public class RoomRepository : IRoomRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<bool> IncrementPlayerCountAsync(string roomCode, CancellationToken ct = default)
+    public async Task<bool> TryJoinAsync(string roomCode, ulong steamId, CancellationToken ct = default)
     {
         var updated = await _context.Rooms
             .Where(x => x.RoomCode == roomCode
                         && x.Status == RoomStatus.Active
-                        && x.CurrentPlayers < x.MaxPlayers)
+                        && x.CurrentPlayers < x.MaxPlayers
+                        && x.GuestSteamId == null
+                        && x.HostSteamId != steamId)
             .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1), ct);
+                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1)
+                .SetProperty(x => x.GuestSteamId, steamId), ct);
 
         return updated > 0;
     }
