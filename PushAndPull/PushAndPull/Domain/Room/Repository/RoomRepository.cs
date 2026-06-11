@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using PushAndPull.Domain.Room.Entity;
+using PushAndPull.Domain.Room.Exception;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Global.Infrastructure;
 using RoomEntity = PushAndPull.Domain.Room.Entity.Room;
@@ -33,8 +35,17 @@ public class RoomRepository : IRoomRepository
 
     public async Task CreateAsync(RoomEntity room, CancellationToken ct = default)
     {
-        _context.Rooms.Add(room);
-        await _context.SaveChangesAsync(ct);
+        try
+        {
+            _context.Rooms.Add(room);
+            await _context.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException ex)
+            when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        {
+            _context.Entry(room).State = EntityState.Detached;
+            throw new DuplicateRoomCodeException(room.RoomCode);
+        }
     }
 
     public async Task<bool> TryJoinAsync(string roomCode, ulong steamId, CancellationToken ct = default)

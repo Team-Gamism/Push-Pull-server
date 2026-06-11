@@ -57,6 +57,92 @@ public class CreateRoomServiceTests
         }
     }
 
+    public class WhenTheGeneratedRoomCodeCollides
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IRoomCodeGenerator> _roomCodeGeneratorMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly CreateRoomService _sut;
+
+        private const string CollidingCode = "DUP001";
+        private const string FreshCode = "NEW001";
+        private readonly CreateRoomCommand _command = new(
+            LobbyId: 111UL,
+            RoomName: "Retry Room",
+            IsPrivate: false,
+            Password: null,
+            HostSteamId: 76561198000000001UL
+        );
+
+        public WhenTheGeneratedRoomCodeCollides()
+        {
+            _roomCodeGeneratorMock
+                .SetupSequence(g => g.Generate())
+                .Returns(CollidingCode)
+                .Returns(FreshCode);
+
+            _roomRepositoryMock
+                .Setup(r => r.CreateAsync(
+                    It.Is<EntityRoom>(room => room.RoomCode == CollidingCode),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new DuplicateRoomCodeException(CollidingCode));
+
+            _sut = new CreateRoomService(
+                _roomRepositoryMock.Object,
+                _roomCodeGeneratorMock.Object,
+                _passwordHasherMock.Object
+            );
+        }
+
+        [Fact]
+        public async Task It_RetriesWithANewCode()
+        {
+            var result = await _sut.ExecuteAsync(_command);
+
+            Assert.Equal(FreshCode, result.RoomCode);
+            _roomCodeGeneratorMock.Verify(g => g.Generate(), Times.Exactly(2));
+        }
+    }
+
+    public class WhenEveryGeneratedRoomCodeCollides
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IRoomCodeGenerator> _roomCodeGeneratorMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly CreateRoomService _sut;
+
+        private readonly CreateRoomCommand _command = new(
+            LobbyId: 111UL,
+            RoomName: "Unlucky Room",
+            IsPrivate: false,
+            Password: null,
+            HostSteamId: 76561198000000001UL
+        );
+
+        public WhenEveryGeneratedRoomCodeCollides()
+        {
+            _roomCodeGeneratorMock.Setup(g => g.Generate()).Returns("DUP001");
+
+            _roomRepositoryMock
+                .Setup(r => r.CreateAsync(It.IsAny<EntityRoom>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new DuplicateRoomCodeException("DUP001"));
+
+            _sut = new CreateRoomService(
+                _roomRepositoryMock.Object,
+                _roomCodeGeneratorMock.Object,
+                _passwordHasherMock.Object
+            );
+        }
+
+        [Fact]
+        public async Task It_ThrowsRoomCodeGenerationFailedExceptionAfterExhaustingRetries()
+        {
+            await Assert.ThrowsAsync<RoomCodeGenerationFailedException>(() => _sut.ExecuteAsync(_command));
+
+            _roomCodeGeneratorMock.Verify(g => g.Generate(), Times.Exactly(3));
+        }
+    }
+
     public class WhenCreatingAPublicRoomWithoutAPassword
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
