@@ -73,4 +73,26 @@ public class RoomRepository : IRoomRepository
                 .SetProperty(x => x.Status, RoomStatus.Closed)
                 .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);
     }
+
+    public async Task<bool> UpdateHeartbeatAsync(string roomCode, ulong hostSteamId, DateTimeOffset now, CancellationToken ct = default)
+    {
+        var updated = await _context.Rooms
+            .Where(x => x.RoomCode == roomCode
+                        && x.HostSteamId == hostSteamId
+                        && x.Status == RoomStatus.Active)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.LastHeartbeatAt, now), ct);
+
+        return updated > 0;
+    }
+
+    public async Task<int> CloseStaleRoomsAsync(DateTimeOffset cutoff, CancellationToken ct = default)
+    {
+        return await _context.Rooms
+            .Where(x => x.Status == RoomStatus.Active
+                        && (x.LastHeartbeatAt ?? x.CreatedAt) < cutoff)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.Status, RoomStatus.Closed)
+                .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);
+    }
 }

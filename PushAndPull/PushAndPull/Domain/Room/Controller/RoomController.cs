@@ -18,6 +18,7 @@ public class RoomController : ControllerBase
     private readonly IJoinRoomService _joinRoomService;
     private readonly ILeaveRoomService _leaveRoomService;
     private readonly ICloseRoomService _closeRoomService;
+    private readonly IHeartbeatRoomService _heartbeatRoomService;
 
     public RoomController(
         ICreateRoomService createRoomService,
@@ -25,7 +26,8 @@ public class RoomController : ControllerBase
         IGetAllRoomService getAllRoomService,
         IJoinRoomService joinRoomService,
         ILeaveRoomService leaveRoomService,
-        ICloseRoomService closeRoomService
+        ICloseRoomService closeRoomService,
+        IHeartbeatRoomService heartbeatRoomService
         )
     {
         _createRoomService = createRoomService;
@@ -34,6 +36,7 @@ public class RoomController : ControllerBase
         _joinRoomService = joinRoomService;
         _leaveRoomService = leaveRoomService;
         _closeRoomService = closeRoomService;
+        _heartbeatRoomService = heartbeatRoomService;
     }
 
     [SessionAuthorize]
@@ -116,6 +119,18 @@ public class RoomController : ControllerBase
         await _closeRoomService.ExecuteAsync(new CloseRoomCommand(roomCode, User.GetSteamId()), ct);
 
         return CommonApiResponse.Success("방을 닫았습니다.");
+    }
+
+    [SessionAuthorize]
+    [HttpPost("{roomCode}/heartbeat")]
+    public async Task<CommonApiResponse> Heartbeat(
+        [FromRoute] string roomCode,
+        CancellationToken ct
+        )
+    {
+        await _heartbeatRoomService.ExecuteAsync(new HeartbeatRoomCommand(roomCode, User.GetSteamId()), ct);
+
+        return CommonApiResponse.Success("하트비트가 갱신되었습니다.");
     }
 
     private static GetRoomResponse ToGetRoomResponse(GetRoomResult result) =>
