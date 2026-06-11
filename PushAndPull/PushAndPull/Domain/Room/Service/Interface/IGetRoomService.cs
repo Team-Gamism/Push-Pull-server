@@ -14,5 +14,6 @@ public record GetRoomResult(
     string RoomCode,
     int CurrentPlayers,
     int MaxPlayers,
-    bool IsPrivate
+    bool IsPrivate,
+    bool HasPassword
     );

@@ -22,7 +22,8 @@ public class GetAllRoomService : IGetAllRoomService
                 room.RoomCode,
                 room.CurrentPlayers,
                 room.MaxPlayers,
-                room.IsPrivate
+                room.IsPrivate,
+                room.PasswordHash != null
             ))
             .ToList();
 

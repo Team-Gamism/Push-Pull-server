@@ -5,5 +5,6 @@ public record GetRoomResponse(
     string RoomName,
     int CurrentPlayers,
     int MaxPlayers,
-    bool IsPrivate
+    bool IsPrivate,
+    bool HasPassword
     );

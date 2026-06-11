@@ -47,6 +47,8 @@ public class GetAllRoomServiceTests
             Assert.Equal("Room B", result.Rooms[1].RoomName);
             Assert.Equal("BBB002", result.Rooms[1].RoomCode);
             Assert.Equal(_rooms[0].MaxPlayers, result.Rooms[0].MaxPlayers);
+            Assert.False(result.Rooms[0].HasPassword);
+            Assert.True(result.Rooms[1].HasPassword);
         }
     }
 

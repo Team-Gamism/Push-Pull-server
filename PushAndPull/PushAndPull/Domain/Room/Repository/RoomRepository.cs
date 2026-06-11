@@ -26,7 +26,7 @@ public class RoomRepository : IRoomRepository
     {
         return await _context.Rooms
             .AsNoTracking()
-            .Where(x => x.Status == RoomStatus.Active)
+            .Where(x => x.Status == RoomStatus.Active && !x.IsPrivate)
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(ct);
     }

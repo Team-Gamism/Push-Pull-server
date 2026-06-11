@@ -94,6 +94,7 @@ public class RoomController : ControllerBase
             result.RoomName,
             result.CurrentPlayers,
             result.MaxPlayers,
-            result.IsPrivate
+            result.IsPrivate,
+            result.HasPassword
         );
 }

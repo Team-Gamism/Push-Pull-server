@@ -90,6 +90,66 @@ public class JoinRoomServiceTests
         }
     }
 
+    public class WhenAPrivateRoomWithoutAPasswordIsJoined
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomService _sut;
+
+        private const string RoomCode = "PRIV04";
+
+        public WhenAPrivateRoomWithoutAPasswordIsJoined()
+        {
+            var privateRoomWithoutPassword = new EntityRoom(RoomCode, "Hidden Room", 888UL, 76561198000000001UL, true, null);
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(privateRoomWithoutPassword);
+
+            _roomRepositoryMock
+                .Setup(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_JoinsWithoutPasswordVerification()
+        {
+            await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+
+            _passwordHasherMock.Verify(h => h.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _roomRepositoryMock.Verify(r => r.IncrementPlayerCountAsync(RoomCode, It.IsAny<CancellationToken>()), Times.Once);
+        }
+    }
+
+    public class WhenAPublicRoomWithAPasswordIsJoinedWithoutAPassword
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
+        private readonly JoinRoomService _sut;
+
+        private const string RoomCode = "PUBL01";
+
+        public WhenAPublicRoomWithAPasswordIsJoinedWithoutAPassword()
+        {
+            var publicRoomWithPassword = new EntityRoom(RoomCode, "Locked Public Room", 999UL, 76561198000000001UL, false, "some-hash");
+
+            _roomRepositoryMock
+                .Setup(r => r.GetAsync(RoomCode, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(publicRoomWithPassword);
+
+            _sut = new JoinRoomService(_roomRepositoryMock.Object, _passwordHasherMock.Object);
+        }
+
+        [Fact]
+        public async Task It_ThrowsPasswordRequiredException()
+        {
+            await Assert.ThrowsAsync<PasswordRequiredException>(
+                () => _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null)));
+        }
+    }
+
     public class WhenTheWrongPasswordIsProvidedForAPrivateRoom
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();

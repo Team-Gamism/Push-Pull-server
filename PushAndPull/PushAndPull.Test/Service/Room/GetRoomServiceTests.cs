@@ -83,6 +83,7 @@ public class GetRoomServiceTests
             Assert.Equal(_room.CurrentPlayers, result.CurrentPlayers);
             Assert.Equal(_room.MaxPlayers, result.MaxPlayers);
             Assert.Equal(_room.IsPrivate, result.IsPrivate);
+            Assert.False(result.HasPassword);
         }
     }
 }
