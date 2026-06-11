@@ -59,12 +59,7 @@ public class RoomController : ControllerBase
     {
         var result = await _getRoomService.ExecuteAsync(new GetRoomCommand(roomCode), ct);
 
-        return CommonApiResponse.Success("방 조회 성공.", new GetRoomResponse(
-            result.RoomCode,
-            result.RoomName,
-            result.CurrentPlayers,
-            result.IsPrivate
-        ));
+        return CommonApiResponse.Success("방 조회 성공.", ToGetRoomResponse(result));
     }
 
     [HttpGet("all")]
@@ -72,20 +67,33 @@ public class RoomController : ControllerBase
     {
         var result = await _getAllRoomService.ExecuteAsync(ct);
 
-        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(result.Rooms));
+        var rooms = result.Rooms
+            .Select(ToGetRoomResponse)
+            .ToList();
+
+        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(rooms));
     }
 
     [SessionAuthorize]
     [HttpPost("{roomCode}/join")]
     [EnableRateLimiting("join_room")]
-    public async Task<CommonApiResponse> JoinRoom(
+    public async Task<CommonApiResponse<JoinRoomResponse>> JoinRoom(
         [FromRoute] string roomCode,
         [FromBody] JoinRoomRequest request,
         CancellationToken ct
         )
     {
-        await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password), ct);
+        var result = await _joinRoomService.ExecuteAsync(new JoinRoomCommand(roomCode, request.Password), ct);
 
-        return CommonApiResponse.Success("방에 참여했습니다.");
+        return CommonApiResponse.Success("방에 참여했습니다.", new JoinRoomResponse(result.SteamLobbyId));
     }
+
+    private static GetRoomResponse ToGetRoomResponse(GetRoomResult result) =>
+        new(
+            result.RoomCode,
+            result.RoomName,
+            result.CurrentPlayers,
+            result.MaxPlayers,
+            result.IsPrivate
+        );
 }

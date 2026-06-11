@@ -81,6 +81,7 @@ public class GetRoomServiceTests
             Assert.Equal(RoomCode, result.RoomCode);
             Assert.Equal(RoomName, result.RoomName);
             Assert.Equal(_room.CurrentPlayers, result.CurrentPlayers);
+            Assert.Equal(_room.MaxPlayers, result.MaxPlayers);
             Assert.Equal(_room.IsPrivate, result.IsPrivate);
         }
     }

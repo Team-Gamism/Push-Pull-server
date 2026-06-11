@@ -257,6 +257,14 @@ public class JoinRoomServiceTests
         {
             await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
         }
+
+        [Fact]
+        public async Task It_ReturnsTheSteamLobbyId()
+        {
+            var result = await _sut.ExecuteAsync(new JoinRoomCommand(RoomCode, null));
+
+            Assert.Equal(_activeRoom.SteamLobbyId, result.SteamLobbyId);
+        }
     }
 
     public class WhenCorrectPasswordIsProvidedForAPrivateRoom

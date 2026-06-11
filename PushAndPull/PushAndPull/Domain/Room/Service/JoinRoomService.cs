@@ -20,7 +20,7 @@ public class JoinRoomService : IJoinRoomService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task ExecuteAsync(JoinRoomCommand request, CancellationToken ct = default)
+    public async Task<JoinRoomResult> ExecuteAsync(JoinRoomCommand request, CancellationToken ct = default)
     {
         var room = await _roomRepository.GetAsync(request.RoomCode, ct)
             ?? throw new RoomNotFoundException(request.RoomCode);
@@ -48,5 +48,7 @@ public class JoinRoomService : IJoinRoomService
 
             throw new RoomFullException(request.RoomCode);
         }
+
+        return new JoinRoomResult(room.SteamLobbyId);
     }
 }

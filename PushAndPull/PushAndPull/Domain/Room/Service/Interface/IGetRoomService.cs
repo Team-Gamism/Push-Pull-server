@@ -13,5 +13,6 @@ public record GetRoomResult(
     string RoomName,
     string RoomCode,
     int CurrentPlayers,
+    int MaxPlayers,
     bool IsPrivate
     );

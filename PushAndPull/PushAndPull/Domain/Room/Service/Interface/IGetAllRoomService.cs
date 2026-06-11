@@ -1,5 +1,3 @@
-using PushAndPull.Domain.Room.Dto.Response;
-
 namespace PushAndPull.Domain.Room.Service.Interface;
 
 public interface IGetAllRoomService
@@ -8,5 +6,5 @@ public interface IGetAllRoomService
 }
 
 public record GetAllRoomResult(
-    IReadOnlyList<GetRoomResponse> Rooms
+    IReadOnlyList<GetRoomResult> Rooms
 );
