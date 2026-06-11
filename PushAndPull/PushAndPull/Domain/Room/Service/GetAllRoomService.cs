@@ -7,16 +7,24 @@ public class GetAllRoomService : IGetAllRoomService
 {
     private readonly IRoomRepository _roomRepository;
 
+    private const int MaxPageSize = 50;
+
     public GetAllRoomService(IRoomRepository roomRepository)
     {
         _roomRepository = roomRepository;
     }
 
-    public async Task<GetAllRoomResult> ExecuteAsync(CancellationToken ct = default)
+    public async Task<GetAllRoomResult> ExecuteAsync(GetAllRoomQuery request, CancellationToken ct = default)
     {
-        var rooms = await _roomRepository.GetAllAsync(ct);
+        var page = Math.Max(request.Page, 1);
+        var size = Math.Clamp(request.Size, 1, MaxPageSize);
+
+        // size + 1개를 조회해 다음 페이지 존재 여부를 count 쿼리 없이 판별한다.
+        var rooms = await _roomRepository.GetAllAsync((page - 1) * size, size + 1, ct);
+        var hasNext = rooms.Count > size;
 
         var results = rooms
+            .Take(size)
             .Select(room => new GetRoomResult(
                 room.RoomName,
                 room.RoomCode,
@@ -27,6 +35,6 @@ public class GetAllRoomService : IGetAllRoomService
             ))
             .ToList();
 
-        return new GetAllRoomResult(results);
+        return new GetAllRoomResult(results, page, size, hasNext);
     }
 }

@@ -72,15 +72,20 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<CommonApiResponse<GetAllRoomResponse>> GetAllRoom(CancellationToken ct)
+    public async Task<CommonApiResponse<GetAllRoomResponse>> GetAllRoom(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        CancellationToken ct = default
+        )
     {
-        var result = await _getAllRoomService.ExecuteAsync(ct);
+        var result = await _getAllRoomService.ExecuteAsync(new GetAllRoomQuery(page, size), ct);
 
         var rooms = result.Rooms
             .Select(ToGetRoomResponse)
             .ToList();
 
-        return CommonApiResponse.Success("방 목록 조회 성공.", new GetAllRoomResponse(rooms));
+        return CommonApiResponse.Success("방 목록 조회 성공.",
+            new GetAllRoomResponse(rooms, result.Page, result.Size, result.HasNext));
     }
 
     [SessionAuthorize]

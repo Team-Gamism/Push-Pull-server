@@ -24,12 +24,14 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefaultAsync(x => x.RoomCode == roomCode, ct);
     }
 
-    public async Task<IReadOnlyList<RoomEntity>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<RoomEntity>> GetAllAsync(int skip, int take, CancellationToken ct = default)
     {
         return await _context.Rooms
             .AsNoTracking()
             .Where(x => x.Status == RoomStatus.Active && !x.IsPrivate)
             .OrderByDescending(x => x.CreatedAt)
+            .Skip(skip)
+            .Take(take)
             .ToListAsync(ct);
     }
 
