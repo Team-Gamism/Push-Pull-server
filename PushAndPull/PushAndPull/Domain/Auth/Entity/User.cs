@@ -19,17 +19,4 @@ public class User
         CreatedAt = DateTimeOffset.UtcNow;
         LastLoginAt = DateTimeOffset.UtcNow;
     }
-
-    public void UpdateNickname(string nickname)
-    {
-        if (string.IsNullOrWhiteSpace(nickname))
-            throw new ArgumentException("INVALID_NICKNAME");
-
-        Nickname = nickname;
-    }
-
-    public void UpdateLastLogin()
-    {
-        LastLoginAt = DateTimeOffset.UtcNow;
-    }
 }

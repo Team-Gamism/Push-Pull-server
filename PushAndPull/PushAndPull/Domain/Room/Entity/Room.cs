@@ -49,12 +49,6 @@ public class Room
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void MarkDeleting(TimeSpan ttl)
-    {
-        Status = RoomStatus.Deleting;
-        ExpiresAt = DateTimeOffset.UtcNow.Add(ttl);
-    }
-
     public void Close()
     {
         Status = RoomStatus.Closed;
