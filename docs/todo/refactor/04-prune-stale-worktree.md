@@ -10,8 +10,7 @@
 
 ## 작업
 ```bash
-git worktree prune
-rm -rf .claude/worktrees/trusting-beaver-7e4a30
+git worktree remove .claude/worktrees/trusting-beaver-7e4a30
 git branch -D claude/trusting-beaver-7e4a30  # 병합 여부 확인 후
 ```
 
