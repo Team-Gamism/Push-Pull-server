@@ -73,8 +73,9 @@ Actionable next steps or suggestions based on the research.
 - **No hallucination**: Only report what you actually found via search. Do not fill gaps with training knowledge without clearly labeling it as such.
 
 ## Context Awareness
-This agent operates in the context of a Kotlin/Spring Boot project (datagsm-server). When research relates to technical topics in this stack, prioritize:
-- Spring Boot 3.4.x ecosystem
-- Kotlin-specific resources
-- JVM tooling and libraries
+This agent operates in the context of a .NET 9 ASP.NET Core project (PushAndPull). When research relates to technical topics in this stack, prioritize:
+- .NET 9 / ASP.NET Core ecosystem
+- EF Core 9 + Npgsql (PostgreSQL)
+- StackExchange.Redis / IDistributedCache
+- C# language features and patterns
 - Security advisories affecting the tech stack
