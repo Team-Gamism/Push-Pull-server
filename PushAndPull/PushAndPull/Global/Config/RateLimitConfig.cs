@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace PushAndPull.Global.Config;
@@ -8,23 +9,34 @@ public static class RateLimitConfig
     {
         services.AddRateLimiter(options =>
         {
-            options.AddFixedWindowLimiter("login", opt =>
-            {
-                opt.PermitLimit = 5;
-                opt.Window = TimeSpan.FromMinutes(1);
-            });
+            // 레이트리밋 미들웨어는 세션 인증 필터보다 먼저 실행되므로
+            // claims 대신 클라이언트 IP 또는 Session-Id 헤더를 파티션 키로 사용한다.
+            options.AddPolicy("login", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetIpKey(httpContext),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,
+                        Window = TimeSpan.FromMinutes(1)
+                    }));
 
-            options.AddFixedWindowLimiter("create_room", opt =>
-            {
-                opt.PermitLimit = 10;
-                opt.Window = TimeSpan.FromMinutes(1);
-            });
+            options.AddPolicy("create_room", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetSessionOrIpKey(httpContext),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromMinutes(1)
+                    }));
 
-            options.AddFixedWindowLimiter("join_room", opt =>
-            {
-                opt.PermitLimit = 20;
-                opt.Window = TimeSpan.FromMinutes(1);
-            });
+            options.AddPolicy("join_room", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetSessionOrIpKey(httpContext),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 20,
+                        Window = TimeSpan.FromMinutes(1)
+                    }));
 
             options.OnRejected = async (context, token) =>
             {
@@ -35,4 +47,13 @@ public static class RateLimitConfig
 
         return services;
     }
+
+    internal static string GetIpKey(HttpContext httpContext)
+        => $"ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+
+    internal static string GetSessionOrIpKey(HttpContext httpContext)
+        => httpContext.Request.Headers.TryGetValue("Session-Id", out var sessionId)
+           && !string.IsNullOrWhiteSpace(sessionId)
+            ? $"session:{sessionId}"
+            : GetIpKey(httpContext);
 }

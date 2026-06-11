@@ -38,4 +38,8 @@
       <Folder Include="Migrations\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="PushAndPull.Test" />
+    </ItemGroup>
+
 </Project>
