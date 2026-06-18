@@ -143,6 +143,7 @@ public class RoomController : ControllerBase
 
     [SessionAuthorize]
     [HttpPost("{roomCode}/reconnect")]
+    [EnableRateLimiting("join_room")]
     public async Task<CommonApiResponse<ReconnectRoomResponse>> Reconnect(
         [FromRoute] string roomCode,
         CancellationToken ct
