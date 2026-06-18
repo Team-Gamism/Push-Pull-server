@@ -6,7 +6,7 @@ Select **1–2 labels** from the PR-eligible list below. Do NOT use issue-only o
 
 | Label               | When to use                                               |
 |---------------------|-----------------------------------------------------------|
-| `enhancement:개선작업`  | New feature, improvement to existing feature, refactoring |
+| `enhancement:개선사항`  | New feature, improvement to existing feature, refactoring |
 | `bug:버그`            | Bug fix                                                   |
 | `documentation:문서화` | Docs-only changes (README, CONTRIBUTING, comments)        |
 | `release:릴리즈`       | Release preparation or version bump                       |
@@ -26,8 +26,8 @@ Select **1–2 labels** from the PR-eligible list below. Do NOT use issue-only o
 
 ```
 Bug fix?          → bug:버그
-New feature or improvement? → enhancement:개선작업
+New feature or improvement? → enhancement:개선사항
 Docs only?        → documentation:문서화
 Release?          → release:릴리즈
-Unsure?           → enhancement:개선작업
+Unsure?           → enhancement:개선사항
 ```
