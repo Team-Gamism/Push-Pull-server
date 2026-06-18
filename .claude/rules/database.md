@@ -16,5 +16,5 @@ paths:
 - Use PostgreSQL `timestamptz` for `DateTimeOffset` values.
 - Do not expose `IQueryable` from repositories.
 - Do not edit committed migrations to rewrite history; add a new migration for schema changes.
-- After entity or configuration changes, create a migration with a descriptive PascalCase name.
+- After entity or configuration changes, create a migration with a descriptive PascalCase name using the `db-migrate` skill (do not run `dotnet ef migrations add` ad hoc).
 - Review generated migrations before committing to ensure no unrelated schema churn is included.
