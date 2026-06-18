@@ -117,7 +117,7 @@ public class RoomRepository : IRoomRepository
         return await _context.Rooms
             .Where(x => x.Status == RoomStatus.Active
                         && x.GuestSteamId != null
-                        && (x.GuestLastHeartbeatAt ?? x.CreatedAt) < cutoff)
+                        && (x.GuestLastHeartbeatAt ?? x.LastHeartbeatAt ?? x.CreatedAt) < cutoff)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers - 1)
                 .SetProperty(x => x.GuestSteamId, (ulong?)null)
