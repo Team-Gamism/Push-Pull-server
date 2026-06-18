@@ -19,6 +19,7 @@ public class RoomController : ControllerBase
     private readonly ILeaveRoomService _leaveRoomService;
     private readonly ICloseRoomService _closeRoomService;
     private readonly IHeartbeatRoomService _heartbeatRoomService;
+    private readonly IReconnectRoomService _reconnectRoomService;
 
     public RoomController(
         ICreateRoomService createRoomService,
@@ -27,7 +28,8 @@ public class RoomController : ControllerBase
         IJoinRoomService joinRoomService,
         ILeaveRoomService leaveRoomService,
         ICloseRoomService closeRoomService,
-        IHeartbeatRoomService heartbeatRoomService
+        IHeartbeatRoomService heartbeatRoomService,
+        IReconnectRoomService reconnectRoomService
         )
     {
         _createRoomService = createRoomService;
@@ -37,6 +39,7 @@ public class RoomController : ControllerBase
         _leaveRoomService = leaveRoomService;
         _closeRoomService = closeRoomService;
         _heartbeatRoomService = heartbeatRoomService;
+        _reconnectRoomService = reconnectRoomService;
     }
 
     [SessionAuthorize]
@@ -136,6 +139,18 @@ public class RoomController : ControllerBase
         await _heartbeatRoomService.ExecuteAsync(new HeartbeatRoomCommand(roomCode, User.GetSteamId()), ct);
 
         return CommonApiResponse.Success("하트비트가 갱신되었습니다.");
+    }
+
+    [SessionAuthorize]
+    [HttpPost("{roomCode}/reconnect")]
+    public async Task<CommonApiResponse<ReconnectRoomResponse>> Reconnect(
+        [FromRoute] string roomCode,
+        CancellationToken ct
+        )
+    {
+        var result = await _reconnectRoomService.ExecuteAsync(new ReconnectRoomCommand(roomCode, User.GetSteamId()), ct);
+
+        return CommonApiResponse.Success("재접속했습니다.", new ReconnectRoomResponse(result.SteamLobbyId, result.Role));
     }
 
     private static GetRoomResponse ToGetRoomResponse(GetRoomResult result) =>

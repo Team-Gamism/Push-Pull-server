@@ -57,5 +57,9 @@ public class StaleRoomCleanupService : BackgroundService
         var closed = await roomRepository.CloseStaleRoomsAsync(cutoff, ct);
         if (closed > 0)
             _logger.LogInformation("Closed {Count} stale rooms", closed);
+
+        var freed = await roomRepository.FreeStaleGuestsAsync(cutoff, ct);
+        if (freed > 0)
+            _logger.LogInformation("Freed {Count} stale guest slots", freed);
     }
 }

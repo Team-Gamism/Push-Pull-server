@@ -23,6 +23,7 @@ public class Room
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? ExpiresAt { get; private set; }
     public DateTimeOffset? LastHeartbeatAt { get; private set; }
+    public DateTimeOffset? GuestLastHeartbeatAt { get; private set; }
 
     private const int DefaultMaxPlayers = 2;
 

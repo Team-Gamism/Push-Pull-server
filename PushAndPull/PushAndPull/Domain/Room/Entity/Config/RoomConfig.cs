@@ -88,6 +88,10 @@ public class RoomConfig : IEntityTypeConfiguration<Room>
             .HasColumnName("last_heartbeat_at")
             .HasColumnType("timestamptz");
 
+        builder.Property(x => x.GuestLastHeartbeatAt)
+            .HasColumnName("guest_last_heartbeat_at")
+            .HasColumnType("timestamptz");
+
         builder.HasOne(r => r.Host)
             .WithMany()
             .HasForeignKey(r => r.HostSteamId)

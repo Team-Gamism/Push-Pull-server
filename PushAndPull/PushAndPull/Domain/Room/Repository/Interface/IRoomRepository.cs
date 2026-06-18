@@ -10,6 +10,7 @@ public interface IRoomRepository
     Task<bool> TryJoinAsync(string roomCode, ulong steamId, CancellationToken ct = default);
     Task<bool> TryRemoveGuestAsync(string roomCode, ulong steamId, CancellationToken ct = default);
     Task CloseAsync(string roomCode, CancellationToken ct = default);
-    Task<bool> UpdateHeartbeatAsync(string roomCode, ulong hostSteamId, DateTimeOffset now, CancellationToken ct = default);
+    Task<bool> UpdateHeartbeatAsync(string roomCode, ulong steamId, DateTimeOffset now, CancellationToken ct = default);
     Task<int> CloseStaleRoomsAsync(DateTimeOffset cutoff, CancellationToken ct = default);
+    Task<int> FreeStaleGuestsAsync(DateTimeOffset cutoff, CancellationToken ct = default);
 }

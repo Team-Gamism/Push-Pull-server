@@ -60,7 +60,8 @@ public class RoomRepository : IRoomRepository
                         && x.HostSteamId != steamId)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers + 1)
-                .SetProperty(x => x.GuestSteamId, steamId), ct);
+                .SetProperty(x => x.GuestSteamId, steamId)
+                .SetProperty(x => x.GuestLastHeartbeatAt, DateTimeOffset.UtcNow), ct);
 
         return updated > 0;
     }
@@ -73,7 +74,8 @@ public class RoomRepository : IRoomRepository
                         && x.CurrentPlayers > 1)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers - 1)
-                .SetProperty(x => x.GuestSteamId, (ulong?)null), ct);
+                .SetProperty(x => x.GuestSteamId, (ulong?)null)
+                .SetProperty(x => x.GuestLastHeartbeatAt, (DateTimeOffset?)null), ct);
 
         return updated > 0;
     }
@@ -87,14 +89,15 @@ public class RoomRepository : IRoomRepository
                 .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);
     }
 
-    public async Task<bool> UpdateHeartbeatAsync(string roomCode, ulong hostSteamId, DateTimeOffset now, CancellationToken ct = default)
+    public async Task<bool> UpdateHeartbeatAsync(string roomCode, ulong steamId, DateTimeOffset now, CancellationToken ct = default)
     {
         var updated = await _context.Rooms
             .Where(x => x.RoomCode == roomCode
-                        && x.HostSteamId == hostSteamId
-                        && x.Status == RoomStatus.Active)
+                        && x.Status == RoomStatus.Active
+                        && (x.HostSteamId == steamId || x.GuestSteamId == steamId))
             .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.LastHeartbeatAt, now), ct);
+                .SetProperty(x => x.LastHeartbeatAt, x => x.HostSteamId == steamId ? now : x.LastHeartbeatAt)
+                .SetProperty(x => x.GuestLastHeartbeatAt, x => x.GuestSteamId == steamId ? now : x.GuestLastHeartbeatAt), ct);
 
         return updated > 0;
     }
@@ -107,5 +110,17 @@ public class RoomRepository : IRoomRepository
             .ExecuteUpdateAsync(s => s
                 .SetProperty(x => x.Status, RoomStatus.Closed)
                 .SetProperty(x => x.ExpiresAt, DateTimeOffset.UtcNow), ct);
+    }
+
+    public async Task<int> FreeStaleGuestsAsync(DateTimeOffset cutoff, CancellationToken ct = default)
+    {
+        return await _context.Rooms
+            .Where(x => x.Status == RoomStatus.Active
+                        && x.GuestSteamId != null
+                        && (x.GuestLastHeartbeatAt ?? x.CreatedAt) < cutoff)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.CurrentPlayers, x => x.CurrentPlayers - 1)
+                .SetProperty(x => x.GuestSteamId, (ulong?)null)
+                .SetProperty(x => x.GuestLastHeartbeatAt, (DateTimeOffset?)null), ct);
     }
 }

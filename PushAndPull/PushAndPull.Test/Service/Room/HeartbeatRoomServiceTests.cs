@@ -10,6 +10,7 @@ namespace Tests.Service.Room;
 public class HeartbeatRoomServiceTests
 {
     private const ulong HostSteamId = 76561198000000001UL;
+    private const ulong GuestSteamId = 76561198000000003UL;
     private const ulong OtherSteamId = 76561198000000002UL;
 
     private sealed class FixedTimeProvider : TimeProvider
@@ -77,14 +78,42 @@ public class HeartbeatRoomServiceTests
         }
     }
 
-    public class WhenANonHostSendsAHeartbeat
+    public class WhenTheGuestSendsAHeartbeat
+    {
+        private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
+        private readonly HeartbeatRoomService _sut;
+
+        private const string RoomCode = "BEAT04";
+        private static readonly DateTimeOffset Now = new(2026, 6, 11, 12, 0, 0, TimeSpan.Zero);
+
+        public WhenTheGuestSendsAHeartbeat()
+        {
+            _roomRepositoryMock
+                .Setup(r => r.UpdateHeartbeatAsync(RoomCode, GuestSteamId, Now, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _sut = new HeartbeatRoomService(_roomRepositoryMock.Object, new FixedTimeProvider(Now));
+        }
+
+        [Fact]
+        public async Task It_UpdatesTheHeartbeatWithTheCurrentTime()
+        {
+            await _sut.ExecuteAsync(new HeartbeatRoomCommand(RoomCode, GuestSteamId));
+
+            _roomRepositoryMock.Verify(
+                r => r.UpdateHeartbeatAsync(RoomCode, GuestSteamId, Now, It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+    }
+
+    public class WhenANonParticipantSendsAHeartbeat
     {
         private readonly Mock<IRoomRepository> _roomRepositoryMock = new();
         private readonly HeartbeatRoomService _sut;
 
         private const string RoomCode = "BEAT02";
 
-        public WhenANonHostSendsAHeartbeat()
+        public WhenANonParticipantSendsAHeartbeat()
         {
             var room = new EntityRoom(RoomCode, "Host Room", 111UL, HostSteamId, false, null);
 
@@ -100,9 +129,9 @@ public class HeartbeatRoomServiceTests
         }
 
         [Fact]
-        public async Task It_ThrowsNotRoomHostException()
+        public async Task It_ThrowsRoomNotParticipantException()
         {
-            await Assert.ThrowsAsync<NotRoomHostException>(
+            await Assert.ThrowsAsync<RoomNotParticipantException>(
                 () => _sut.ExecuteAsync(new HeartbeatRoomCommand(RoomCode, OtherSteamId)));
         }
     }
