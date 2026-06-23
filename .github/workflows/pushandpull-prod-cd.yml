@@ -87,6 +87,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           script: |
+            set -euo pipefail
             mkdir -p ~/deploy
 
             printf 'DB_CONNECTION_STRING=%s\nSTEAM_WEB_API_KEY=%s\nSTEAM_APP_ID=%s\n' \

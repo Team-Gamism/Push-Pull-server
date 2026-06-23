@@ -44,7 +44,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     needs: [validate-title]
-    if: always() && (needs.validate-title.result == 'success' || needs.validate-title.result == 'skipped')
+    if: >-
+      always()
+      && (needs.validate-title.result == 'success' || needs.validate-title.result == 'skipped')
+      && (github.event.action != 'edited' || github.event.changes.base != null)
 
     env:
       SOLUTION: PushAndPull/PushAndPull.sln
