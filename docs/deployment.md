@@ -8,7 +8,7 @@ Push & Pull 서버의 환경 분리, 배포 파이프라인, 클라이언트 연
 
 | 환경 | `ASPNETCORE_ENVIRONMENT` | 인스턴스 | 접속 대상 | Swagger |
 |---|---|---|---|---|
-| 로컬 개발 | `Development` | 로컬 (compose.dev) | 백엔드 개발자 PC | 노출 |
+| 로컬 개발 | `Development` | 로컬 실행 | 백엔드 개발자 PC | 노출 |
 | 스테이지 | `Staging` | `pushandpull-stage` | 클라이언트 개발자 | 노출 |
 | 운영 | `Production` | `pushandpull-prod` | 실제 유저 | **차단** |
 
@@ -88,7 +88,6 @@ main 머지    → prod 배포   → 출시 빌드가 실제 유저에게 서비
 | `deploy/compose.yaml` | 부모 — redis/server 공통 정의, 공통 env, 네트워크/볼륨 (**DB 미포함**) |
 | `deploy/compose.prod.yaml` | prod override — `:latest`, 포트 80, `Production`, 외부 관리형 DB connstring |
 | `deploy/compose.stage.yaml` | stage override — `:stage`, 포트 80, `Staging`, **DB 컨테이너 추가** |
-| `deploy/compose.dev.yaml` | 로컬 전용 — 소스 빌드 + 핫 리로드 + 자체 DB (base와 별개) |
 
 DB는 환경마다 위치가 달라 base에 두지 않는다. prod는 connstring을 외부에서 주입하고, stage는 override에서 postgres 컨테이너를 직접 올린다.
 
@@ -106,7 +105,7 @@ docker compose -f compose.yaml -f compose.stage.yaml --env-file .env up -d  # st
 
 > prod는 학교 서버(GSM) 포트포워딩(내부 80 → 외부 25139)에 맞춰 호스트 포트를 80으로 둔다. 호스트 포트는 반드시 외부로 포워딩되는 내부 포트와 일치해야 외부 접속이 된다.
 
-prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다. (`dev.dockerfile`은 핫 리로드용 로컬 전용)
+prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다.
 
 ## 필요한 GitHub Secrets
 
