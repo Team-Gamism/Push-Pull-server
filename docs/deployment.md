@@ -101,7 +101,7 @@ docker compose -f compose.yaml -f compose.stage.yaml --env-file .env up -d  # st
 
 | 환경 | 이미지 태그 | 호스트 포트 | 외부 접속 |
 |---|---|---|---|
-| stage | `seanyee1227/pushandpull-server:stage` | (서버 포워딩에 맞춰 지정) | — |
+| stage | `seanyee1227/pushandpull-server:stage` | 80 | `ssh.gsmsv.site:25144` (HTTP 포워딩 확인 필요) |
 | prod | `seanyee1227/pushandpull-server:latest` | 80 | `ssh.gsmsv.site:25139` |
 
 > prod는 학교 서버(GSM) 포트포워딩(내부 80 → 외부 25139)에 맞춰 호스트 포트를 80으로 둔다. 호스트 포트는 반드시 외부로 포워딩되는 내부 포트와 일치해야 외부 접속이 된다.
@@ -113,18 +113,19 @@ prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다. (`dev.dockerfile`은
 ### 공통
 - `DOCKER_USERNAME`, `DOCKER_PASSWORD`
 - `DISCORD_WEBHOOK`
+- `STEAM_WEB_API_KEY`, `STEAM_APP_ID` — prod·stage 공용
 
 ### prod (`pushandpull-prod-cd.yml`)
 - `SSH_HOST`, `SSH_USERNAME`, `SSH_PORT`, `SSH_PRIVATE_KEY`
 - `SSH_FINGERPRINT` — 서버 호스트 키 SHA256 지문 (MITM 방지)
 - `DB_CONNECTION_STRING` — 외부 관리형 Postgres 연결 문자열
-- `STEAM_WEB_API_KEY`, `STEAM_APP_ID`
 
 ### stage (`pushandpull-stage-cd.yml`)
 - `STAGE_SSH_HOST`, `STAGE_SSH_USERNAME`, `STAGE_SSH_PORT`, `STAGE_SSH_PRIVATE_KEY`
 - `STAGE_SSH_FINGERPRINT` — 서버 호스트 키 SHA256 지문 (MITM 방지)
 - `STAGE_POSTGRES_DB`, `STAGE_POSTGRES_USER`, `STAGE_POSTGRES_PASSWORD` — in-compose DB 컨테이너 자격증명
-- `STAGE_STEAM_WEB_API_KEY`, `STAGE_STEAM_APP_ID`
+
+> Steam 키(`STEAM_WEB_API_KEY`, `STEAM_APP_ID`)는 prod·stage 공용이라 공통 섹션에서 한 번만 등록한다.
 
 > Redis는 내부 컨테이너(고정 주소)라 시크릿이 없다.
 
