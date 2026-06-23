@@ -58,7 +58,7 @@ jobs:
               "${{ secrets.STAGE_POSTGRES_DB }}" \
               "${{ secrets.STAGE_POSTGRES_USER }}" \
               "${{ secrets.STAGE_POSTGRES_PASSWORD }}" \
-              "${{ secrets.STEAM_WEB_API_KEY }}" \
+              "${{ secrets.STEAM_API_KEY }}" \
               "${{ secrets.STEAM_APP_ID }}" \
               > ~/deploy/.env
 

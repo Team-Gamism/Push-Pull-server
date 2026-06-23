@@ -114,7 +114,7 @@ prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다.
 ### 공통
 - `DOCKER_USERNAME`, `DOCKER_PASSWORD`
 - `DISCORD_WEBHOOK`
-- `STEAM_WEB_API_KEY`, `STEAM_APP_ID` — prod·stage 공용
+- `STEAM_API_KEY`, `STEAM_APP_ID` — prod·stage 공용
 
 ### prod (`pushandpull-prod-cd.yml`)
 - `SSH_HOST`, `SSH_USERNAME`, `SSH_PORT`, `SSH_PRIVATE_KEY`
@@ -126,7 +126,7 @@ prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다.
 - `STAGE_SSH_FINGERPRINT` — 서버 호스트 키 SHA256 지문 (MITM 방지)
 - `STAGE_POSTGRES_DB`, `STAGE_POSTGRES_USER`, `STAGE_POSTGRES_PASSWORD` — in-compose DB 컨테이너 자격증명
 
-> Steam 키(`STEAM_WEB_API_KEY`, `STEAM_APP_ID`)는 prod·stage 공용이라 공통 섹션에서 한 번만 등록한다.
+> Steam 키(`STEAM_API_KEY`, `STEAM_APP_ID`)는 prod·stage 공용이라 공통 섹션에서 한 번만 등록한다.
 
 > Redis는 내부 컨테이너(고정 주소)라 시크릿이 없다.
 
