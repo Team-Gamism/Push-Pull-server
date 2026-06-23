@@ -21,6 +21,9 @@ services:
 
   pushandpull-redis:
     container_name: pushandpull-stage-redis
+    depends_on:
+      pushandpull-db:
+        condition: service_healthy
 
   pushandpull-server:
     image: seanyee1227/pushandpull-server:stage

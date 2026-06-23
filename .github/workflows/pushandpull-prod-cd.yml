@@ -96,6 +96,25 @@ jobs:
               > ~/deploy/.env
 
             docker compose -f ~/deploy/compose.yaml -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env pull
+
+            # 외부 DB 인스턴스가 받을 준비가 됐는지 확인 후 기동 (db -> server)
+            DB_HOST=$(echo "${{ secrets.DB_CONNECTION_STRING }}" | sed -n 's/.*[Hh]ost=\([^;]*\).*/\1/p')
+            DB_PORT=$(echo "${{ secrets.DB_CONNECTION_STRING }}" | sed -n 's/.*[Pp]ort=\([^;]*\).*/\1/p')
+            DB_PORT=${DB_PORT:-5432}
+            echo "Checking DB reachability at ${DB_HOST}:${DB_PORT}..."
+            for i in $(seq 1 30); do
+              if nc -z "$DB_HOST" "$DB_PORT" 2>/dev/null; then
+                echo "DB is reachable."
+                break
+              fi
+              if [ "$i" = "30" ]; then
+                echo "DB unreachable after 30 attempts. Aborting deploy."
+                exit 1
+              fi
+              echo "waiting for DB... ($i/30)"
+              sleep 2
+            done
+
             docker compose -f ~/deploy/compose.yaml -f ~/deploy/compose.prod.yaml --env-file ~/deploy/.env up -d
 
             sleep 5
