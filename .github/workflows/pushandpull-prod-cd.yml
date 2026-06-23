@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.claude/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
