@@ -19,7 +19,26 @@ stage와 prod는 **DB / Redis / 시크릿을 반드시 분리**한다. stage에�
 | 환경 | PostgreSQL | 비고 |
 |---|---|---|
 | stage | compose 내 컨테이너(`pushandpull-stage-db`) | 테스트 데이터, 날아가도 무방 |
-| prod | **외부 관리형 DB** | 연결 문자열(`DB_CONNECTION_STRING`)만 주입. 백업·내구성·독립 운영 |
+| prod | **별도 DB 인스턴스** | 다른 학교 서버 인스턴스에서 `compose.db.yaml`로 단독 운영. 앱은 `DB_CONNECTION_STRING`으로 원격 연결 |
+
+### prod DB 인스턴스 (`compose.db.yaml`)
+
+prod의 Postgres는 앱과 분리된 별도 학교 서버 인스턴스에서 돌린다. 학교 SVC 포워딩(내부 10000 → 외부 `ssh.gsmsv.site:23143`)에 맞춰 호스트 포트 10000에 바인딩한다.
+
+```bash
+# DB 인스턴스에서 (최초 1회)
+docker volume create pushandpull-prod-postgres-data
+printf 'POSTGRES_DB=%s\nPOSTGRES_USER=%s\nPOSTGRES_PASSWORD=%s\n' '<db>' '<user>' '<강력한_비밀번호>' > .env
+docker compose -f compose.db.yaml --env-file .env up -d
+```
+
+prod 앱의 `DB_CONNECTION_STRING`은 이 인스턴스를 가리킨다:
+
+```
+Host=ssh.gsmsv.site;Port=23143;Database=<db>;Username=<user>;Password=<비밀번호>
+```
+
+> ⚠️ DB가 공개 포워딩으로 노출되므로 **강력한 비밀번호 필수**. 포워딩 포트는 0.0.0.0/0으로 열리니 IP 제한이 어렵다. 가능하면 SSH 터널 등 추가 보호를 검토한다.
 
 Redis는 stage/prod 모두 compose 내 컨테이너로 띄우고 내부 네트워크로만 접근한다(고정 주소 `pushandpull-redis:6379`, 시크릿 불필요).
 
@@ -80,10 +99,12 @@ docker compose -f compose.yaml -f compose.prod.yaml --env-file .env up -d   # pr
 docker compose -f compose.yaml -f compose.stage.yaml --env-file .env up -d  # stage
 ```
 
-| 환경 | 이미지 태그 | 호스트 포트 |
-|---|---|---|
-| stage | `seanyee1227/pushandpull-server:stage` | 21755 |
-| prod | `seanyee1227/pushandpull-server:latest` | 21754 |
+| 환경 | 이미지 태그 | 호스트 포트 | 외부 접속 |
+|---|---|---|---|
+| stage | `seanyee1227/pushandpull-server:stage` | (서버 포워딩에 맞춰 지정) | — |
+| prod | `seanyee1227/pushandpull-server:latest` | 80 | `ssh.gsmsv.site:25139` |
+
+> prod는 학교 서버(GSM) 포트포워딩(내부 80 → 외부 25139)에 맞춰 호스트 포트를 80으로 둔다. 호스트 포트는 반드시 외부로 포워딩되는 내부 포트와 일치해야 외부 접속이 된다.
 
 prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다. (`dev.dockerfile`은 핫 리로드용 로컬 전용)
 
