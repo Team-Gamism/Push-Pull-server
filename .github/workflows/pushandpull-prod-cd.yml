@@ -92,7 +92,7 @@ jobs:
 
             printf 'DB_CONNECTION_STRING=%s\nSTEAM_WEB_API_KEY=%s\nSTEAM_APP_ID=%s\n' \
               "${{ secrets.DB_CONNECTION_STRING }}" \
-              "${{ secrets.STEAM_WEB_API_KEY }}" \
+              "${{ secrets.STEAM_API_KEY }}" \
               "${{ secrets.STEAM_APP_ID }}" \
               > ~/deploy/.env
 
