@@ -55,5 +55,16 @@ public class StaleRoomCleanupServiceTests
                 r => r.CloseStaleRoomsAsync(expectedCutoff, It.IsAny<CancellationToken>()),
                 Times.Once);
         }
+
+        [Fact]
+        public async Task It_FreesGuestSlotsStaleSinceTheHeartbeatTimeout()
+        {
+            await _sut.SweepOnceAsync(CancellationToken.None);
+
+            var expectedCutoff = Now.AddSeconds(-HeartbeatTimeoutSeconds);
+            _roomRepositoryMock.Verify(
+                r => r.FreeStaleGuestsAsync(expectedCutoff, It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
     }
 }

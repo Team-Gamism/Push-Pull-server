@@ -29,8 +29,8 @@ public class HeartbeatRoomService : IHeartbeatRoomService
             var room = await _roomRepository.GetAsync(request.RoomCode, ct);
             if (room == null)
                 throw new RoomNotFoundException(request.RoomCode);
-            if (room.HostSteamId != request.SteamId)
-                throw new NotRoomHostException(request.RoomCode);
+            if (room.HostSteamId != request.SteamId && room.GuestSteamId != request.SteamId)
+                throw new RoomNotParticipantException(request.RoomCode);
 
             throw new RoomNotActiveException(request.RoomCode);
         }

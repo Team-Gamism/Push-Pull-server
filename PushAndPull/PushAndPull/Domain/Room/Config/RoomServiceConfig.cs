@@ -24,6 +24,7 @@ public static class RoomServiceConfig
         services.AddScoped<ILeaveRoomService, LeaveRoomService>();
         services.AddScoped<ICloseRoomService, CloseRoomService>();
         services.AddScoped<IHeartbeatRoomService, HeartbeatRoomService>();
+        services.AddScoped<IReconnectRoomService, ReconnectRoomService>();
         services.AddHostedService<StaleRoomCleanupService>();
         return services;
     }
