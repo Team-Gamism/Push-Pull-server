@@ -57,8 +57,8 @@ jobs:
               "${{ secrets.STAGE_POSTGRES_DB }}" \
               "${{ secrets.STAGE_POSTGRES_USER }}" \
               "${{ secrets.STAGE_POSTGRES_PASSWORD }}" \
-              "${{ secrets.STAGE_STEAM_WEB_API_KEY }}" \
-              "${{ secrets.STAGE_STEAM_APP_ID }}" \
+              "${{ secrets.STEAM_WEB_API_KEY }}" \
+              "${{ secrets.STEAM_APP_ID }}" \
               > ~/deploy/.env
 
             docker volume create pushandpull-stage-postgres-data
