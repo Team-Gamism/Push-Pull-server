@@ -50,6 +50,8 @@ docker volume create pushandpull-stage-postgres-data
 
 (호스트 경로로 직접 관리하려면 `-v /data/postgres:/var/lib/postgresql/data` 같은 bind mount로 대체할 수도 있다.)
 
+> ⚠️ stage 서버의 연결 문자열은 `compose.stage.yaml`에서 `STAGE_POSTGRES_PASSWORD`로 조립되며 값은 싱글쿼트로 인용된다(`Password='...'`). 덕분에 `;`·`=`·공백은 안전하지만, **비밀번호에 싱글쿼트(`'`)는 넣지 말 것**. Npgsql 연결 문자열 파서가 인용을 조기에 닫아 인증에 실패한다(굳이 쓰려면 `''`로 이스케이프). prod는 `DB_CONNECTION_STRING`을 통째로 주입하므로 이 제약이 없다.
+
 ## Swagger 노출 정책
 
 `Program.cs`에서 환경에 따라 게이팅한다.
