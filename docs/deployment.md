@@ -95,15 +95,24 @@ prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다. (`dev.dockerfile`은
 
 ### prod (`pushandpull-prod-cd.yml`)
 - `SSH_HOST`, `SSH_USERNAME`, `SSH_PORT`, `SSH_PRIVATE_KEY`
+- `SSH_FINGERPRINT` — 서버 호스트 키 SHA256 지문 (MITM 방지)
 - `DB_CONNECTION_STRING` — 외부 관리형 Postgres 연결 문자열
 - `STEAM_WEB_API_KEY`, `STEAM_APP_ID`
 
 ### stage (`pushandpull-stage-cd.yml`)
 - `STAGE_SSH_HOST`, `STAGE_SSH_USERNAME`, `STAGE_SSH_PORT`, `STAGE_SSH_PRIVATE_KEY`
+- `STAGE_SSH_FINGERPRINT` — 서버 호스트 키 SHA256 지문 (MITM 방지)
 - `STAGE_POSTGRES_DB`, `STAGE_POSTGRES_USER`, `STAGE_POSTGRES_PASSWORD` — in-compose DB 컨테이너 자격증명
 - `STAGE_STEAM_WEB_API_KEY`, `STAGE_STEAM_APP_ID`
 
 > Redis는 내부 컨테이너(고정 주소)라 시크릿이 없다.
+
+호스트 키 지문(`*_SSH_FINGERPRINT`)은 배포 대상 서버에서 아래로 얻는다:
+
+```bash
+ssh-keyscan -t ed25519 <host> | ssh-keygen -lf - | awk '{print $2}'
+# 예: SHA256:abc123...  (이 값 전체를 시크릿에 등록)
+```
 
 > stage 배포를 활성화하려면 위 `STAGE_*` 시크릿을 먼저 등록해야 한다.
 

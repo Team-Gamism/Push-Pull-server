@@ -31,23 +31,25 @@ jobs:
         run: docker push seanyee1227/pushandpull-server:stage
 
       - name: Copy Compose File to Server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.STAGE_SSH_HOST }}
           username: ${{ secrets.STAGE_SSH_USERNAME }}
           port: ${{ secrets.STAGE_SSH_PORT }}
           key: ${{ secrets.STAGE_SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.STAGE_SSH_FINGERPRINT }}
           source: "PushAndPull/deploy/compose.yaml,PushAndPull/deploy/compose.stage.yaml"
           target: "~/deploy/"
           strip_components: 2
 
       - name: Deploy via Docker Compose
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.STAGE_SSH_HOST }}
           username: ${{ secrets.STAGE_SSH_USERNAME }}
           port: ${{ secrets.STAGE_SSH_PORT }}
           key: ${{ secrets.STAGE_SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.STAGE_SSH_FINGERPRINT }}
           script: |
             mkdir -p ~/deploy
 
