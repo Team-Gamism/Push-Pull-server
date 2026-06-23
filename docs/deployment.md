@@ -130,10 +130,10 @@ prod/stage 모두 `deploy/prod.dockerfile`로 빌드한다.
 
 > Redis는 내부 컨테이너(고정 주소)라 시크릿이 없다.
 
-호스트 키 지문(`*_SSH_FINGERPRINT`)은 배포 대상 서버에서 아래로 얻는다:
+호스트 키 지문(`*_SSH_FINGERPRINT`)은 배포 대상 서버에서 아래로 얻는다. appleboy/scp-action·ssh-action(Go `x/crypto/ssh`)은 호스트 키 협상 시 ECDSA를 ED25519보다 우선하므로 **ECDSA 키 지문**을 등록해야 한다. ED25519 지문을 넣으면 `ssh: handshake failed: host key fingerprint mismatch`로 실패한다.
 
 ```bash
-ssh-keyscan -t ed25519 <host> | ssh-keygen -lf - | awk '{print $2}'
+ssh-keyscan -p <port> -t ecdsa <host> | ssh-keygen -lf - | awk '{print $2}'
 # 예: SHA256:abc123...  (이 값 전체를 시크릿에 등록)
 ```
 
