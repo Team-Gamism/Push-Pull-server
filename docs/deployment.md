@@ -86,8 +86,8 @@ main 머지    → prod 배포   → 출시 빌드가 실제 유저에게 서비
 | 파일 | 역할 |
 |---|---|
 | `deploy/compose.yaml` | 부모 — redis/server 공통 정의, 공통 env, 네트워크/볼륨 (**DB 미포함**) |
-| `deploy/compose.prod.yaml` | prod override — `:latest`, 포트 21754, `Production`, 외부 관리형 DB connstring |
-| `deploy/compose.stage.yaml` | stage override — `:stage`, 포트 21755, `Staging`, **DB 컨테이너 추가** |
+| `deploy/compose.prod.yaml` | prod override — `:latest`, 포트 80, `Production`, 외부 관리형 DB connstring |
+| `deploy/compose.stage.yaml` | stage override — `:stage`, 포트 80, `Staging`, **DB 컨테이너 추가** |
 | `deploy/compose.dev.yaml` | 로컬 전용 — 소스 빌드 + 핫 리로드 + 자체 DB (base와 별개) |
 
 DB는 환경마다 위치가 달라 base에 두지 않는다. prod는 connstring을 외부에서 주입하고, stage는 override에서 postgres 컨테이너를 직접 올린다.
