@@ -13,6 +13,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddGamismSdk(options =>
 {
     options.Swagger.Title = "Push & Pull API";
+    options.Swagger.Enabled = !builder.Environment.IsProduction();
     options.Logging.NotLoggingUrls = ["/swagger/**", "/health"];
     options.Response.NotWrappingUrls = ["/swagger/**", "/health"];
 });
