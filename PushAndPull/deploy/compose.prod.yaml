@@ -7,7 +7,7 @@ services:
   pushandpull-server:
     container_name: pushandpull-server
     ports:
-      - "21754:80"
+      - "80:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__Default=${DB_CONNECTION_STRING}
