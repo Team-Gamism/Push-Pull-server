@@ -34,16 +34,11 @@ Read `references/labels.md` and select 1–2 appropriate labels based on the nat
 - No emojis
 - Max 2500 characters
 
-## Step 4 — Write Body & Show Preview
+## Step 4 — Write Body, Show Preview & Select Title
 
-Write the body to `PR_BODY.md`, then display:
+Write the body to `PR_BODY.md`, then display the labels and body preview:
 
 ```
-## 추천 PR 제목
-1. [title1]
-2. [title2]
-3. [title3] ← 추천
-
 ## 선택된 라벨
 - label1, label2
 
@@ -51,7 +46,9 @@ Write the body to `PR_BODY.md`, then display:
 [body content]
 ```
 
-Ask the user to confirm which title to use. If no answer is given, proceed with the recommended (marked) title.
+Then use **AskUserQuestion** to let the user pick the title. Present the 3 generated
+options as selectable choices, with the recommended option listed first and its label
+suffixed with `(추천)`. If the user makes no selection, proceed with the recommended title.
 
 ## Step 5 — Create PR
 
