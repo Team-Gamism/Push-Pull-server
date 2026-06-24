@@ -28,7 +28,7 @@
 | `Microsoft.Extensions.Caching.StackExchangeRedis` | 9.0.3 | `/stackexchange/stackexchange.redis` |
 | `Dapper` | 2.1.66 | `/dotnet/docs` |
 | `BCrypt.Net-Next` | 4.0.3 | — (no Context7 entry) |
-| `Gamism.SDK.Extensions.AspNetCore` | 0.2.8 | — (no Context7 entry) |
+| `Gamism.SDK.Extensions.AspNetCore` | 0.3.2 | — (no Context7 entry) |
 | `xunit` | 2.9.2 | `/xunit/xunit.net` |
 | `Moq` | 4.20.72 | — (no Context7 entry) |
 
