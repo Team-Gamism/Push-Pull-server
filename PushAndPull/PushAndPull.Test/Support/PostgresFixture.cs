@@ -58,7 +58,13 @@ public abstract class RepositoryTestBase : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _transaction.DisposeAsync();
-        await Db.DisposeAsync();
+        if (_transaction is not null)
+        {
+            await _transaction.DisposeAsync();
+        }
+        if (Db is not null)
+        {
+            await Db.DisposeAsync();
+        }
     }
 }
