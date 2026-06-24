@@ -16,6 +16,8 @@ namespace PushAndPull.Test.Service.Auth;
 
 public class SteamCircuitBreakerTests
 {
+    private const string ResilienceCollection = "SteamResiliencePipeline";
+
     private static IConfiguration BuildConfig(int minimumThroughput = 2, int timeoutSeconds = 5)
         => new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -51,6 +53,11 @@ public class SteamCircuitBreakerTests
     private static HttpResponseMessage ServerError()
         => new(HttpStatusCode.InternalServerError);
 
+    // Classes that build the real HttpClient resilience pipeline share one collection so
+    // they never run in parallel. Concurrent first-time DataAnnotations validation of the
+    // pipeline's TimeSpan options ([Range(typeof(TimeSpan), ...)]) is not thread-safe and
+    // intermittently throws InvalidCastException (TimeSpan -> String).
+    [Collection(ResilienceCollection)]
     public class WhenFailuresBelowThreshold
     {
         [Fact]
@@ -70,6 +77,7 @@ public class SteamCircuitBreakerTests
         }
     }
 
+    [Collection(ResilienceCollection)]
     public class WhenFailureRatioExceeded
     {
         [Fact]
@@ -90,6 +98,7 @@ public class SteamCircuitBreakerTests
         }
     }
 
+    [Collection(ResilienceCollection)]
     public class WhenCircuitOpenAndBreakDurationElapsed
     {
         [Fact]
@@ -116,6 +125,7 @@ public class SteamCircuitBreakerTests
         }
     }
 
+    [Collection(ResilienceCollection)]
     public class WhenSteamApiHangs
     {
         [Fact]
