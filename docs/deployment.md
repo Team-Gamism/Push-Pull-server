@@ -102,7 +102,7 @@ docker compose -f compose.yaml -f compose.stage.yaml --env-file .env up -d  # st
 
 | 환경 | 이미지 태그 | 호스트 포트 | 외부 접속 |
 |---|---|---|---|
-| stage | `seanyee1227/pushandpull-server:stage` | 80 | `ssh.gsmsv.site:25144` (HTTP 포워딩 확인 필요) |
+| stage | `seanyee1227/pushandpull-server:stage` | 80 | `ssh.gsmsv.site:25144` |
 | prod | `seanyee1227/pushandpull-server:latest` | 80 | `ssh.gsmsv.site:25139` |
 
 > prod는 학교 서버(GSM) 포트포워딩(내부 80 → 외부 25139)에 맞춰 호스트 포트를 80으로 둔다. 호스트 포트는 반드시 외부로 포워딩되는 내부 포트와 일치해야 외부 접속이 된다.
