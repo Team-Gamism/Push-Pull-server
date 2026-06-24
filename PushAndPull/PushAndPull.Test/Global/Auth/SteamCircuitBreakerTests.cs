@@ -12,7 +12,7 @@ using PushAndPull.Domain.Auth.Exception;
 using PushAndPull.Global.Auth;
 using PushAndPull.Global.Filter;
 
-namespace PushAndPull.Test.Service.Auth;
+namespace PushAndPull.Test.Global.Auth;
 
 public class SteamCircuitBreakerTests
 {

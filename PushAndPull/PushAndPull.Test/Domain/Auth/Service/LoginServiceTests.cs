@@ -6,7 +6,7 @@ using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Domain.Auth.Service.Interface;
 using PushAndPull.Global.Auth;
 
-namespace PushAndPull.Test.Service.Auth;
+namespace PushAndPull.Test.Domain.Auth.Service;
 
 public class LoginServiceTests
 {

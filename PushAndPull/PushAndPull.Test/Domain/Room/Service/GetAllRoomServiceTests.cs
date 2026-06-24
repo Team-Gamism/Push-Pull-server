@@ -4,7 +4,7 @@ using PushAndPull.Domain.Room.Service;
 using PushAndPull.Domain.Room.Service.Interface;
 using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
-namespace Tests.Service.Room;
+namespace PushAndPull.Test.Domain.Room.Service;
 
 public class GetAllRoomServiceTests
 {
