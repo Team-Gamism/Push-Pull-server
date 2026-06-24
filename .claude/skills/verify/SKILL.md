@@ -8,7 +8,7 @@ Run this after changing C# code in the PushAndPull solution to confirm the chang
 ## Step 1 — Build (after any C# change)
 
 ```bash
-dotnet build PushAndPull/PushAndPull.sln --nologo
+dotnet build src/PushAndPull.sln --nologo
 ```
 
 Fix every build error before moving on. Do not report work as complete while the build is broken.
@@ -16,7 +16,7 @@ Fix every build error before moving on. Do not report work as complete while the
 ## Step 2 — Test (after behavior or test changes)
 
 ```bash
-dotnet test PushAndPull/PushAndPull.sln --nologo
+dotnet test src/PushAndPull.sln --nologo
 ```
 
 Required whenever you changed service behavior, entity invariants, auth/session logic, repository queries, or added/updated tests.

@@ -7,7 +7,7 @@ Use this skill whenever an entity or `IEntityTypeConfiguration` change requires 
 
 All commands run from the repository root. The API project doubles as the migrations and startup project:
 
-- Project / startup project: `PushAndPull/PushAndPull/PushAndPull.csproj`
+- Project / startup project: `src/PushAndPull/PushAndPull.csproj`
 - Migrations live in that project's `Migrations/` folder (the default output dir — do not override it).
 - `migrations add` does **not** connect to a database, so no `DB_CONNECTION_STRING` is needed to generate.
 
@@ -16,7 +16,7 @@ All commands run from the repository root. The API project doubles as the migrat
 A migration is generated from the compiled model, so the solution must build.
 
 ```bash
-dotnet build PushAndPull/PushAndPull.sln --nologo
+dotnet build src/PushAndPull.sln --nologo
 ```
 
 Fix any build errors before continuing.
@@ -27,8 +27,8 @@ Choose a descriptive PascalCase name that reflects the schema change (e.g. `AddG
 
 ```bash
 dotnet ef migrations add <PascalCaseName> \
-  --project PushAndPull/PushAndPull/PushAndPull.csproj \
-  --startup-project PushAndPull/PushAndPull/PushAndPull.csproj
+  --project src/PushAndPull/PushAndPull.csproj \
+  --startup-project src/PushAndPull/PushAndPull.csproj
 ```
 
 This creates `Migrations/<timestamp>_<PascalCaseName>.cs`, its `.Designer.cs`, and updates `AppDbContextModelSnapshot.cs`.
@@ -45,8 +45,8 @@ Open `Migrations/<timestamp>_<PascalCaseName>.cs` and confirm `Up`/`Down` contai
 Per the project verification rules, after adding the migration:
 
 ```bash
-dotnet build PushAndPull/PushAndPull.sln --nologo
-dotnet test PushAndPull/PushAndPull.sln --nologo
+dotnet build src/PushAndPull.sln --nologo
+dotnet test src/PushAndPull.sln --nologo
 ```
 
 ## If the migration is wrong — remove and redo
@@ -55,8 +55,8 @@ Only safe when the migration has **not** been committed/shared or applied to any
 
 ```bash
 dotnet ef migrations remove \
-  --project PushAndPull/PushAndPull/PushAndPull.csproj \
-  --startup-project PushAndPull/PushAndPull/PushAndPull.csproj
+  --project src/PushAndPull/PushAndPull.csproj \
+  --startup-project src/PushAndPull/PushAndPull.csproj
 ```
 
 Then adjust the entity/config and repeat from Step 1. For a schema change on top of an **already-committed** migration, add a new migration instead of editing the old one.
