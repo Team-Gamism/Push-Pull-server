@@ -1,6 +1,6 @@
 ---
 paths:
-  - "PushAndPull/Domain/**/*.cs"
+  - "src/PushAndPull/Domain/**/*.cs"
 ---
 
 # Domain Pattern Rules

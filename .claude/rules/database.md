@@ -1,9 +1,9 @@
 ---
 paths:
-  - "PushAndPull/Domain/**/Entity/**/*.cs"
-  - "PushAndPull/Domain/**/Repository/**/*.cs"
-  - "PushAndPull/Global/Infrastructure/**/*.cs"
-  - "PushAndPull/Migrations/**/*.cs"
+  - "src/PushAndPull/Domain/**/Entity/**/*.cs"
+  - "src/PushAndPull/Domain/**/Repository/**/*.cs"
+  - "src/PushAndPull/Global/Infrastructure/**/*.cs"
+  - "src/PushAndPull/Migrations/**/*.cs"
 ---
 
 # Database Rules

@@ -51,7 +51,7 @@ jobs:
     if: always() && (needs.validate-title.result == 'success' || needs.validate-title.result == 'skipped')
 
     env:
-      SOLUTION: PushAndPull/PushAndPull.sln
+      SOLUTION: src/PushAndPull.sln
       DOTNET_VERSION: 9.0.x
 
     steps:

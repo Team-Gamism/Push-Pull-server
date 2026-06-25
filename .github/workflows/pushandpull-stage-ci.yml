@@ -50,7 +50,7 @@ jobs:
       && (github.event.action != 'edited' || github.event.changes.base != null)
 
     env:
-      SOLUTION: PushAndPull/PushAndPull.sln
+      SOLUTION: src/PushAndPull.sln
       DOTNET_VERSION: 9.0.x
 
     steps:

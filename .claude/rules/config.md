@@ -1,9 +1,9 @@
 ---
 paths:
-  - "PushAndPull/appsettings*.json"
-  - "deploy/*.yaml"
-  - "deploy/*.dockerfile"
-  - "PushAndPull/Global/Config/**/*.cs"
+  - "src/PushAndPull/appsettings*.json"
+  - "src/deploy/*.yaml"
+  - "src/deploy/*.dockerfile"
+  - "src/PushAndPull/Global/Config/**/*.cs"
 ---
 
 # Configuration Rules

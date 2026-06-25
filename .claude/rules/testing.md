@@ -1,7 +1,7 @@
 ---
 paths:
-  - "PushAndPull.Test/**/*.cs"
-  - "PushAndPull/**/*.cs"
+  - "src/PushAndPull.Test/**/*.cs"
+  - "src/PushAndPull/**/*.cs"
 ---
 
 # Testing Rules

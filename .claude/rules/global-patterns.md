@@ -1,7 +1,7 @@
 ---
 paths:
-  - "PushAndPull/Global/**/*.cs"
-  - "PushAndPull/Domain/Auth/**/*.cs"
+  - "src/PushAndPull/Global/**/*.cs"
+  - "src/PushAndPull/Domain/Auth/**/*.cs"
 ---
 
 # Global Pattern Rules

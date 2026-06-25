@@ -10,7 +10,7 @@ on:
       - '.claude/**'
       - '.agent/**'
       - '.github/**'
-      - 'PushAndPull/PushAndPull.Test/**'
+      - 'src/PushAndPull.Test/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -67,8 +67,8 @@ jobs:
         run: |
           docker build \
             -t seanyee1227/pushandpull-server:latest \
-            -f PushAndPull/deploy/prod.dockerfile \
-            PushAndPull
+            -f src/deploy/prod.dockerfile \
+            src
 
       - name: Push Docker Image
         run: docker push seanyee1227/pushandpull-server:latest
@@ -81,7 +81,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          source: "PushAndPull/deploy/compose.yaml,PushAndPull/deploy/compose.prod.yaml"
+          source: "src/deploy/compose.yaml,src/deploy/compose.prod.yaml"
           target: "~/deploy/"
           strip_components: 2
 
