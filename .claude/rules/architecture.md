@@ -1,7 +1,7 @@
 ---
 paths:
-  - "PushAndPull/**/*.cs"
-  - "PushAndPull.Test/**/*.cs"
+  - "src/PushAndPull/**/*.cs"
+  - "src/PushAndPull.Test/**/*.cs"
 ---
 
 # Architecture Rules

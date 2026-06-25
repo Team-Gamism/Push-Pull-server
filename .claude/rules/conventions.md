@@ -1,7 +1,7 @@
 ---
 paths:
-  - "PushAndPull/**/*.cs"
-  - "PushAndPull/**/*.json"
+  - "src/PushAndPull/**/*.cs"
+  - "src/PushAndPull/**/*.json"
 ---
 
 # Project Conventions

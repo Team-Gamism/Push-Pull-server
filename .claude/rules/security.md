@@ -1,7 +1,7 @@
 ---
 paths:
-  - "PushAndPull/**/*.cs"
-  - "PushAndPull/appsettings*.json"
+  - "src/PushAndPull/**/*.cs"
+  - "src/PushAndPull/appsettings*.json"
   - "deploy/*.yaml"
 ---
 
