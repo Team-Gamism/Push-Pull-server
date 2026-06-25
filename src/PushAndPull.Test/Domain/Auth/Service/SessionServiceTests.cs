@@ -3,7 +3,7 @@ using PushAndPull.Domain.Auth.Entity;
 using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Global.Infrastructure.Cache;
 
-namespace PushAndPull.Test.Service.Auth;
+namespace PushAndPull.Test.Domain.Auth.Service;
 
 public class SessionServiceTests
 {

@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using PushAndPull.Global.Config;
 
-namespace Tests.Global.Config;
+namespace PushAndPull.Test.Global.Config;
 
 public class RateLimitConfigTests
 {

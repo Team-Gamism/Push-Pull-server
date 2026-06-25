@@ -2,7 +2,7 @@ using Moq;
 using PushAndPull.Domain.Auth.Service;
 using PushAndPull.Domain.Auth.Service.Interface;
 
-namespace PushAndPull.Test.Service.Auth;
+namespace PushAndPull.Test.Domain.Auth.Service;
 
 public class LogoutServiceTests
 {

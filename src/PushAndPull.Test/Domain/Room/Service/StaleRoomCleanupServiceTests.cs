@@ -6,7 +6,7 @@ using PushAndPull.Domain.Room.Config;
 using PushAndPull.Domain.Room.Repository.Interface;
 using PushAndPull.Domain.Room.Service;
 
-namespace Tests.Service.Room;
+namespace PushAndPull.Test.Domain.Room.Service;
 
 public class StaleRoomCleanupServiceTests
 {
