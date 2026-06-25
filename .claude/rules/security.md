@@ -2,7 +2,7 @@
 paths:
   - "src/PushAndPull/**/*.cs"
   - "src/PushAndPull/appsettings*.json"
-  - "deploy/*.yaml"
+  - "src/deploy/*.yaml"
 ---
 
 # Security Rules

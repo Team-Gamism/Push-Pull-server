@@ -1,8 +1,8 @@
 ---
 paths:
   - "src/PushAndPull/appsettings*.json"
-  - "deploy/*.yaml"
-  - "deploy/*.dockerfile"
+  - "src/deploy/*.yaml"
+  - "src/deploy/*.dockerfile"
   - "src/PushAndPull/Global/Config/**/*.cs"
 ---
 
