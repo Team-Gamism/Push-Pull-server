@@ -6,7 +6,7 @@ using PushAndPull.Domain.Room.Service.Interface;
 using PushAndPull.Global.Service;
 using EntityRoom = PushAndPull.Domain.Room.Entity.Room;
 
-namespace Tests.Service.Room;
+namespace PushAndPull.Test.Domain.Room.Service;
 
 public class JoinRoomServiceTests
 {
