@@ -43,6 +43,12 @@ public class SteamAuthExceptionTests
         {
             Assert.Equal(HttpStatusCode.Forbidden, new PublisherBannedException(7UL).StatusCode);
         }
+
+        [Fact]
+        public void It_PreservesTheSteamId()
+        {
+            Assert.Equal(7UL, new PublisherBannedException(7UL).SteamId);
+        }
     }
 
     public class WhenAFamilySharingNotAllowedExceptionIsCreated
@@ -51,6 +57,12 @@ public class SteamAuthExceptionTests
         public void It_MapsToForbidden()
         {
             Assert.Equal(HttpStatusCode.Forbidden, new FamilySharingNotAllowedException(7UL).StatusCode);
+        }
+
+        [Fact]
+        public void It_PreservesTheSteamId()
+        {
+            Assert.Equal(7UL, new FamilySharingNotAllowedException(7UL).SteamId);
         }
     }
 
