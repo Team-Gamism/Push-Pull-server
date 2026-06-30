@@ -22,8 +22,7 @@ public class SteamCircuitBreakerTests
     private static IConfiguration BuildConfig(int minimumThroughput = 2, int timeoutSeconds = 5)
         => new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Steam:WebApiKey"] = "test-key-name",
-            ["test-key-name"] = "test-api-key",
+            ["Steam:WebApiKey"] = "test-api-key",
             ["Steam:AppId"] = "480",
             ["Steam:CircuitBreaker:FailureRatio"] = "0.5",
             ["Steam:CircuitBreaker:SamplingDurationSeconds"] = "2",

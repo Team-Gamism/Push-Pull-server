@@ -24,10 +24,10 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
         )
     {
         _httpClient = httpClient;
-        var apiKeySecretName = configuration["Steam:WebApiKey"]
-                             ?? throw new ArgumentException("STEAM_API_KEY_SECRET_NAME_REQUIRED");
-        _apiKey = configuration[apiKeySecretName]
-                  ?? throw new ArgumentException("STEAM_API_KEY_NOT_FOUND_IN_KEY_VAULT");
+        var apiKey = configuration["Steam:WebApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new ArgumentException("STEAM_API_KEY_REQUIRED");
+        _apiKey = apiKey;
 
         if (!int.TryParse(configuration["Steam:AppId"], out _appId))
             throw new ArgumentException("APPID_REQUIRED");
