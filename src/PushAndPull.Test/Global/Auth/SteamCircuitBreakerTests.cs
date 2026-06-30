@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Logging;
 using PushAndPull.Domain.Auth.Config;
 using PushAndPull.Domain.Auth.Exception;
 using PushAndPull.Global.Auth;
@@ -150,9 +151,15 @@ public class SteamCircuitBreakerTests
         }
     }
 
-    public class WhenCircuitOpenExceptionIsThrown
+    public class WhenASteamApiExceptionIsThrown
     {
-        private readonly CircuitBreakerExceptionFilter _sut = new();
+        private readonly RecordingLogger<SteamApiExceptionFilter> _logger = new();
+        private readonly SteamApiExceptionFilter _sut;
+
+        public WhenASteamApiExceptionIsThrown()
+        {
+            _sut = new SteamApiExceptionFilter(_logger);
+        }
 
         private static ExceptionContext CreateContext(Exception ex)
         {
@@ -164,7 +171,7 @@ public class SteamCircuitBreakerTests
         }
 
         [Fact]
-        public void It_Returns503CommonApiResponse()
+        public void It_Returns503ForACircuitOpenException()
         {
             var context = CreateContext(
                 new SteamCircuitOpenException(new Exception("circuit open")));
@@ -177,6 +184,28 @@ public class SteamCircuitBreakerTests
         }
 
         [Fact]
+        public void It_Returns503ForAnySteamApiException()
+        {
+            var context = CreateContext(new SteamApiException("STEAM_API_TIMEOUT"));
+
+            _sut.OnException(context);
+
+            var result = Assert.IsType<ObjectResult>(context.Result);
+            Assert.Equal(StatusCodes.Status503ServiceUnavailable, result.StatusCode);
+            Assert.True(context.ExceptionHandled);
+        }
+
+        [Fact]
+        public void It_LogsTheFailureAsWarning()
+        {
+            var context = CreateContext(new SteamApiException("STEAM_API_TIMEOUT"));
+
+            _sut.OnException(context);
+
+            Assert.Contains(LogLevel.Warning, _logger.Entries);
+        }
+
+        [Fact]
         public void It_DoesNotHandleOtherExceptions()
         {
             var context = CreateContext(new InvalidOperationException("other"));
@@ -185,6 +214,25 @@ public class SteamCircuitBreakerTests
 
             Assert.Null(context.Result);
             Assert.False(context.ExceptionHandled);
+        }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        public List<LogLevel> Entries { get; } = [];
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter) => Entries.Add(logLevel);
+
+        private sealed class NullScope : IDisposable
+        {
+            public static readonly NullScope Instance = new();
+            public void Dispose() { }
         }
     }
 

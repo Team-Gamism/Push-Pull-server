@@ -6,12 +6,21 @@ using PushAndPull.Domain.Auth.Exception;
 
 namespace PushAndPull.Global.Filter;
 
-public class CircuitBreakerExceptionFilter : IExceptionFilter
+public class SteamApiExceptionFilter : IExceptionFilter
 {
+    private readonly ILogger<SteamApiExceptionFilter> _logger;
+
+    public SteamApiExceptionFilter(ILogger<SteamApiExceptionFilter> logger)
+    {
+        _logger = logger;
+    }
+
     public void OnException(ExceptionContext context)
     {
-        if (context.Exception is not SteamCircuitOpenException)
+        if (context.Exception is not SteamApiException ex)
             return;
+
+        _logger.LogWarning(ex, "Steam auth upstream failure");
 
         context.Result = new ObjectResult(
             CommonApiResponse.Error(

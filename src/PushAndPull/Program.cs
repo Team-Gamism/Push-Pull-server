@@ -9,7 +9,7 @@ using PushAndPull.Global.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
-    options.Filters.Add<CircuitBreakerExceptionFilter>());
+    options.Filters.Add<SteamApiExceptionFilter>());
 builder.Services.AddGamismSdk(options =>
 {
     options.Swagger.Title = "Push & Pull API";
