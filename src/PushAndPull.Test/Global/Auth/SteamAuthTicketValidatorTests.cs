@@ -16,8 +16,7 @@ public class SteamAuthTicketValidatorTests
     private static IConfiguration BuildConfig() =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Steam:WebApiKey"] = "key-name",
-            ["key-name"] = "secret-api-key",
+            ["Steam:WebApiKey"] = "secret-api-key",
             ["Steam:AppId"] = "480",
         }).Build();
 
@@ -181,28 +180,34 @@ public class SteamAuthTicketValidatorTests
         }
     }
 
+    public class WhenTheWebApiKeyIsConfigured
+    {
+        [Fact]
+        public void It_UsesTheWebApiKeyValueDirectly()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Steam:WebApiKey"] = "secret-api-key",
+                ["Steam:AppId"] = "480",
+            }).Build();
+
+            var ex = Record.Exception(() => new SteamAuthTicketValidator(
+                new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))), config));
+
+            Assert.Null(ex);
+        }
+    }
+
     public class WhenTheConfigurationIsInvalid
     {
         private static SteamAuthTicketValidator Build(IConfiguration config) =>
             new(new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))), config);
 
         [Fact]
-        public void It_ThrowsWhenTheWebApiKeyNameIsMissing()
+        public void It_ThrowsWhenTheWebApiKeyIsMissing()
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Steam:AppId"] = "480",
-            }).Build();
-
-            Assert.Throws<ArgumentException>(() => Build(config));
-        }
-
-        [Fact]
-        public void It_ThrowsWhenTheApiKeySecretIsNotFound()
-        {
-            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Steam:WebApiKey"] = "key-name",
                 ["Steam:AppId"] = "480",
             }).Build();
 
@@ -214,8 +219,7 @@ public class SteamAuthTicketValidatorTests
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Steam:WebApiKey"] = "key-name",
-                ["key-name"] = "secret-api-key",
+                ["Steam:WebApiKey"] = "secret-api-key",
                 ["Steam:AppId"] = "not-an-int",
             }).Build();
 
