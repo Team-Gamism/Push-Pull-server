@@ -69,9 +69,21 @@ public class SteamAuthExceptionTests
     public class WhenASteamApiExceptionIsCreated
     {
         [Fact]
-        public void It_IsNotAnExpectedException()
+        public void It_IsAnExpectedException()
         {
-            Assert.False(typeof(ExpectedException).IsAssignableFrom(typeof(SteamApiException)));
+            Assert.IsAssignableFrom<ExpectedException>(new SteamApiException("BOOM"));
+        }
+
+        [Fact]
+        public void It_MapsToServiceUnavailable()
+        {
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, new SteamApiException("BOOM").StatusCode);
+        }
+
+        [Fact]
+        public void It_PreservesTheUpstreamStatusCode()
+        {
+            Assert.Equal(502, new SteamApiException("BOOM", 502).UpstreamStatusCode);
         }
     }
 }

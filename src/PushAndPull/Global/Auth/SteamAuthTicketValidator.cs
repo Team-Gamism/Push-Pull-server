@@ -100,9 +100,10 @@ public class SteamAuthTicketValidator : IAuthTicketValidator
         if (steamResponse?.Response.Params == null)
         {
             var error = steamResponse?.Response.Error;
-            throw new SteamApiException(error != null
-                ? $"STEAM_ERROR [{error.ErrorCode}]: {error.ErrorDesc}"
-                : "INVALID_RESPONSE");
+            if (error != null)
+                throw new InvalidTicketException($"STEAM_ERROR [{error.ErrorCode}]: {error.ErrorDesc}");
+
+            throw new SteamApiException("INVALID_RESPONSE");
         }
 
         return steamResponse;

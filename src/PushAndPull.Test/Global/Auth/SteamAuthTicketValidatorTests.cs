@@ -67,11 +67,26 @@ public class SteamAuthTicketValidatorTests
             var sut = BuildValidator(_ => new HttpResponseMessage(HttpStatusCode.BadGateway));
 
             var ex = await Assert.ThrowsAsync<SteamApiException>(() => sut.ValidateAsync(Ticket));
-            Assert.Equal((int)HttpStatusCode.BadGateway, ex.StatusCode);
+            Assert.Equal((int)HttpStatusCode.BadGateway, ex.UpstreamStatusCode);
         }
     }
 
     public class WhenTheResponseContainsAnErrorInsteadOfParams
+    {
+        [Fact]
+        public async Task It_ThrowsInvalidTicketException()
+        {
+            var sut = BuildValidator(_ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = JsonContent.Create(new SteamAuthResponse(
+                    new SteamAuthResponseData(null, new SteamAuthResponseError(101, "Invalid ticket"))))
+            });
+
+            await Assert.ThrowsAsync<InvalidTicketException>(() => sut.ValidateAsync(Ticket));
+        }
+    }
+
+    public class WhenTheResponseHasNeitherParamsNorError
     {
         [Fact]
         public async Task It_ThrowsSteamApiException()
@@ -79,7 +94,7 @@ public class SteamAuthTicketValidatorTests
             var sut = BuildValidator(_ => new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = JsonContent.Create(new SteamAuthResponse(
-                    new SteamAuthResponseData(null, new SteamAuthResponseError(101, "Invalid ticket"))))
+                    new SteamAuthResponseData(null, null)))
             });
 
             await Assert.ThrowsAsync<SteamApiException>(() => sut.ValidateAsync(Ticket));
