@@ -191,10 +191,8 @@ public class SteamAuthTicketValidatorTests
                 ["Steam:AppId"] = "480",
             }).Build();
 
-            var ex = Record.Exception(() => new SteamAuthTicketValidator(
-                new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))), config));
-
-            Assert.Null(ex);
+            _ = new SteamAuthTicketValidator(
+                new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))), config);
         }
     }
 
