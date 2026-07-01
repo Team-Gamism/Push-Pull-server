@@ -24,6 +24,7 @@ builder.Services.AddGlobalServices();
 builder.Services.AddAuthServices(builder.Configuration);
 builder.Services.AddRoomServices(builder.Configuration);
 builder.Services.AddRateLimit();
+builder.Services.AddForwardedHeaders(builder.Configuration);
 
 var app = builder.Build();
 
@@ -33,6 +34,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
 }
 
+app.UseForwardedHeaders();
 app.UseRateLimiter();
 app.UseGamismSdk();
 app.MapControllers();

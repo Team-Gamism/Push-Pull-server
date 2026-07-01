@@ -11,3 +11,4 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__Default=${DB_CONNECTION_STRING}
+      - ReverseProxy__KnownProxyIp=${CADDY_PROXY_IP}

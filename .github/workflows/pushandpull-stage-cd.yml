@@ -61,12 +61,13 @@ jobs:
             set -euo pipefail
             mkdir -p ~/deploy
 
-            printf 'POSTGRES_DB=%s\nPOSTGRES_USER=%s\nPOSTGRES_PASSWORD=%s\nSTEAM_WEB_API_KEY=%s\nSTEAM_APP_ID=%s\n' \
+            printf 'POSTGRES_DB=%s\nPOSTGRES_USER=%s\nPOSTGRES_PASSWORD=%s\nSTEAM_WEB_API_KEY=%s\nSTEAM_APP_ID=%s\nCADDY_PROXY_IP=%s\n' \
               "${{ secrets.STAGE_POSTGRES_DB }}" \
               "${{ secrets.STAGE_POSTGRES_USER }}" \
               "${{ secrets.STAGE_POSTGRES_PASSWORD }}" \
               "${{ secrets.STEAM_API_KEY }}" \
               "${{ secrets.STEAM_APP_ID }}" \
+              "${{ secrets.CADDY_PROXY_IP }}" \
               > ~/deploy/.env
 
             docker volume create pushandpull-stage-postgres-data
