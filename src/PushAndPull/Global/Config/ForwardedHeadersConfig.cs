@@ -13,10 +13,15 @@ public static class ForwardedHeadersConfig
 
         services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
             if (!string.IsNullOrWhiteSpace(knownProxyIp))
-                options.KnownProxies.Add(IPAddress.Parse(knownProxyIp));
+            {
+                if (!IPAddress.TryParse(knownProxyIp, out var proxyIp))
+                    throw new InvalidOperationException($"ReverseProxy:KnownProxyIp is not a valid IP address: {knownProxyIp}");
+
+                options.KnownProxies.Add(proxyIp);
+            }
         });
 
         return services;
