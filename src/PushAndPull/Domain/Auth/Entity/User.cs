@@ -11,7 +11,7 @@ public class User
 
     public User(ulong steamId, string nickname)
     {
-        if (string.IsNullOrWhiteSpace(nickname))
+        if (string.IsNullOrWhiteSpace(nickname) || nickname.Length > 32)
             throw new ArgumentException("INVALID_NICKNAME");
 
         SteamId = steamId;
