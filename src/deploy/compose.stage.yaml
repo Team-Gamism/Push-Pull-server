@@ -26,7 +26,7 @@ services:
     image: seanyee1227/pushandpull-server:stage
     container_name: pushandpull-stage-server
     ports:
-      - "80:80"
+      - "80:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Staging
       - ConnectionStrings__Default=Host=pushandpull-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password='${POSTGRES_PASSWORD}'

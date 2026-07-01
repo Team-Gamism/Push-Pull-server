@@ -10,7 +10,7 @@ services:
   pushandpull-server:
     image: seanyee1227/pushandpull-server:latest
     environment:
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
       - Redis__ConnectionString=pushandpull-redis:6379,abortConnect=false
       - Steam__WebApiKey=${STEAM_WEB_API_KEY}
       - Steam__AppId=${STEAM_APP_ID}
