@@ -1,0 +1,29 @@
+services:
+  pushandpull-redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - pushandpull-network
+    restart: unless-stopped
+
+  pushandpull-server:
+    image: seanyee1227/pushandpull-server:latest
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - Redis__ConnectionString=pushandpull-redis:6379,abortConnect=false
+      - Steam__WebApiKey=${STEAM_WEB_API_KEY}
+      - Steam__AppId=${STEAM_APP_ID}
+    depends_on:
+      pushandpull-redis:
+        condition: service_started
+    networks:
+      - pushandpull-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  pushandpull-network:
+    driver: bridge

@@ -1,0 +1,14 @@
+name: pushandpull-prod
+
+services:
+  pushandpull-redis:
+    container_name: pushandpull-redis
+
+  pushandpull-server:
+    container_name: pushandpull-server
+    ports:
+      - "80:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=${DB_CONNECTION_STRING}
+      - ReverseProxy__KnownProxyIp=${CADDY_PROXY_IP}

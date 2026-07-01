@@ -1,0 +1,25 @@
+﻿# Claude Code
+PR_BODY.md
+specs/
+.claude/worktrees/
+
+# Local environment secrets
+.env
+
+# .NET build output
+bin/
+obj/
+
+# NuGet
+project.assets.json
+project.nuget.cache
+*.nuget.*
+
+# JetBrains IDE (Rider / IntelliJ)
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio user settings
+*.DotSettings.user

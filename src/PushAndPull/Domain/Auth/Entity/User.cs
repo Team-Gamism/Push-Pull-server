@@ -1,0 +1,22 @@
+namespace PushAndPull.Domain.Auth.Entity;
+
+public class User
+{
+    public ulong SteamId { get; private set; }
+    public string Nickname { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset LastLoginAt { get; private set; }
+
+    private User() { }
+
+    public User(ulong steamId, string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname) || nickname.Length > 32)
+            throw new ArgumentException("INVALID_NICKNAME");
+
+        SteamId = steamId;
+        Nickname = nickname;
+        CreatedAt = DateTimeOffset.UtcNow;
+        LastLoginAt = DateTimeOffset.UtcNow;
+    }
+}

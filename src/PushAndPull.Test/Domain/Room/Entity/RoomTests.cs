@@ -1,0 +1,70 @@
+using PushAndPull.Domain.Room.Entity;
+
+namespace PushAndPull.Test.Domain.Room.Entity;
+
+public class RoomTests
+{
+    public class WhenARoomIsClosed
+    {
+        private readonly PushAndPull.Domain.Room.Entity.Room _room;
+
+        public WhenARoomIsClosed()
+        {
+            _room = new PushAndPull.Domain.Room.Entity.Room("ROOM04", "Closing Room", 444UL, 76561198000000001UL, false, null);
+        }
+
+        [Fact]
+        public void It_ChangesStatusToClosed()
+        {
+            _room.Close();
+
+            Assert.Equal(RoomStatus.Closed, _room.Status);
+        }
+
+        [Fact]
+        public void It_SetsExpiresAtToNow()
+        {
+            var before = DateTimeOffset.UtcNow;
+
+            _room.Close();
+
+            Assert.NotNull(_room.ExpiresAt);
+            Assert.True(_room.ExpiresAt >= before);
+        }
+    }
+
+    public class WhenARoomIsCreated
+    {
+        [Fact]
+        public void It_StartsWithOnePlayer()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM05", "New Room", 555UL, 76561198000000001UL, false, null);
+
+            Assert.Equal(1, room.CurrentPlayers);
+        }
+
+        [Fact]
+        public void It_StartsWithActiveStatus()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM06", "Active Room", 666UL, 76561198000000001UL, false, null);
+
+            Assert.Equal(RoomStatus.Active, room.Status);
+        }
+
+        [Fact]
+        public void It_SetsMaxPlayerToTwo()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM07", "Two-Player Room", 777UL, 76561198000000001UL, false, null);
+
+            Assert.Equal(2, room.MaxPlayers);
+        }
+
+        [Fact]
+        public void It_SetsExpiresAtToNull()
+        {
+            var room = new PushAndPull.Domain.Room.Entity.Room("ROOM08", "Fresh Room", 888UL, 76561198000000001UL, false, null);
+
+            Assert.Null(room.ExpiresAt);
+        }
+    }
+}
