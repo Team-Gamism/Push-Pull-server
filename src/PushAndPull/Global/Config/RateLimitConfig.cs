@@ -38,6 +38,16 @@ public static class RateLimitConfig
                         Window = TimeSpan.FromMinutes(1)
                     }));
 
+            // 인증 없이 열려 있는 방 조회 엔드포인트의 열거/스크래핑을 제한한다.
+            options.AddPolicy("read_room", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetIpKey(httpContext),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 60,
+                        Window = TimeSpan.FromMinutes(1)
+                    }));
+
             options.OnRejected = async (context, token) =>
             {
                 context.HttpContext.Response.StatusCode = 429;
