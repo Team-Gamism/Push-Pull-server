@@ -72,6 +72,7 @@ public class RoomController : ControllerBase
     [ApiDoc("방 조회", "roomCode로 단일 방 정보를 조회한다.")]
     [ApiError(typeof(RoomNotFoundException), "방을 찾을 수 없습니다.")]
     [HttpGet("{roomCode}")]
+    [EnableRateLimiting("read_room")]
     public async Task<CommonApiResponse<GetRoomResponse>> GetRoom(
         [FromRoute] string roomCode,
         CancellationToken ct
@@ -84,6 +85,7 @@ public class RoomController : ControllerBase
 
     [ApiDoc("방 목록 조회", "페이지네이션으로 공개된 방 목록을 조회한다.")]
     [HttpGet("all")]
+    [EnableRateLimiting("read_room")]
     public async Task<CommonApiResponse<GetAllRoomResponse>> GetAllRoom(
         [FromQuery] int page = 1,
         [FromQuery] int size = 20,
